@@ -37,7 +37,7 @@ export default defineComponent({
   data() {
     return {
       inputVal: null,
-      uploadProgress: 50,
+      uploadProgress: 0,
       uploading: false,
       language: "",
       who: "",

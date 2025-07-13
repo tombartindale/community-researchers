@@ -222,7 +222,7 @@ export const transcribe = onObjectFinalized(async (event) => {
       // console.log(response);
 
       const [operation] = await speechClient.longRunningRecognize(request);
-      console.log("Transcription Started:", outputPath);
+      //   console.log("Transcription Started:", outputPath);
     } catch (error) {
       console.error("Error during transcription:", error);
       const folders = event.data.name.split("/");

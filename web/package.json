@@ -17,6 +17,8 @@
   "dependencies": {
     "@quasar/extras": "^1.16.4",
     "firebase": "^11.10.0",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "postcss-rtlcss": "^5.7.1",
     "pug": "^3.0.3",
     "pug-plain-loader": "^1.1.0",

@@ -13,19 +13,21 @@ q-page(padding)
           .row
             .col-auto
               q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
-            .col Transcribe audio
+            .col  Automatic audio transcription
           .row
             .col-auto
               q-icon(:name="getIcon(recording.status, 'coding')" color="green" size="16px") 
-            .col Code transcript
-          .row
-            .col-auto
-              q-icon(:name="getIcon(recording.status, 'reviewing')" color="green" size="16px") 
-            .col Review codes
+            .col 
+              router-link(:to="`/code/${recording.id}`" v-if="canCode(recording)") Code transcript
+              div(v-else) Code transcript
           .row
             .col-auto
               q-icon(:name="getIcon(recording.status, 'grouped')" color="green" size="16px") 
             .col Group codes
+          .row
+            .col-auto
+              q-icon(:name="getIcon(recording.status, 'reviewing')" color="green" size="16px") 
+            .col Review codes
         //- q-space
         //- q-separator(vertical)
         //- q-card-section(horizontal)
@@ -53,19 +55,27 @@ export default defineComponent({
     };
   },
   methods: {
-    getIcon(status) {
-      //TOOD:
-      switch (status) {
-        case "uploaded":
-          return "cloud_done";
-        case "transcribed":
-          return "text_snippet";
-        case "coded":
-          return "code";
-        case "grouped":
-          return "group_work";
-        default:
-          return "help";
+    canCode(recording) {
+      return !(
+        recording.status === "uploaded" || recording.status === "converted"
+      );
+    },
+    getIcon(status, step) {
+      console.log("getIcon", status, step);
+      if (status === "converted" || status === "uploaded") {
+        return "hourglass_empty";
+      }
+
+      if (step == "transcribing") {
+        if (status != "converted" && status != "uploaded") {
+          return "check";
+        }
+      }
+
+      if (step == "coding") {
+        if (status == "coded") {
+          return "check";
+        }
       }
     },
   },
