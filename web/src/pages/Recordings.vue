@@ -1,21 +1,37 @@
 <template lang="pug">
 q-page(padding).text-center
   .text-h4 Recordings
+  q-list(separator).text-left
+    q-item(v-for="record of records")
+      q-item-section
+        div {{record.who}} &middot; {{record.when}}
+      q-item-section(side)
+        q-btn(icon="download" dense flat @click="getRecording(record)" no-caps) Recording
+      q-item-section(side)
+        q-btn(icon="download" dense flat @click="getCoding(record)" no-caps) Coding
 
 </template>
 
 <script>
 import { defineComponent } from "vue";
 
-import { useCollection, useCurrentUser, useDocument } from "vuefire";
-import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
+import { useCollection, useCurrentUser } from "vuefire";
+import { db, storage } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 // import { ref, uploadBytesResumable } from "firebase/storage";
-import { doc, collection, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
+import {
+  // doc,
+  collection,
+  // updateDoc,
+  collectionGroup,
+} from "firebase/firestore"; // Importing dbRef for database operations
 
-import find from "lodash/find";
+import { ref, getDownloadURL } from "firebase/storage";
+import { openURL } from "quasar";
 
-const toggleElement = (arr, val) =>
-  arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
+// import find from "lodash/find";
+
+// const toggleElement = (arr, val) =>
+//   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
 
 // const user = useCurrentUser()
 
@@ -25,17 +41,15 @@ export default defineComponent({
   data() {
     return {};
   },
-  setup(props) {
+  setup() {
     const user = useCurrentUser();
 
-    const record = useDocument(
-      doc(db, `users/${user.value.email}/recordings/${props.id}`)
-    );
+    const records = useCollection(collectionGroup(db, `recordings`));
 
     const codeBook = useCollection(collection(db, `codebook`));
 
     // console.log("record", record);
-    return { user, record, codeBook };
+    return { user, records, codeBook };
   },
   // watch: {
   //   record: {
@@ -48,43 +62,36 @@ export default defineComponent({
   //   },
   // },
   methods: {
-    done() {
-      updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-        status: "coded",
-      });
-      this.$router.push("/");
-    },
-    isActiveCode(line, code) {
-      return line.codes?.includes(code.code);
-    },
-    addCode(line, code) {
-      console.log(line);
+    getRecording(record) {
+      // console.log(record);
+      getDownloadURL(ref(storage, record.filePath))
+        .then((url) => {
+          // `url` is the download URL for 'images/stars.jpg'
 
-      // console.log(`transcription.results.${line}.codes`);
-      if (!line.codes) {
-        line.codes = [];
-      }
+          // This can be downloaded directly:
+          // const xhr = new XMLHttpRequest();
+          // xhr.responseType = "blob";
+          // xhr.onload = () => {
+          //   const blob = xhr.response;
+          // };
+          // xhr.open("GET", url);
+          // xhr.send();
 
-      line.codes = toggleElement(line.codes, code.code);
+          console.log(url);
 
-      // line.codes.push(code.code);
-      updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-        transcription: this.record.transcription,
-      });
-      // console.log(line, code);
+          openURL(url);
+
+          // Or inserted into an <img> element
+          // const img = document.getElementById("myimg");
+          // img.setAttribute("src", url);
+        })
+        .catch((err) => {
+          // Handle any errors
+          console.log(err);
+        });
     },
-    getLineColor(line) {
-      //index of this code:
-      if (this.codeBook.length) {
-        if (line.codes && line.codes.length == 1) {
-          //find the color of the first code:
-          const col = find(this.codeBook, { code: line.codes[0] });
-          return col.color;
-        } else if (line.codes && line.codes.length > 1) {
-          return "grey";
-        }
-      }
-      return "transparent";
+    getCoding(record) {
+      console.log(record);
     },
   },
 });
