@@ -1,15 +1,18 @@
 <template lang="pug">
 q-layout.view
   q-header 
-    q-toolbar
+    q-toolbar.bg-white.text-primary
       q-btn(to="/" flat dense icon="home")
+      q-btn(to="/codebook" flat dense icon="book" v-if="user?.profile?.isEditor || user?.profile?.isAdmin")
+        q-tooltip Codebook
+      q-btn(to="/admin" flat dense icon="library_books" v-if="user?.profile?.isAdmin")
+        q-tooltip Admin
       q-space
-      span Community Researcher Dashboard ({{ user ? user.email : 'Not signed in' }})
+      span Community Researcher Dashboard &middot; {{ user ? user.email : 'Not signed in' }}
       q-space
       q-select(
         v-model="locale"
         :options="localeOptions"
-        dark
         borderless
         emit-value
         map-options
@@ -17,6 +20,7 @@ q-layout.view
       q-btn(@click="signOut()" flat dense v-if="user" icon="logout")
     q-separator
   q-page-container
+    //- div {{user}}
     router-view
 </template>
 
@@ -103,6 +107,7 @@ export default defineComponent({
           // and calling it with result:
           // getAdditionalUserInfo(result)
           // You can access the user's profile via:
+
           // getAdditionalUserInfo(result)?.profile
           // You can check if the user is new or existing:
           // getAdditionalUserInfo(result)?.isNewUser
