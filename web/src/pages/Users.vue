@@ -1,9 +1,9 @@
 <template lang="pug">
 q-page(padding).text-center
   .text-h4 Users
-  q-list(seperator).text-left
+  q-list(separator).text-left
     q-item
-      q-item-section Email
+      q-item-section.text-grey Email
       q-item-section(side) Admin
       q-item-section(side) Editor
     q-item(v-for="user of users")

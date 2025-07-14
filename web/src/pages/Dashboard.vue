@@ -6,6 +6,28 @@ q-page(padding)
           //- q-btn(to="/upload" color="primary" size="lg" no-caps) Upload New Recording
         //- div {{recordings}}
         .text-h4.q-mb-lg.q-mt-sm.text-center Your Research Tasks
+        .row.q-my-md.items-center
+          .col 
+            q-separator
+          .col-auto.q-px-md.text-caption.text-grey Planning Your research
+          .col 
+            q-separator
+        q-card(bordered flat).q-mb-md
+          q-card-section(horizontal).items-center
+            q-card-section(side)
+              q-checkbox(readonly size="lg" :model-value="hasResearchPlan()" color="black")
+            q-card-section 
+              .text-h6 Upload Your research plan
+              span(v-if="user.profile.researchPlanUploded").text-grey Research plan has been uploaded and is being reviewed
+            q-space
+            q-card-section
+              q-btn(to="/researchplan" flat icon-right="chevron_right" no-caps) Upload
+        .row.q-my-md.items-center
+          .col 
+            q-separator
+          .col-auto.q-px-md.text-caption.text-grey Collecting data
+          .col 
+            q-separator
         q-card(bordered flat).q-mb-md
           q-card-section(horizontal).items-center
             q-card-section(side)
@@ -19,7 +41,12 @@ q-page(padding)
                   //- q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
                 //- .col  Automatic audio transcription
               q-btn(to="/upload" flat icon-right="chevron_right" no-caps) Upload
-
+        .row.q-my-md.items-center
+          .col 
+            q-separator
+          .col-auto.q-px-md.text-caption.text-grey Gaining insights
+          .col 
+            q-separator
         q-card(v-for="recording in recordings" :key="recording.id" class="my-card" bordered flat).q-mb-md
           q-card-section(horizontal).items-center
             q-card-section(side)
@@ -27,7 +54,7 @@ q-page(padding)
               //- q-icon(:name="getIcon(recording.status, 'coding')" color="green" size="md") 
             q-card-section 
               .text-h6 Code transcript
-              .text-body1 {{ recording.who }} &middot; {{ recording.when }}
+              .text-body1.text-grey {{ recording.who }} &middot; {{ recording.when }}
             q-space
             q-card-section
               //- .row
@@ -43,6 +70,12 @@ q-page(padding)
             //-   q-btn(flat) Code
             //-   q-separator(vertical)
             //-   q-btn(flat) Group
+        .row.q-my-md.items-center
+          .col 
+            q-separator
+          .col-auto.q-px-md.text-caption.text-grey Summarising insights
+          .col 
+            q-separator
         q-card(bordered flat).q-mb-md
           q-card-section(horizontal).items-center
             q-card-section(side)
@@ -113,6 +146,9 @@ export default defineComponent({
     },
     isReviewed() {
       return this.userProfile.status == "reviewed";
+    },
+    hasResearchPlan() {
+      return this.user.profile.researchPlanReviewed || false;
     },
   },
   watch: {

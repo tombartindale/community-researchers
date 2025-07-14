@@ -1,6 +1,48 @@
 <template lang="pug">
 q-page(padding).text-center
   .text-h4 Codebook
+  //- div {{codeBook}}
+  //- div {{locale}}
+  q-list(separator).text-left
+    q-item
+      q-item-section.col-1.text-grey Color
+      q-item-section.col-2.text-grey Code
+      q-item-section.col-2.text-grey Name
+      q-item-section.text-grey Description
+    q-item(v-for="code of codeBook")
+      q-item-section.col-1
+        q-avatar(round :style="{'background-color':code.color}" size="2.5em")
+      q-item-section.col-2 {{code.code}}
+      q-item-section.col-2 
+        div(v-for="(n,l) of code.name") 
+          span.text-grey {{l}}&nbsp;
+          span {{n}} 
+      q-item-section
+        div(v-for="(n,l) of code.description") 
+          span.text-grey {{l}}&nbsp;
+          span {{n}} 
+    q-item
+      q-item-section.col-1
+        //- q-input(filled v-model="newCode.color" )
+        //-   template(v-slot:append)
+        //- div {{newCode.color}}
+        q-avatar(round :style="{'background-color':newCode.color}" size="2.5em")
+          q-icon(name="colorize" class="cursor-pointer" size="sm" color="grey")
+            q-popup-proxy(cover transition-show="scale" transition-hide="scale")
+              q-color(v-model="newCode.color")
+      q-item-section.col-2
+        q-input(filled v-model="newCode.code")
+      q-item-section.col-2
+        div(v-for="l of langs")
+          q-input(filled v-model="newCode.name[l]" :label="l")
+      q-item-section
+        .row
+          .col
+            div(v-for="l of langs")
+              q-input(filled v-model="newCode.description[l]" :label="l")
+          q-btn(icon="add" flat @click="addCode")
+      
+
     
 
 </template>
@@ -8,15 +50,17 @@ q-page(padding).text-center
 <script>
 import { defineComponent } from "vue";
 
-import { useCollection, useCurrentUser, useDocument } from "vuefire";
+import { useCollection, useCurrentUser } from "vuefire";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 // import { ref, uploadBytesResumable } from "firebase/storage";
-import { doc, collection, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
+import { collection, addDoc } from "firebase/firestore"; // Importing dbRef for database operations
 
-import find from "lodash/find";
+import { useI18n } from "vue-i18n";
 
-const toggleElement = (arr, val) =>
-  arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
+// import find from "lodash/find";
+
+// const toggleElement = (arr, val) =>
+//   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
 
 // const user = useCurrentUser()
 
@@ -24,19 +68,29 @@ export default defineComponent({
   name: "CodePage",
   props: ["id"],
   data() {
-    return {};
+    return {
+      langs: ["en", "fr", "ar", "es", "zh"],
+      newCode: {
+        color: "",
+        code: "",
+        name: {},
+        description: {},
+      },
+    };
   },
-  setup(props) {
+  setup() {
     const user = useCurrentUser();
 
-    const record = useDocument(
-      doc(db, `users/${user.value.email}/recordings/${props.id}`)
-    );
+    // const record = useDocument(
+    //   doc(db, `users/${user.value.email}/recordings/${props.id}`)
+    // );
 
     const codeBook = useCollection(collection(db, `codebook`));
 
+    const { locale } = useI18n({ useScope: "global" });
+
     // console.log("record", record);
-    return { user, record, codeBook };
+    return { user, codeBook, locale };
   },
   // watch: {
   //   record: {
@@ -49,43 +103,22 @@ export default defineComponent({
   //   },
   // },
   methods: {
-    done() {
-      updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-        status: "coded",
-      });
-      this.$router.push("/");
-    },
-    isActiveCode(line, code) {
-      return line.codes?.includes(code.code);
-    },
-    addCode(line, code) {
-      console.log(line);
+    addCode() {
+      // const translated = {
+      //   color: this.newCode.color,
+      //   code: this.newCode.code,
+      //   name: {},
+      //   description: {},
+      // };
+      // translated.name[this.locale] = this.newCode.name;
+      // translated.description[this.locale] = this.newCode.description;
 
-      // console.log(`transcription.results.${line}.codes`);
-      if (!line.codes) {
-        line.codes = [];
-      }
-
-      line.codes = toggleElement(line.codes, code.code);
-
-      // line.codes.push(code.code);
-      updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-        transcription: this.record.transcription,
-      });
-      // console.log(line, code);
-    },
-    getLineColor(line) {
-      //index of this code:
-      if (this.codeBook.length) {
-        if (line.codes && line.codes.length == 1) {
-          //find the color of the first code:
-          const col = find(this.codeBook, { code: line.codes[0] });
-          return col.color;
-        } else if (line.codes && line.codes.length > 1) {
-          return "grey";
-        }
-      }
-      return "transparent";
+      addDoc(collection(db, `codebook`), this.newCode);
+      // this.$router.push("/");
+      this.newCode.color = "";
+      this.newCode.code = "";
+      this.newCode.name = {};
+      this.newCode.description = {};
     },
   },
 });

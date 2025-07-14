@@ -39,6 +39,19 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     if (to.meta.requiresAuth) {
       console.log("This route requires authentication:", to.fullPath);
       const currentUser = await getCurrentUser();
+      console.log("Current user:", currentUser);
+      // if the user is not logged in, redirect to the login page
+      if (!currentUser) {
+        return {
+          path: "/login",
+          query: {
+            // we keep the current path in the query so we can
+            // redirect to it after login with
+            // `router.push(route.query.redirect || '/')`
+            redirect: to.fullPath,
+          },
+        };
+      }
 
       const userDat = await getDoc(doc(db, `users/${currentUser.email}`));
 
@@ -64,20 +77,6 @@ export default defineRouter(function (/* { store, ssrContext } */) {
         return {
           path: "/",
         };
-
-      console.log("Current user:", currentUser);
-      // if the user is not logged in, redirect to the login page
-      if (!currentUser) {
-        return {
-          path: "/login",
-          query: {
-            // we keep the current path in the query so we can
-            // redirect to it after login with
-            // `router.push(route.query.redirect || '/')`
-            redirect: to.fullPath,
-          },
-        };
-      }
     }
   });
 

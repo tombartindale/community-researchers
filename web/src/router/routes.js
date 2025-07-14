@@ -18,6 +18,13 @@ const routes = [
     },
   },
   {
+    path: "/researchplan",
+    component: () => import("pages/ResearchPlan.vue"),
+    meta: {
+      requiresAuth: true, // This route does not require authentication
+    },
+  },
+  {
     path: "/code/:id",
     component: () => import("pages/Code.vue"),
     props: true,
@@ -60,6 +67,11 @@ const routes = [
       {
         path: "users",
         component: () => import("pages/Users.vue"),
+        props: true,
+      },
+      {
+        path: "researchplans",
+        component: () => import("pages/ResearchPlans.vue"),
         props: true,
       },
     ],

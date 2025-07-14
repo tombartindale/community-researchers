@@ -18,13 +18,13 @@ q-page(padding).text-center
                 q-separator
                 q-item(v-for="code in codeBook" :key="code.id" @click="addCode(line, code)" clickable v-close-popup :active="isActiveCode(line, code)")
                   q-item-section
-                    q-item-label {{code.name}}
-                    q-item-label(caption lines="2") {{code.description}}
+                    q-item-label {{code.name[locale] || code.name['en']}}
+                    q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
             span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}
             span . 
     .col-md-1.md
       div.text-overline Legend
-      div.transcript.line(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name}} 
+      div.transcript.line(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
   
   q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg I've finished coding
 
@@ -45,6 +45,8 @@ const toggleElement = (arr, val) =>
 
 // const user = useCurrentUser()
 
+import { useI18n } from "vue-i18n";
+
 export default defineComponent({
   name: "CodePage",
   props: ["id"],
@@ -60,8 +62,10 @@ export default defineComponent({
 
     const codeBook = useCollection(collection(db, `codebook`));
 
+    const { locale } = useI18n();
+
     // console.log("record", record);
-    return { user, record, codeBook };
+    return { user, record, codeBook, locale };
   },
   // watch: {
   //   record: {
@@ -105,7 +109,8 @@ export default defineComponent({
         if (line.codes && line.codes.length == 1) {
           //find the color of the first code:
           const col = find(this.codeBook, { code: line.codes[0] });
-          return col.color;
+          if (col) return col.color;
+          else return "transparent";
         } else if (line.codes && line.codes.length > 1) {
           return "grey";
         }

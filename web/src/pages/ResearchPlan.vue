@@ -2,17 +2,17 @@
 q-page(padding)
   .row.justify-center
     .col.col-md-8
-      .text-h4.text-center.q-mb-md Upload new recording
+      .text-h4.text-center.q-mb-md Upload Your research plan
       q-form(@submit.prevent="upload" v-if="!uploading")
         .column.q-col-gutter-sm
           q-file(v-model="inputVal" label="Select File" filled)
-          q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options)
-          q-input(v-model="who" label="Who" filled :rules="[val => !!val || 'Who is required']")
-          .col
-            q-field(:rules="[val => !!val || 'When is required']")
-              q-date(v-model="when" label="When" filled landscape)
-          .col.text-right
-            q-btn.q-mt-md(type="submit" label="Upload" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
+          //- q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options)
+          //- //- q-input(v-model="who" label="Who" filled :rules="[val => !!val || 'Who is required']")
+          //- .col
+          //-   q-field(:rules="[val => !!val || 'When is required']")
+          //-     q-date(v-model="when" label="When" filled landscape)
+          //- .col.text-right
+          q-btn.q-mt-md(type="submit" label="Upload" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
       
       .row.justify-center
         .col-auto
@@ -33,7 +33,7 @@ import { defineComponent } from "vue";
 import { useCurrentUser } from "vuefire";
 import { storage, db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 import { ref, uploadBytesResumable } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore"; // Importing dbRef for database operations
+import { updateDoc, doc } from "firebase/firestore"; // Importing dbRef for database operations
 
 // const user = useCurrentUser()
 
@@ -44,16 +44,16 @@ export default defineComponent({
       inputVal: null,
       uploadProgress: 0,
       uploading: false,
-      language: "",
-      who: "",
-      when: "",
-      languageOptions: [
-        { value: "en-US", label: "English" },
-        { value: "es-ES", label: "Spanish" },
-        { value: "fr-FR", label: "French" },
-        { value: "ar-EG", label: "Arabic" },
-        { value: "zh-CN", label: "Chinese" },
-      ],
+      // language: "",
+      // who: "",
+      // when: "",
+      // languageOptions: [
+      //   { value: "en-US", label: "English" },
+      //   { value: "es-ES", label: "Spanish" },
+      //   { value: "fr-FR", label: "French" },
+      //   { value: "ar-EG", label: "Arabic" },
+      //   { value: "zh-CN", label: "Chinese" },
+      // ],
     };
   },
   setup() {
@@ -75,7 +75,7 @@ export default defineComponent({
 
           const uploadRef = ref(
             storage,
-            `recordings/${this.user.email}/${this.language}_${Date.now()}_${this.inputVal.name}`
+            `recordings/${this.user.email}/plans/${Date.now()}_${this.inputVal.name}`
           );
 
           const uploadResult = uploadBytesResumable(uploadRef, this.inputVal);
@@ -91,19 +91,15 @@ export default defineComponent({
 
           await uploadResult;
 
-          //on completion -- add record to database
-          const docRef = collection(db, `users/${this.user.email}/recordings`);
+          // //on completion -- add record to database
+          // const docRef = collection(db, `users/${this.user.email}/recordings`);
 
-          await addDoc(docRef, {
-            language: this.language,
-            who: this.who,
-            when: this.when,
-            filePath: uploadRef.fullPath,
-            status: "uploaded",
-            createdAt: new Date().valueOf(),
+          await updateDoc(doc(db, `users/${this.user.email}`), {
+            researchPlanUploded: true,
           });
           this.$router.push("/"); // Redirect to the dashboard or any other page
-        } catch {
+        } catch (er) {
+          console.error(er);
           alert("Error uploading file. Please try again.");
         }
 
