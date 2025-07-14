@@ -9,8 +9,10 @@ service firebase.storage {
       allow read, write: if false;
     }
 
-    match /recordings/{user}/{file} {
-      allow read, write: if user == request.auth.token.email;
+    match /recordings/{user}/{file=**} {
+      allow read: if request.auth!=null
+      allow write: if user == request.auth.token.email
+
     }
   }
 }
