@@ -4,10 +4,13 @@ q-page(padding).text-center
   q-list(separator).text-left
     q-item
       q-item-section.text-grey Email
+      q-item-section.text-grey Region
       q-item-section(side) Admin
       q-item-section(side) Editor
     q-item(v-for="user of users")
       q-item-section {{user.id}}
+      q-item-section
+        q-select(:options="regions" :model-value="user.region" @update:model-value="changeRegion($event,user)" dense filled)
       q-item-section(side) 
         q-checkbox(:model-value="user.isAdmin" @update:model-value="changeAdmin(user)" :disable="currentUser.email === user.id")
       q-item-section(side) 
@@ -44,6 +47,7 @@ export default defineComponent({
   data() {
     return {
       newEmail: "",
+      regions: ["Europe (French)", "Asia", "Americas (Spanish)"],
     };
   },
   setup() {
@@ -85,6 +89,12 @@ export default defineComponent({
     async changeEditor(user) {
       await updateDoc(doc(db, `users/${user.id}`), {
         isEditor: !user.isEditor,
+      });
+    },
+    async changeRegion(ev, user) {
+      // console.log(ev);
+      await updateDoc(doc(db, `users/${user.id}`), {
+        region: ev,
       });
     },
   },

@@ -15,7 +15,12 @@ q-page(padding).text-center
             //- div {{line.codes}}
             q-menu(touch-position)
               q-list(separator)
-                q-item-label(header) Select a code
+                q-item
+                  q-item-section.text-grey Select a code
+                  q-item-section(side)
+                    q-btn(icon="edit" flat dense)
+                      q-popup-edit(:model-value="line.alternatives[0].transcript" anchor="top right" auto-save v-slot="scope" @save="editLine($event,line)")
+                        q-input(v-model="scope.value" dense autofocus @keyup.enter="scope.set" borderless style="min-width:50vw;")
                 q-separator
                 q-item(v-for="code in codeBook" :key="code.id" @click="addCode(line, code)" clickable v-close-popup :active="isActiveCode(line, code)")
                   q-item-section
@@ -79,6 +84,14 @@ export default defineComponent({
   //   },
   // },
   methods: {
+    editLine(val, line) {
+      // console.log(val);
+      // console.log(line);
+      line.alternatives[0].transcript = val;
+      updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
+        transcription: this.record.transcription,
+      });
+    },
     done() {
       updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
         status: "coded",
