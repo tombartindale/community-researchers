@@ -2,15 +2,19 @@
 q-page(padding)
   .row.justify-center
     .col.col-md-8
-      .text-h4.text-center.q-mb-md Upload new recording
+      .text-h4.text-center.q-mb-md Upload new interview
       q-form(@submit.prevent="upload" v-if="!uploading")
         .column.q-col-gutter-sm
-          q-file(v-model="inputVal" label="Select File" filled)
-          q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options)
+          q-file(v-model="inputVal" label="Select File" filled accept="audio/*, video/*, .docx")
+          q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options )
+          .text-caption If the language you require is listed, please transcribe the audio yourself and upload the transcript.
           q-input(v-model="who" label="Who" filled :rules="[val => !!val || 'Who is required']")
           .col
-            q-field(:rules="[val => !!val || 'When is required']")
-              q-date(v-model="when" label="When" filled landscape)
+            q-input(:rules="[val => !!val || 'When is required']" v-model="when" readonly filled label="When")
+              template(v-slot:append)
+                q-icon(name="event").cursor-pointer
+                  q-popup-proxy(cover)
+                    q-date(v-model="when" label="When" filled landscape v-close-popup)
           .col.text-right
             q-btn.q-mt-md(type="submit" label="Upload" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
       
@@ -62,10 +66,6 @@ export default defineComponent({
   },
   methods: {
     async upload() {
-      // const filename = `${this.inputVal.name}_${DateTime.now().toHTTP()}`;
-
-      // console.log("uploading");
-
       if (this.inputVal) {
         this.uploading = true;
         try {

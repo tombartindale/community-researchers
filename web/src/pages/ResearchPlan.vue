@@ -72,11 +72,8 @@ export default defineComponent({
           // const uuid = await import("uuid");
 
           // console.log(state.user);
-
-          const uploadRef = ref(
-            storage,
-            `recordings/${this.user.email}/plans/${Date.now()}_${this.inputVal.name}`
-          );
+          const filename = `recordings/${this.user.email}/plans/${Date.now()}_${this.inputVal.name}`;
+          const uploadRef = ref(storage, filename);
 
           const uploadResult = uploadBytesResumable(uploadRef, this.inputVal);
 
@@ -95,7 +92,7 @@ export default defineComponent({
           // const docRef = collection(db, `users/${this.user.email}/recordings`);
 
           await updateDoc(doc(db, `users/${this.user.email}`), {
-            researchPlanUploded: true,
+            latestResearchPlan: filename,
           });
           this.$router.push("/"); // Redirect to the dashboard or any other page
         } catch (er) {

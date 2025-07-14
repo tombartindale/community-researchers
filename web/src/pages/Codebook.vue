@@ -23,23 +23,20 @@ q-page(padding).text-center
           span {{n}} 
     q-item
       q-item-section.col-1
-        //- q-input(filled v-model="newCode.color" )
-        //-   template(v-slot:append)
-        //- div {{newCode.color}}
         q-avatar(round :style="{'background-color':newCode.color}" size="2.5em")
           q-icon(name="colorize" class="cursor-pointer" size="sm" color="grey")
             q-popup-proxy(cover transition-show="scale" transition-hide="scale")
               q-color(v-model="newCode.color")
       q-item-section.col-2
-        q-input(filled v-model="newCode.code")
+        q-input(filled v-model="newCode.code" dense)
       q-item-section.col-2
         div(v-for="l of langs")
-          q-input(filled v-model="newCode.name[l]" :label="l")
+          q-input(filled v-model="newCode.name[l]" :label="l" dense)
       q-item-section
         .row
           .col
             div(v-for="l of langs")
-              q-input(filled v-model="newCode.description[l]" :label="l")
+              q-input(filled v-model="newCode.description[l]" :label="l" dense)
           q-btn(icon="add" flat @click="addCode")
       
 

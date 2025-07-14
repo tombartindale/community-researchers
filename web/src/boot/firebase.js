@@ -22,12 +22,15 @@ export const db = getFirestore(firebaseApp);
 export const auth = getAuth(firebaseApp);
 export const storage = getStorage(firebaseApp);
 
-// import { connectFirestoreEmulator } from "firebase/firestore";
-// import { connectAuthEmulator } from "firebase/auth";
-// import { connectStorageEmulator } from "firebase/storage";
-// connectAuthEmulator(auth, "http://localhost:9099");
-// connectFirestoreEmulator(db, "localhost", 8080);
-// connectStorageEmulator(storage, "localhost", 9199);
+import { connectFirestoreEmulator } from "firebase/firestore";
+import { connectAuthEmulator } from "firebase/auth";
+import { connectStorageEmulator } from "firebase/storage";
+
+if (process.env.VUE_APP_EMULATORS) {
+  connectAuthEmulator(auth, "http://localhost:9099");
+  connectFirestoreEmulator(db, "localhost", 8080);
+  connectStorageEmulator(storage, "localhost", 9199);
+}
 
 export default defineBoot(({ app }) => {
   console.log("Booting Firebase...");

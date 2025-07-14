@@ -6,6 +6,7 @@ q-page(padding).text-center
         .text-body1 Read the transcript. When you see somthing that might be relevant to the research questions, select the sentence and then select a 'code' to apply.
       //- div {{codeBook}}
   
+  //- div {{record.transcription.results}}
   .row.justify-center(v-if="record")
     .col-md-8.col
       q-card().text-justify

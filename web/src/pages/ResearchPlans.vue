@@ -1,16 +1,37 @@
 <template lang="pug">
 q-page(padding).text-center
-  .text-h4 Research Plans
-
+  .row.justify-center
+    .col.col-md-8
+      .text-h4 Research Plans
+      .text-h6 To check
+      .text-caption Check each research plan. Contact the researcher directly if you need them to make changes to their research plan
+      q-list(separator).text-left
+        div(v-for="plan of plans")
+          q-item( v-if="!plan?.isResearchPlanChecked") 
+            q-item-section {{plan.id}}
+            q-item-section(side) 
+              q-btn(flat icon="download" @click="download(plan.latestResearchPlan)" dense)
+            q-item-section(side)
+              q-btn(flat icon="check" dense @click="approve(plan)") 
+                q-tooltip OK to move forward
+      .text-h6 In operation
+      q-list(separator).text-left
+        div(v-for="plan of plans")
+          q-item( v-if="plan?.isResearchPlanChecked") 
+            q-item-section {{plan.id}}
+            q-item-section(side) 
+              q-btn(flat icon="download" @click="download(plan.latestResearchPlan)" dense)
+           
 </template>
 
 <script>
 import { defineComponent } from "vue";
 
-import { useCollection, useCurrentUser, useDocument } from "vuefire";
-import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
-// import { ref, uploadBytesResumable } from "firebase/storage";
+import { useCollection, useCurrentUser } from "vuefire";
+import { db, storage } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
+import { ref, getDownloadURL } from "firebase/storage";
 import { doc, collection, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
+import { openURL } from "quasar";
 
 import find from "lodash/find";
 
@@ -25,17 +46,17 @@ export default defineComponent({
   data() {
     return {};
   },
-  setup(props) {
+  setup() {
     const user = useCurrentUser();
 
-    const record = useDocument(
-      doc(db, `users/${user.value.email}/recordings/${props.id}`)
-    );
+    // const record = useDocument(
+    //   doc(db, `users/${user.value.email}/recordings/${props.id}`)
+    // );
 
-    const codeBook = useCollection(collection(db, `codebook`));
+    const plans = useCollection(collection(db, `users`));
 
     // console.log("record", record);
-    return { user, record, codeBook };
+    return { user, plans };
   },
   // watch: {
   //   record: {
@@ -48,6 +69,40 @@ export default defineComponent({
   //   },
   // },
   methods: {
+    approve(plan) {
+      updateDoc(doc(db, `users/${plan.id}`), {
+        isResearchPlanChecked: true,
+        planCheckedBy: this.user.email,
+        planCheckedOn: Date(),
+      });
+    },
+    download(file) {
+      getDownloadURL(ref(storage, file))
+        .then((url) => {
+          // `url` is the download URL for 'images/stars.jpg'
+
+          // This can be downloaded directly:
+          // const xhr = new XMLHttpRequest();
+          // xhr.responseType = "blob";
+          // xhr.onload = () => {
+          //   const blob = xhr.response;
+          // };
+          // xhr.open("GET", url);
+          // xhr.send();
+
+          console.log(url);
+
+          openURL(url);
+
+          // Or inserted into an <img> element
+          // const img = document.getElementById("myimg");
+          // img.setAttribute("src", url);
+        })
+        .catch((err) => {
+          // Handle any errors
+          console.log(err);
+        });
+    },
     done() {
       updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
         status: "coded",

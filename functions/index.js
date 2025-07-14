@@ -22,8 +22,9 @@ const { SpeechClient } = v1p1beta1;
 import ffmpeg from "fluent-ffmpeg";
 import os from "os";
 import fs from "fs";
+import reader from "any-text";
+import flatten from "lodash/flatten.js";
 
-//TODO: make them long running with more memory and timeout
 export const convertfile = onDocumentCreated(
   {
     memory: "4GiB",
@@ -31,74 +32,127 @@ export const convertfile = onDocumentCreated(
   },
 
   async (event) => {
-    console.log("New recording created:", event.data.data());
     const record = event.data.data();
-
-    // const inputPath = `${os.tmpdir()}/${event.params.recordingId}`;
-    const outputPath = `recordings/${event.params.email}/audio/${record.language}_${event.params.recordingId}.wav`;
-    const outputFile = `${os.tmpdir()}/output.wav`;
-
-    // fs.ensureDirSync(inputPath);
-
-    // console.log("Input path:", inputPath);
-
-    //get the file from storage into tmp:
     const fileExt = record.filePath.split(".").pop();
-    const localFile = `${os.tmpdir()}/${event.params.recordingId}.${fileExt}`;
-
-    const bucket = getStorage().bucket();
-    await bucket.file(record.filePath).download({
-      destination: localFile,
-    });
-
-    const info = fs.statSync(localFile);
-
-    console.log(info);
-
+    console.log("New recording created:", event.data.data());
     try {
-      // -acodec pcm_s16le -ac 1 -ar 16000
-      await new Promise((resolve, reject) => {
-        ffmpeg(localFile)
-          .audioChannels(1)
-          .audioFrequency(16000)
-          .audioCodec("pcm_s16le")
-          .on("error", (err) => {
-            console.error("FFmpeg error:", err);
-            reject(err);
-          })
-          .on("start", (commandLine) => {
-            console.log("FFmpeg command:", commandLine);
-          })
-          // .on("progress", (progress) => {
-          //   console.log(`FFmpeg progress: ${progress.percent}%`);
-          // })
-          .on("end", () => {
-            console.log("FFmpeg conversion completed successfully");
-            resolve();
-            // res.sendFile("/tmp/mini.mp4");
-          })
-          .output(outputFile)
-          .run();
-      });
+      if (fileExt === "docx") {
+        console.log("docx convert");
+        const localFile = `${os.tmpdir()}/${
+          event.params.recordingId
+        }.${fileExt}`;
 
-      console.log("FFmpeg conversion completed");
+        const bucket = getStorage().bucket();
+        await bucket.file(record.filePath).download({
+          destination: localFile,
+        });
 
-      const info2 = fs.statSync(outputFile);
+        //get contents of doc
+        const text = await reader.getText(localFile);
 
-      console.log(info2);
+        //split by sentence:
+        // console.log(text);
 
-      await bucket.upload(outputFile, {
-        destination: outputPath,
-      });
+        //create transcption object:
+        const lines = text.split("\n");
+        let sentences = lines.map((l) => {
+          return l.split(".");
+        });
 
-      //   await bucket.file(outputPath).save(outputFile, {
-      //     metadata: {
-      //       contentType: "audio/wav",
-      //     },
-      //   });
-      await event.data.ref.update({
-        status: "converted",
-      });
+        console.log(sentences);
+
+        sentences = flatten(sentences);
+
+        console.log(sentences);
+
+        let transcription = {
+          results: [],
+        };
+        for (const line of sentences) {
+          transcription.results.push({
+            alternatives: [
+              {
+                transcript: line.trim(),
+              },
+            ],
+          });
+        }
+
+        await event.data.ref.update({
+          status: "transcribed",
+          transcription: transcription,
+        });
+
+        // const transcption = lines.map((f)=>{})
+      } else {
+        console.log("Audio convert");
+        // const inputPath = `${os.tmpdir()}/${event.params.recordingId}`;
+        const outputPath = `recordings/${event.params.email}/audio/${record.language}_${event.params.recordingId}.wav`;
+        const outputFile = `${os.tmpdir()}/output.wav`;
+
+        // fs.ensureDirSync(inputPath);
+
+        // console.log("Input path:", inputPath);
+
+        //get the file from storage into tmp:
+
+        const localFile = `${os.tmpdir()}/${
+          event.params.recordingId
+        }.${fileExt}`;
+
+        const bucket = getStorage().bucket();
+        await bucket.file(record.filePath).download({
+          destination: localFile,
+        });
+
+        // const info = fs.statSync(localFile);
+
+        // console.log(info);
+
+        // -acodec pcm_s16le -ac 1 -ar 16000
+        await new Promise((resolve, reject) => {
+          ffmpeg(localFile)
+            .audioChannels(1)
+            .audioFrequency(16000)
+            .audioCodec("pcm_s16le")
+            .on("error", (err) => {
+              console.error("FFmpeg error:", err);
+              reject(err);
+            })
+            .on("start", (commandLine) => {
+              console.log("FFmpeg command:", commandLine);
+            })
+            // .on("progress", (progress) => {
+            //   console.log(`FFmpeg progress: ${progress.percent}%`);
+            // })
+            .on("end", () => {
+              console.log("FFmpeg conversion completed successfully");
+              resolve();
+              // res.sendFile("/tmp/mini.mp4");
+            })
+            .output(outputFile)
+            .run();
+        });
+
+        console.log("FFmpeg conversion completed");
+
+        const info2 = fs.statSync(outputFile);
+
+        console.log(info2);
+
+        await bucket.upload(outputFile, {
+          destination: outputPath,
+        });
+
+        //   await bucket.file(outputPath).save(outputFile, {
+        //     metadata: {
+        //       contentType: "audio/wav",
+        //     },
+        //   });
+        await event.data.ref.update({
+          status: "converted",
+        });
+      }
     } catch (error) {
       console.error("Error during FFmpeg conversion:", error);
       await event.data.ref.update({
