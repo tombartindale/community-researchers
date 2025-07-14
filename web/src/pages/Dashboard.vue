@@ -1,39 +1,64 @@
 <template lang="pug">
 q-page(padding)
     
-    .text-center.q-mb-lg
-      q-btn(to="/upload" color="primary" size="lg" no-caps) Upload New Recording
+    //- .text-center.q-mb-lg
+      //- q-btn(to="/upload" color="primary" size="lg" no-caps) Upload New Recording
     //- div {{recordings}}
+    .text-h4.q-mb-lg.q-mt-sm.text-center Your Research Tasks
+    q-card(bordered flat).q-mb-md
+      q-card-section(horizontal).items-center
+        q-card-section(side)
+          q-icon(name="upload" size="md").q-mx-sm 
+        q-card-section 
+          .text-h6 Upload new recording
+        q-space
+        q-card-section
+          //- .row
+            //- .col-auto
+              //- q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
+            //- .col  Automatic audio transcription
+          q-btn(to="/upload" flat icon-right="chevron_right" no-caps) Upload
+
     q-card(v-for="recording in recordings" :key="recording.id" class="my-card" bordered flat).q-mb-md
-      q-card-section(horizontal)
+      q-card-section(horizontal).items-center
+        q-card-section(side)
+          q-checkbox(readonly size="lg" :model-value="isComplete(recording)")
+          //- q-icon(:name="getIcon(recording.status, 'coding')" color="green" size="md") 
+        q-card-section 
+          .text-h6 Code transcript
+          .text-body1 {{ recording.who }} &middot; {{ recording.when }}
+        q-space
         q-card-section
-          .text-h6 {{ recording.who }}
-          p {{ recording.when }}
-        q-card-section
-          .row
-            .col-auto
-              q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
-            .col  Automatic audio transcription
-          .row
-            .col-auto
-              q-icon(:name="getIcon(recording.status, 'coding')" color="green" size="16px") 
-            .col 
-              router-link(:to="`/code/${recording.id}`" v-if="canCode(recording)") Code transcript
-              div(v-else) Code transcript
-          .row
-            .col-auto
-              q-icon(:name="getIcon(recording.status, 'grouped')" color="green" size="16px") 
-            .col Group codes
-          .row
-            .col-auto
-              q-icon(:name="getIcon(recording.status, 'reviewing')" color="green" size="16px") 
-            .col Review codes
+          //- .row
+            //- .col-auto
+              //- q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
+            //- .col  Automatic audio transcription
+          q-btn(no-caps :to="`/code/${recording.id}`" v-if="canCode(recording)" flat icon-right="chevron_right") Code transcript
+          div(v-else) Waiting for automatic transcription
+        
         //- q-space
         //- q-separator(vertical)
         //- q-card-section(horizontal)
         //-   q-btn(flat) Code
         //-   q-separator(vertical)
         //-   q-btn(flat) Group
+    q-card(bordered flat).q-mb-md
+      q-card-section(horizontal).items-center
+        q-card-section(side)
+          q-checkbox(readonly size="lg" :model-value="isGrouped()")
+        q-card-section 
+          .text-h6 Group codes
+        q-space
+        q-card-section
+          q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right") Group Codes
+        //- router-link(:to="`/code/${recording.id}`" v-if="canCode(recording)") Code transcript
+        //- div(v-else) Code transcript
+    q-card(flat bordered).q-mb-md
+      q-card-section(horizontal).items-center
+        q-card-section(side)
+          q-checkbox(readonly size="lg" :model-value="isReviewed()")
+        q-card-section 
+          .text-h6 Review codes
 
 </template>
 
@@ -44,7 +69,7 @@ import { useCurrentUser } from "vuefire";
 
 // const user = useCurrentUser()
 
-import { collection } from "firebase/firestore";
+import { collection, doc } from "firebase/firestore";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase Firestore setup
 
 export default defineComponent({
@@ -52,6 +77,7 @@ export default defineComponent({
   data() {
     return {
       recordings: [],
+      userProfile: {},
     };
   },
   methods: {
@@ -78,6 +104,15 @@ export default defineComponent({
         }
       }
     },
+    isComplete(recording) {
+      return recording.status == "coded";
+    },
+    isGrouped() {
+      return this.userProfile.status == "grouped";
+    },
+    isReviewed() {
+      return this.userProfile.status == "reviewed";
+    },
   },
   watch: {
     user: {
@@ -88,6 +123,8 @@ export default defineComponent({
           "recordings",
           collection(db, `users/${this.user.email}/recordings`)
         );
+
+        this.$firestoreBind("userProfile", doc(db, `users/${this.user.email}`));
       },
     },
   },

@@ -25,6 +25,14 @@ const routes = [
       requiresAuth: true, // This route does not require authentication
     },
   },
+  {
+    path: "/group/:email",
+    component: () => import("pages/Group.vue"),
+    props: true,
+    meta: {
+      requiresAuth: true, // This route does not require authentication
+    },
+  },
 
   // Always leave this as last one,
   // but you can also remove it

@@ -1,13 +1,14 @@
 <template lang="pug">
 q-page(padding)
-  .text-h4.text-center Upload new recording
+  .text-h4.text-center.q-mb-md Upload new recording
   q-form(@submit.prevent="upload" v-if="!uploading")
     .column.q-col-gutter-sm
       q-file(v-model="inputVal" label="Select File" filled)
       q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options)
       q-input(v-model="who" label="Who" filled :rules="[val => !!val || 'Who is required']")
-      q-date(v-model="when" label="When" filled :rules="[val => !!val || 'When is required']")
-      q-btn(type="submit" label="Upload" color="primary" :disable="this.uploading || !inputVal")
+      q-field(:rules="[val => !!val || 'When is required']")
+        q-date(v-model="when" label="When" filled landscape)
+      q-btn.q-mt-md(type="submit" label="Upload" color="primary" :disable="this.uploading || !inputVal" no-caps)
   
   .row.justify-center
     .col-auto
