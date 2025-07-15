@@ -10,6 +10,9 @@ q-page(padding).text-center
     //- div {{list1}}
     //- div {{clusters}}
 
+  .text-center(v-if="loading")
+    q-spinner(size="md")
+
   .row.q-mb-md.items-center
     .col
       q-separator
@@ -45,7 +48,7 @@ q-page(padding).text-center
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import draggable from "vuedraggable";
 
 import { useCollection, useCurrentUser } from "vuefire";
@@ -108,18 +111,24 @@ export default defineComponent({
   setup(props) {
     const user = useCurrentUser();
 
-    const records = useCollection(
+    const { data: records, promise: promise2 } = useCollection(
       collection(db, `users/${props.email}/recordings`),
       { once: true }
     );
 
     const { locale } = useI18n();
+    const loading = ref(true);
 
     const codeBook = useCollection(collection(db, `codebook`));
 
     const { data: clusters, promise } = useCollection(
       collection(db, `users/${props.email}/clusters`)
     );
+
+    Promise.all([promise2.value, promise.value]).then(() => {
+      // console.log("loaded");
+      loading.value = false;
+    });
 
     promise.value.then(async function (val) {
       // console.log("clusters loaded");
@@ -140,7 +149,7 @@ export default defineComponent({
     });
 
     // console.log("record", record);
-    return { user, records, codeBook, locale, clusters };
+    return { user, records, codeBook, locale, clusters, loading };
   },
   computed: {
     allCodes() {

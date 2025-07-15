@@ -38,7 +38,7 @@ q-page(padding).text-center
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import draggable from "vuedraggable";
 
 import { useCollection, useCurrentUser } from "vuefire";
@@ -85,13 +85,19 @@ export default defineComponent({
   setup(props) {
     const user = useCurrentUser();
 
-    const records = useCollection(
+    const loading = ref(true);
+
+    const { data: records, promise } = useCollection(
       collection(db, `users/${props.email}/recordings`)
     );
 
-    const { data: clusters } = useCollection(
+    const { data: clusters, promise: promise1 } = useCollection(
       collection(db, `users/${props.email}/clusters`)
     );
+
+    Promise.all([promise, promise1]).then(() => {
+      loading.value = false;
+    });
 
     // console.log(user);
 

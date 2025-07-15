@@ -13,7 +13,8 @@ q-page(padding).text-center
 
 
     //- div {{clusters}}
-
+  .text-center.q-mt-lg(v-if="loading")
+    q-spinner(size="md")
 
   .row.q-col-gutter-sm.q-mt-lg
     .col-4(v-for="(cluster,index) of clusters" )
@@ -75,6 +76,7 @@ export default defineComponent({
       this.clusters = (
         await getClustersForRegion({ region: this.region })
       ).data;
+      this.loading = false;
     } catch (e) {
       console.error(e);
     }
@@ -85,6 +87,7 @@ export default defineComponent({
       step: 0,
       clustered: [],
       clusters: [],
+      loading: true,
     };
   },
   setup(props) {
@@ -175,9 +178,6 @@ export default defineComponent({
         { merge: true }
       );
       this.$router.push("/");
-    },
-    isActiveCode(line, code) {
-      return line.codes?.includes(code.code);
     },
   },
 });
