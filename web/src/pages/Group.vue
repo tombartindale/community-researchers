@@ -3,7 +3,7 @@ q-page(padding).text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
-        .text-body1 Create clusters of quotes that tell a story when put together. You do not have to use all quotes. In the next step you can tell us more about why you have clustered thigns like this.
+        .text-body1 {{ $t('create-clusters') }}
       //- div {{codeBook}}
     
     //- div {{list1}}
@@ -16,7 +16,7 @@ q-page(padding).text-center
   .row.q-mb-md.items-center
     .col
       q-separator
-    .col-auto.q-px-sm.text-grey Quotes
+    .col-auto.q-px-sm.text-grey {{ $t('quotes') }}
     .col
       q-separator
   .row
@@ -31,25 +31,25 @@ q-page(padding).text-center
   .row.q-mb-md.items-center
     .col
       q-separator
-    .col-auto.q-px-sm.text-grey Clusters
+    .col-auto.q-px-sm.text-grey {{ $t('clusters') }}
     .col
       q-separator
   .row.q-col-gutter-sm
     .col-4(v-for="cluster of clusters")
       
-      q-input(v-model="cluster.title" filled placeholder="Name of cluster" dense @blur="updateName(cluster)").q-mb-sm
+      q-input(v-model="cluster.title" filled :placeholder="$t('name-of-cluster')" dense @blur="updateName(cluster)").q-mb-sm
       .column.q-col-gutter-sm
         .col( v-for="element of getItemsForCluster(cluster.id)")
           Cluster(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale")
      
   
-  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg I've finished clustering
+  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-clustering') }}
 
 </template>
 
 <script>
 import { defineComponent, ref } from "vue";
-import draggable from "vuedraggable";
+// import draggable from "vuedraggable";
 
 import { useCollection, useCurrentUser } from "vuefire";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
@@ -86,18 +86,12 @@ export default defineComponent({
   name: "GroupPage",
   props: ["email"],
   components: {
-    draggable,
     Cluster,
   },
   data() {
     return {
       drag: false,
-      dragOptions: {
-        animation: 200,
-        group: "description",
-        disabled: false,
-        ghostClass: "ghost",
-      },
+
       // clusters: [
       //   { id: 1, name: "Cluster 1" },
       //   { id: 2, name: "Cluster 2" },
@@ -116,7 +110,7 @@ export default defineComponent({
       { once: true }
     );
 
-    const { locale } = useI18n();
+    const { locale, t } = useI18n();
     const loading = ref(true);
 
     const codeBook = useCollection(collection(db, `codebook`));
@@ -138,7 +132,7 @@ export default defineComponent({
 
         for (let i = 0; i < 3; i++)
           await setDoc(doc(db, `users/${props.email}/clusters/${i}`), {
-            title: `Cluster ${i + 1}`,
+            title: t("cluster-i", [i + 1]),
             description: "",
             learn: "",
             questions: "",

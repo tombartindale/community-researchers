@@ -2,33 +2,33 @@
 q-page(padding)
   .row.justify-center
     .col.col-md-8
-      .text-h6.text-center.q-my-lg Upload new interview
+      .text-h6.text-center.q-my-lg {{ $t('upload-new-interview') }}
       div.q-mt-md &nbsp;
       q-form(@submit.prevent="upload" v-if="!uploading")
         .column.q-col-gutter-sm
-          q-file(v-model="inputVal" label="Which file to upload?" filled accept="audio/*, video/*, .docx")
-          .text-caption Upload any recording file, or an existing transcript (.docx). If the language you require is not listed, please transcribe the audio yourself and upload the transcript.
-          q-select(v-model="language" :options="languageOptions" label="What language was the interview conducted in?" filled :rules="[val => !!val || 'Language is required']" emit-value map-options )
-          q-input(v-model="who" label="Who did you interview?" filled :rules="[val => !!val || 'Who is required']")
+          q-file(v-model="inputVal" :label="$t('which-file-to-upload')" filled accept="audio/*, video/*, .docx")
+          .text-caption {{ $t('upload-any-recording-file') }}
+          q-select(v-model="language" :options="languageOptions" :label="$t('what-language-was-the-interview-conducted-in')" filled :rules="[val => !!val || $t('language-is-required')]" emit-value map-options )
+          q-input(v-model="who" :label="$t('who-did-you-interview')" filled :rules="[val => !!val || $t('who-is-required')]")
           .col
-            q-input(:rules="[val => !!val || 'When is required']" v-model="when" readonly filled label="When did you conduct the interview?")
+            q-input(:rules="[val => !!val || $t('when-is-required')]" v-model="when" readonly filled :label="$t('when-did-you-conduct-the-interview')")
               template(v-slot:append)
                 q-icon(name="event").cursor-pointer
                   q-popup-proxy(cover)
-                    q-date(v-model="when" label="When" filled landscape v-close-popup)
+                    q-date(v-model="when" :label="$t('when')" filled landscape v-close-popup)
           .col.text-center
-            q-btn.q-mt-md(type="submit" label="Upload" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
+            q-btn.q-mt-md(type="submit" :label="$t('upload')" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
       
       .row.justify-center
         .col-auto
           q-banner(v-if="uploading" text-color="white" class="q-mt-md").bg-positive.rounded-borders.text-white.text-center
-            .text-body1 Uploading now...
+            .text-body1 {{ $t('uploading-now') }}
             q-circular-progress.q-my-md(  
               :value="uploadProgress * 100"
               color="white"
               size="6em"
             )
-            .text-body1 Do not close this page while uploading...
+            .text-body1 {{ $t('do-not-close-this-page-while-uploading') }}
     
 </template>
 
@@ -53,11 +53,11 @@ export default defineComponent({
       who: "",
       when: "",
       languageOptions: [
-        { value: "en-US", label: "English" },
-        { value: "es-ES", label: "Spanish" },
-        { value: "fr-FR", label: "French" },
-        { value: "ar-EG", label: "Arabic" },
-        { value: "zh-CN", label: "Chinese" },
+        { value: "en", label: this.$t("english") },
+        { value: "ar", label: this.$t("arabic") },
+        { value: "fr", label: this.$t("french") },
+        { value: "zh", label: this.$t("chinese") },
+        { value: "es", label: this.$t("spanish") },
       ],
     };
   },
@@ -105,7 +105,7 @@ export default defineComponent({
           });
           this.$router.push("/"); // Redirect to the dashboard or any other page
         } catch {
-          alert("Error uploading file. Please try again.");
+          alert(this.$t("error-uploading-file-please-try-again"));
         }
 
         this.uploading = false;

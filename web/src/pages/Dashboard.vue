@@ -5,7 +5,7 @@ q-page(padding)
         //- .text-center.q-mb-lg
           //- q-btn(to="/upload" color="primary" size="lg" no-caps) Upload New Recording
         //- div {{recordings}}
-        .text-h4.q-mb-lg.q-mt-sm.text-center Your Research Tasks
+        .text-h4.q-mb-lg.q-mt-sm.text-center {{ $t('your-research-tasks') }}
 
         .text-center(v-if="loading")
           q-spinner(size="md")
@@ -14,7 +14,7 @@ q-page(padding)
           .row.q-my-md.items-center
             .col 
               q-separator
-            .col-auto.q-px-md.text-caption.text-grey Plan Your research
+            .col-auto.q-px-md.text-caption.text-grey {{ $t('plan-your-research') }}
             .col 
               q-separator
           q-card(bordered flat).q-mb-md
@@ -22,15 +22,15 @@ q-page(padding)
               q-card-section(side)
                 q-checkbox(readonly size="lg" :model-value="hasResearchPlan()" color="black")
               q-card-section 
-                .text-h6 Upload Your research plan
-                span(v-if="user.profile.latestResearchPlan && !user.profile.isResearchPlanChecked").text-grey Your research plan has been uploaded and is being reviewed
+                .text-h6 {{ $t('upload-your-research-plan') }}
+                span(v-if="user.profile.latestResearchPlan && !user.profile.isResearchPlanChecked").text-grey {{ $t('your-research-plan-has-been-uploaded-and-is-being-reviewed') }}
               q-space
               q-card-section
-                q-btn(to="/researchplan" flat icon-right="chevron_right" no-caps v-if="!user.profile.isResearchPlanChecked") Upload
+                q-btn(to="/researchplan" flat icon-right="chevron_right" no-caps v-if="!user.profile.isResearchPlanChecked") {{ $t('upload') }}
           .row.q-my-md.items-center
             .col 
               q-separator
-            .col-auto.q-px-md.text-caption.text-grey Collect Your data
+            .col-auto.q-px-md.text-caption.text-grey {{ $t('collect-your-data') }}
             .col 
               q-separator
           q-card(bordered flat).q-mb-md
@@ -38,18 +38,18 @@ q-page(padding)
               q-card-section(side)
                 q-icon(name="upload" size="md").q-mx-sm 
               q-card-section 
-                .text-h6 Upload new interview
+                .text-h6 {{ $t('upload-new-interview') }}
               q-space
               q-card-section
                 //- .row
                   //- .col-auto
                     //- q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
                   //- .col  Automatic audio transcription
-                q-btn(to="/upload" flat icon-right="chevron_right" no-caps) Upload
+                q-btn(to="/upload" flat icon-right="chevron_right" no-caps) {{ $t('upload') }}
           .row.q-my-md.items-center
             .col 
               q-separator
-            .col-auto.q-px-md.text-caption.text-grey Code Your data
+            .col-auto.q-px-md.text-caption.text-grey {{ $t('code-your-data') }}
             .col 
               q-separator
           q-card(v-for="recording in recordings" :key="recording.id" class="my-card" bordered flat).q-mb-md
@@ -58,7 +58,7 @@ q-page(padding)
                 q-checkbox(readonly size="lg" :model-value="isComplete(recording)" color="black")
                 //- q-icon(:name="getIcon(recording.status, 'coding')" color="green" size="md") 
               q-card-section 
-                .text-h6 Code transcript
+                .text-h6 {{ $t('code-transcript') }}
                 .text-body1.text-grey {{ recording.who }} &middot; {{ recording.when }}
               q-space
               q-card-section
@@ -66,8 +66,8 @@ q-page(padding)
                   //- .col-auto
                     //- q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
                   //- .col  Automatic audio transcription
-                q-btn(no-caps :to="`/code/${recording.id}`" v-if="canCode(recording)" flat icon-right="chevron_right") Code
-                div(v-else) Waiting for automatic transcription
+                q-btn(no-caps :to="`/code/${recording.id}`" v-if="canCode(recording)" flat icon-right="chevron_right") {{ $t('code') }}
+                div(v-else) {{ $t('waiting-for-automatic-transcription') }}
               
               //- q-space
               //- q-separator(vertical)
@@ -78,7 +78,7 @@ q-page(padding)
           .row.q-my-md.items-center
             .col 
               q-separator
-            .col-auto.q-px-md.text-caption.text-grey Develop Your insights
+            .col-auto.q-px-md.text-caption.text-grey {{ $t('develop-your-insights') }}
             .col 
               q-separator
           q-card(bordered flat).q-mb-md
@@ -86,24 +86,24 @@ q-page(padding)
               q-card-section(side)
                 q-checkbox(readonly size="lg" :model-value="isGrouped()" color="black")
               q-card-section 
-                .text-h6 Cluster codes into stories
+                .text-h6 {{ $t('cluster-codes-into-stories') }}
               q-space
               q-card-section
-                q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right" v-if="canGroup()") Cluster
+                q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right" v-if="canGroup()") {{ $t('cluster') }}
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
                 q-checkbox(readonly size="lg" :model-value="isDescribed()" color="black")
               q-card-section 
-                .text-h6 Describe Your insights
+                .text-h6 {{ $t('describe-your-insights') }}
               q-space
               q-card-section
-                q-btn(no-caps :to="`/describe/${user.email}`" flat icon-right="chevron_right" v-if="canDescribe()") Describe
+                q-btn(no-caps :to="`/describe/${user.email}`" flat icon-right="chevron_right" v-if="canDescribe()") {{ $t('describe') }}
               
           .row.q-my-md.items-center
             .col 
               q-separator
-            .col-auto.q-px-md.text-caption.text-grey Share and reflect on Your findings
+            .col-auto.q-px-md.text-caption.text-grey {{ $t('share-and-reflect-on-your-findings') }}
             .col 
               q-separator
           q-card(flat bordered).q-mb-md
@@ -112,8 +112,8 @@ q-page(padding)
                 q-icon(size="lg" name="forum").q-mx-sm
                 //- q-checkbox(readonly size="lg" :model-value="isReviewed()" color="black")
               q-card-section 
-                .text-h6 Review themes
-                .text-body1.text-grey Across {{user.profile.region}}
+                .text-h6 {{ $t('review-themes') }}
+                .text-body1.text-grey {{ $t('across-user-profile-region', [user.profile.region]) }}
               q-space
               q-card-section
                 q-btn(no-caps :to="`/review/${user.profile.region}`" flat icon-right="chevron_right" v-if="canReview()") Review

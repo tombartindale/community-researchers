@@ -4,11 +4,11 @@ q-layout(view="hHh lpR fFf").view
     q-toolbar.bg-white.text-primary
       q-btn(to="/" flat dense icon="home")
       q-btn(to="/codebook" flat dense icon="book" v-if="user?.profile?.isEditor || user?.profile?.isAdmin")
-        q-tooltip Codebook
+        q-tooltip {{ $t('codebook') }}
       q-btn(to="/admin" flat dense icon="settings" v-if="user?.profile?.isAdmin")
-        q-tooltip Admin
+        q-tooltip {{ $t('admin') }}
       q-space
-      span Community Researcher Dashboard &middot; {{ user ? user.email : 'Not signed in' }}
+      span {{ $t('community-researcher-dashboard') }} &middot; {{ user ? user.email : $t('not-signed-in') }}
       q-space
       q-select(
         v-model="locale"
@@ -44,14 +44,14 @@ export default defineComponent({
   setup() {
     const user = useCurrentUser();
 
-    const { locale } = useI18n({ useScope: "global" });
+    const { locale, t } = useI18n({ useScope: "global" });
 
     const localeOptions = [
-      { value: "en", label: "English" },
-      { value: "ar", label: "Arabic" },
-      { value: "fr", label: "French" },
-      { value: "zh", label: "Chinese" },
-      { value: "es", label: "Spanish" },
+      { value: "en", label: t("english") },
+      { value: "ar", label: t("arabic") },
+      { value: "fr", label: t("french") },
+      { value: "zh", label: t("chinese") },
+      { value: "es", label: t("spanish") },
     ];
 
     const $q = useQuasar();

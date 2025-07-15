@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "firebase-tools": "^14.10.1",
-    "memorystream": "^0.3.1"
-  }
-}

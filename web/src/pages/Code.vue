@@ -3,7 +3,7 @@ q-page(padding).text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
-        .text-body1 Read the transcript. When you see somthing that might be relevant to the research questions, select the sentence and then select a 'code' to apply.
+        .text-body1 {{ $t('read-the-transcript') }}
       //- div {{codeBook}}
   
   //- div {{record.transcription.results}}
@@ -16,7 +16,7 @@ q-page(padding).text-center
             q-menu(touch-position)
               q-list(separator)
                 q-item
-                  q-item-section.text-grey Select a code
+                  q-item-section.text-grey {{ $t('select-a-code') }}
                   q-item-section(side)
                     q-btn(icon="edit" flat dense)
                       q-popup-edit(:model-value="line.alternatives[0].transcript" anchor="top right" auto-save v-slot="scope" @save="editLine($event,line)")
@@ -29,10 +29,10 @@ q-page(padding).text-center
             span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}
             span . 
     .col-md-1.gt-md
-      div.text-overline Codes
+      div.text-overline {{ $t('codes') }}
       div.transcript.line(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
   
-  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg I've finished coding
+  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-coding') }}
 
 </template>
 

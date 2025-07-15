@@ -3,13 +3,13 @@ q-page(padding).text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
-        .text-body1 Summarise across all the insights from {{user.profile.region}}.
+        .text-body1 {{ $t('summarise-across-all-the-insights-from-user-profile-region', [user.profile.region]) }}
     //- div {{records}}
   //- div {{regionData}}
 
   .row(v-if="regionData").justify-center
     .col-md-8.col
-      q-editor.text-left(type="textarea" v-model="regionData.description" @blur="saveDesc" filled label="Summary of Findings" content-class="bg-grey-1")
+      q-editor.text-left(type="textarea" v-model="regionData.description" @blur="saveDesc" filled :label="$t('summary-of-findings')" content-class="bg-grey-1")
 
 
     //- div {{clusters}}
@@ -35,7 +35,7 @@ q-page(padding).text-center
               Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
               q-separator(inset).q-mt-sm
   
-  q-btn(color="primary" size="lg" to="/" no-caps).q-mt-lg I've finished reviewing
+  q-btn(color="primary" size="lg" to="/" no-caps).q-mt-lg {{ $t('ive-finished-reviewing') }}
 
 </template>
 

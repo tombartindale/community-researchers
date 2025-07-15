@@ -2,29 +2,29 @@
 q-page(padding)
   .row.justify-center
     .col.col-md-5
-      .text-h6.text-center.q-my-lg Upload Your research plan
+      .text-h6.text-center.q-my-lg {{ $t('upload-your-research-plan-0') }}
       div.q-mt-md &nbsp;
       q-form(@submit.prevent="upload" v-if="!uploading")
         .column
-          q-file(v-model="inputVal" label="Select File" filled)
+          q-file(v-model="inputVal" :label="$t('select-file')" filled)
           //- q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options)
           //- //- q-input(v-model="who" label="Who" filled :rules="[val => !!val || 'Who is required']")
           //- .col
           //-   q-field(:rules="[val => !!val || 'When is required']")
           //-     q-date(v-model="when" label="When" filled landscape)
           //- .col.text-right
-          q-btn.q-mt-md(type="submit" label="Upload" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
+          q-btn.q-mt-md(type="submit" :label="$t('upload')" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
       
       .row.justify-center
         .col-auto
           q-banner(v-if="uploading" text-color="white" class="q-mt-md").bg-positive.rounded-borders.text-white.text-center
-            .text-body1 Uploading now...
+            .text-body1 {{ $t('uploading-now') }}
             q-circular-progress.q-my-md(  
               :value="uploadProgress * 100"
               color="white"
               size="6em"
             )
-            .text-body1 Do not close this page while uploading...
+            .text-body1 {{ $t('do-not-close-this-page-while-uploading') }}
     
 </template>
 
@@ -98,7 +98,7 @@ export default defineComponent({
           this.$router.push("/"); // Redirect to the dashboard or any other page
         } catch (er) {
           console.error(er);
-          alert("Error uploading file. Please try again.");
+          alert(this.$t("error-uploading-file-please-try-again"));
         }
 
         this.uploading = false;

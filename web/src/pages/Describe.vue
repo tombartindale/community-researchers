@@ -3,7 +3,8 @@ q-page(padding).text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md.q-mt-md
-        .text-body1 For each cluster, follow the prompts.
+        .text-body1 {{ $t('for-each-cluster-follow-the-prompts') }}
+        
     //- div {{records}}
     //- div {{clustered}}
     //- div {{clusters}}
@@ -14,26 +15,26 @@ q-page(padding).text-center
       //- div {{clusters[index]}}
       .column.q-col-gutter-sm 
         .col
-          q-input(filled v-model="clusters[index].title" label="Give this cluster a name")
+          q-input(filled v-model="clusters[index].title" :label="$t('give-this-cluster-a-name')")
         .col
-          q-input(filled v-model="clusters[index].description" label="Enter a 2 line description of this cluster")
+          q-input(filled v-model="clusters[index].description" :label="$t('enter-a-2-line-description-of-this-cluster')")
         .col
-          q-input(filled v-model="clusters[index].learn" label="What should someone else learn from this?")
+          q-input(filled v-model="clusters[index].learn" :label="$t('what-should-someone-else-learn-from-this')")
         .col
-          q-input(filled v-model="clusters[index].questions" label="Links to research questions")
+          q-input(filled v-model="clusters[index].questions" :label="$t('links-to-research-questions')")
         .col
-          q-input(filled v-model="clusters[index].bullets" label="Take-home messages (bullets)")
-        .col Select 3 of the following quotes that best represent this cluster
+          q-input(filled v-model="clusters[index].bullets" :label="$t('take-home-messages-bullets')")
+        .col {{ $t('select-3-of-the-following-quotes-that-best-represent-this-cluster') }}
         .col( v-for="element of cluster.quotes")
           Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true")
 
     template(v-slot:navigation)
       q-stepper-navigation
         .row.justify-between
-          q-btn(:disable="step == 0" flat @click="$refs.stepper.previous()" ) Previous cluster
-          q-btn(@click="$refs.stepper.next()" flat :disable="step == Object.keys(clustered).length-1" ) Next cluster
+          q-btn(:disable="step == 0" flat @click="$refs.stepper.previous()" ) {{ $t('previous-cluster') }}
+          q-btn(@click="$refs.stepper.next()" flat :disable="step == Object.keys(clustered).length-1" ) {{ $t('next-cluster') }}
   
-  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg I've finished describing
+  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-describing') }}
 
 </template>
 

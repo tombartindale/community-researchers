@@ -2,11 +2,11 @@
 q-page.flex.flex-center
   .column.items-center.q-col-gutter-md
     .col
-      .text-h4 Login to continue
+      .text-h4 {{ $t('login-to-continue') }}
     .col
-      q-input(v-model="email" label="Enter Your email address" type="email" outlined style="min-width:300px;")
+      q-input(v-model="email" :label="$t('enter-your-email-address')" type="email" outlined style="min-width:300px;")
     .col
-      q-btn(@click="signinPopup" label="Send login link" no-caps flat size="lg" icon-right="chevron_right")
+      q-btn(@click="signinPopup" :label="$t('send-login-link')" no-caps flat size="lg" icon-right="chevron_right")
 </template>
 
 <script>
@@ -46,14 +46,14 @@ export default defineComponent({
             // The link was successfully sent. Inform the user.
             // Save the email locally to complete sign-in when the user returns.
             window.localStorage.setItem("emailForSignIn", this.email);
-            this.q.notify("Email sent! Please check your inbox.");
+            this.q.notify(this.$t("email-sent-please-check-your-inbox"));
             // alert("Email sent! Please check your inbox.");
           })
           .catch(() => {
             // Some error occurred, you can inspect the code: error.code
             this.q.notify({
               type: "negative",
-              message: "Error sending email:",
+              message: this.$t("error-sending-email"),
             });
             // console.error("Error sending email:", error);
           });
