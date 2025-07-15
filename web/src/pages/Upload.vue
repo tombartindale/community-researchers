@@ -2,7 +2,8 @@
 q-page(padding)
   .row.justify-center
     .col.col-md-8
-      .text-h4.text-center.q-mb-lg.q-mt-sm Upload new interview
+      .text-h6.text-center.q-my-lg Upload new interview
+      div.q-mt-md &nbsp;
       q-form(@submit.prevent="upload" v-if="!uploading")
         .column.q-col-gutter-sm
           q-file(v-model="inputVal" label="Which file to upload?" filled accept="audio/*, video/*, .docx")

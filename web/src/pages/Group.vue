@@ -3,8 +3,7 @@ q-page(padding).text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
-        .text-body1 Create clusters of quotes that tell a story when put together. You do not have to use all quotes.
-        .text-body1 In the next step you can tell us more about why you have clustered thigns like this.
+        .text-body1 Create clusters of quotes that tell a story when put together. You do not have to use all quotes. In the next step you can tell us more about why you have clustered thigns like this.
       //- div {{codeBook}}
     
     //- div {{list1}}
@@ -133,6 +132,8 @@ export default defineComponent({
             title: `Cluster ${i + 1}`,
             description: "",
             learn: "",
+            questions: "",
+            bullets: "",
             region: user.value.profile.region,
           });
       }

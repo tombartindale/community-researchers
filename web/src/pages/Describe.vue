@@ -2,14 +2,14 @@
 q-page(padding).text-center
   .row.justify-center
     .col-md-8.col
-      q-banner.text-center.q-mb-md
+      q-banner.text-center.q-mb-md.q-mt-md
         .text-body1 For each cluster, follow the prompts.
     //- div {{records}}
     //- div {{clustered}}
     //- div {{clusters}}
 
 
-  q-stepper(v-model="step" ref="stepper" v-if="clusters.length")
+  q-stepper(v-model="step" ref="stepper" v-if="clusters.length" flat)
     q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title")
       //- div {{clusters[index]}}
       .column.q-col-gutter-sm 
@@ -20,9 +20,9 @@ q-page(padding).text-center
         .col
           q-input(filled v-model="clusters[index].learn" label="What should someone else learn from this?")
         .col
-          q-input(filled v-model="clusters[index].learn" label="Links to research questions")
+          q-input(filled v-model="clusters[index].questions" label="Links to research questions")
         .col
-          q-input(filled v-model="clusters[index].learn" label="Take-home messages (bullets)")
+          q-input(filled v-model="clusters[index].bullets" label="Take-home messages (bullets)")
         .col Select 3 of the following quotes that best represent this cluster
         .col( v-for="element of cluster.quotes")
           Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true")
@@ -181,8 +181,6 @@ export default defineComponent({
           ...cluster,
         });
       }
-
-      //TODO: also save the transcripton objects back again too:
     },
     getItemsForCluster(cluster) {
       return filter(this.allCodes, {

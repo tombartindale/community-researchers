@@ -1,12 +1,12 @@
 <template lang="pug">
-q-card(class="list-group-item" bordered flat).text-left.q-pa-none
+q-card(class="list-group-item" :bordered="!simple" flat).text-left.q-pa-none
   //- div {{clusters}}
   q-card-section(horizontal)
     q-card-section(side v-if="highlight")
       q-checkbox(:model-value="element.highlighted || false" @update:model-value="element.highlighted = $event")  
-    q-card-section.q-pl-sm.q-pb-none.q-pr-sm.q-pt-sm.transcription
+    q-card-section.q-pl-sm.q-pb-none.q-pr-sm.q-pt-sm.transcription.text-secondary
       .scroll-me {{ element.alternatives[0].transcript }}
-  q-separator(inset).q-mt-sm
+  q-separator(inset v-if="!simple").q-mt-sm
   q-card-actions(align="between" v-if="clusters.length")
     //- div {{element}}
     div
@@ -28,7 +28,7 @@ import find from "lodash/find";
 
 export default defineComponent({
   name: "ErrorNotFound",
-  props: ["element", "codeBook", "clusters", "locale", "highlight"],
+  props: ["element", "codeBook", "clusters", "locale", "highlight", "simple"],
   methods: {
     // updateCheck(val) {
     // console.log(val);

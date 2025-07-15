@@ -1,10 +1,11 @@
 <template lang="pug">
 q-page(padding)
   .row.justify-center
-    .col.col-md-8
-      .text-h4.text-center.q-mb-md Upload Your research plan
+    .col.col-md-5
+      .text-h6.text-center.q-my-lg Upload Your research plan
+      div.q-mt-md &nbsp;
       q-form(@submit.prevent="upload" v-if="!uploading")
-        .column.q-col-gutter-sm
+        .column
           q-file(v-model="inputVal" label="Select File" filled)
           //- q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options)
           //- //- q-input(v-model="who" label="Who" filled :rules="[val => !!val || 'Who is required']")

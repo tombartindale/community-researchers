@@ -3,30 +3,38 @@ q-page(padding).text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
-        .text-body1 Summarise across all the clusters from your region.
+        .text-body1 Summarise across all the insights from {{user.profile.region}}.
     //- div {{records}}
   //- div {{regionData}}
 
   .row(v-if="regionData").justify-center
     .col-md-8.col
-      q-input(type="textarea" v-model="regionData.description" @blur="saveDesc" filled label="Summary of Findings")
+      q-editor.text-left(type="textarea" v-model="regionData.description" @blur="saveDesc" filled label="Summary of Findings" content-class="bg-grey-1")
 
 
     //- div {{clusters}}
 
 
-  .row
+  .row.q-col-gutter-sm.q-mt-lg
     .col-4(v-for="(cluster,index) of clusters")
-      q-card()
-        //- div {{clusters[index]}}
-        .column.q-col-gutter-sm 
-          .col {{clusters[index].title}}
-          .col {{clusters[index].description }}
-          .col {{clusters[index].learn}}
-          .col( v-for="element of cluster.quotes")
-            Cluster(:element="element" :clusters="false" :locale="locale")
+      q-card(flat bordered)
+        q-card-section
+          .column.q-col-gutter-sm 
+            .col
+              .text-body1 {{clusters[index].title}}
+            .col 
+              .text-body2 {{clusters[index].description }}
+            .col 
+              .text-body2 {{clusters[index].learn}}
+            .col 
+              .text-body2 {{clusters[index].questions}}
+            .col    
+              .text-body2 {{clusters[index].bullets}}
+            .col( v-for="element of cluster.quotes")
+              Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
+              q-separator(inset).q-mt-sm
   
-  //- q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg I've finished reviewing
+  q-btn(color="primary" size="lg" to="/" no-caps).q-mt-lg I've finished reviewing
 
 </template>
 

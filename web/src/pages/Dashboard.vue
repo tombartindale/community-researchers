@@ -104,7 +104,8 @@ q-page(padding)
         q-card(flat bordered).q-mb-md
           q-card-section(horizontal).items-center
             q-card-section(side)
-              q-checkbox(readonly size="lg" :model-value="isReviewed()" color="black")
+              q-icon(size="lg" name="forum").q-mx-sm
+              //- q-checkbox(readonly size="lg" :model-value="isReviewed()" color="black")
             q-card-section 
               .text-h6 Review themes
               .text-body1.text-grey Across {{user.profile.region}}

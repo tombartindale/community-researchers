@@ -1,7 +1,7 @@
 {
   "name": "web",
   "version": "0.0.1",
-  "description": "A Quasar Project",
+  "description": "Community Reseacher Dashboard",
   "productName": "Community Reseacher",
   "author": "Tom Bartindale <tom@bartindale.com>",
   "type": "module",
