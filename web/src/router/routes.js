@@ -49,6 +49,14 @@ const routes = [
     },
   },
   {
+    path: "/review/:region",
+    component: () => import("pages/Review.vue"),
+    props: true,
+    meta: {
+      requiresAuth: true, // This route does not require authentication
+    },
+  },
+  {
     path: "/codebook",
     component: () => import("pages/Codebook.vue"),
     props: true,

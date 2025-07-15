@@ -110,7 +110,7 @@ q-page(padding)
               .text-body1.text-grey Across {{user.profile.region}}
             q-space
             q-card-section
-              q-btn(no-caps :to="`/review/${user.email}`" flat icon-right="chevron_right") Review
+              q-btn(no-caps :to="`/review/${user.profile.region}`" flat icon-right="chevron_right") Review
 
 </template>
 

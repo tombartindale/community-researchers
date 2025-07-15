@@ -10,7 +10,7 @@ q-page(padding).text-center
 
 
   q-stepper(v-model="step" ref="stepper" v-if="clusters.length")
-    q-step(v-for="(cluster,index) of clustered" :name="index" :title="`Cluster ${parseInt(index)+1}`")
+    q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title")
       //- div {{clusters[index]}}
       .column.q-col-gutter-sm 
         .col
@@ -19,6 +19,10 @@ q-page(padding).text-center
           q-input(filled v-model="clusters[index].description" label="Enter a 2 line description of this cluster")
         .col
           q-input(filled v-model="clusters[index].learn" label="What should someone else learn from this?")
+        .col
+          q-input(filled v-model="clusters[index].learn" label="Links to research questions")
+        .col
+          q-input(filled v-model="clusters[index].learn" label="Take-home messages (bullets)")
         .col Select 3 of the following quotes that best represent this cluster
         .col( v-for="element of cluster.quotes")
           Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true")
@@ -85,25 +89,28 @@ export default defineComponent({
       collection(db, `users/${props.email}/recordings`)
     );
 
-    const { data: clusters, promise } = useCollection(
+    const { data: clusters } = useCollection(
       collection(db, `users/${props.email}/clusters`)
     );
 
-    // console.log(promise);
+    // console.log(user);
 
-    promise.value.then(async function (val) {
-      // console.log("clusters loaded");
-      // console.log(val);
-      if (val.length == 0) {
-        // console.log("adding clusters");
-        for (let i = 0; i < 3; i++)
-          await setDoc(doc(db, `users/${props.email}/clusters/${i}`), {
-            title: "",
-            description: "",
-            learn: "",
-          });
-      }
-    });
+    // console.log(user);
+    // promise.value.then(async function (val) {
+    //   // console.log("clusters loaded");
+    //   // console.log(val);
+    //   if (val.length == 0) {
+    //     console.log("adding clusters");
+
+    //     for (let i = 0; i < 3; i++)
+    //       await setDoc(doc(db, `users/${props.email}/clusters/${i}`), {
+    //         title: "",
+    //         description: "",
+    //         learn: "",
+    //         region: user.value.profile.region,
+    //       });
+    //   }
+    // });
 
     const { locale } = useI18n();
 

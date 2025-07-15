@@ -1,20 +1,22 @@
 <template lang="pug">
 q-card(class="list-group-item" bordered flat).text-left.q-pa-none
-  //- div {{codeBook}}
+  //- div {{clusters}}
   q-card-section(horizontal)
     q-card-section(side v-if="highlight")
       q-checkbox(:model-value="element.highlighted || false" @update:model-value="element.highlighted = $event")  
-    q-card-section.q-pl-sm.q-pb-none.q-pr-sm.q-pt-sm.transcript {{ element.alternatives[0].transcript }}
-  q-card-actions(align="between" v-if="clusters!==false")
-    //- div {{element.codes}}
+    q-card-section.q-pl-sm.q-pb-none.q-pr-sm.q-pt-sm.transcription
+      .scroll-me {{ element.alternatives[0].transcript }}
+  q-separator(inset).q-mt-sm
+  q-card-actions(align="between" v-if="clusters.length")
+    //- div {{element}}
     div
       span(v-for="code of element.codes" :style="{'color':getCode(code)?.color}") {{getCode(code)?.name[locale]}}&nbsp;
-    q-btn(icon-right="add" flat dense no-caps ) {{(element.cluster)?getName(element.cluster).name:''}}
+    q-btn(icon-right="add" flat dense no-caps ) {{(element.cluster)?getName(element.cluster)?.title:''}}
       q-menu()
         q-list(separator)
           q-item(v-for="cluster in clusters" :key="cluster.id" @click="element.cluster = cluster.id" clickable v-close-popup :active="cluster.id == element.cluster")
             q-item-section
-              q-item-label {{cluster.name}}
+              q-item-label {{cluster.title}}
           q-item(@click="delete element.cluster" clickable v-close-popup)
             q-item-section
               q-item-label() Remove from cluster
@@ -38,7 +40,8 @@ export default defineComponent({
       return find(this.codeBook, { code: code });
     },
     getName(cluster) {
-      return find(this.clusters, { id: cluster });
+      // console.log(this.clusters);
+      return find(this.clusters, { id: "" + cluster });
     },
   },
   // watch: {
@@ -49,3 +52,10 @@ export default defineComponent({
   // },
 });
 </script>
+
+<style lang="scss">
+.scroll-me {
+  max-height: 200px;
+  overflow: auto;
+}
+</style>

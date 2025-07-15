@@ -7,7 +7,7 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-// const { onRequest } = require("firebase-functions/v2/https");
+import { onCall } from "firebase-functions/v2/https";
 // const logger = require("firebase-functions/logger");
 import { initializeApp } from "firebase-admin/app";
 initializeApp();
@@ -24,6 +24,7 @@ import os from "os";
 import fs from "fs";
 import reader from "any-text";
 import flatten from "lodash/flatten.js";
+import filter from "lodash/filter.js";
 
 export const convertfile = onDocumentCreated(
   {
@@ -291,5 +292,53 @@ export const transcribe = onObjectFinalized(async (event) => {
     }
     // // Get a Promise representation of the final result of the job
     //   const [response] = await operation.promise();
+  }
+});
+
+export const getClustersForRegion = onCall(async (request) => {
+  if (request.auth) {
+    // return data:
+
+    //get clusters from this region:
+    const clusters = await getFirestore()
+      .collectionGroup("clusters")
+      .where("region", "==", request.data.region)
+      .get();
+
+    //get all records :
+    const records = await getFirestore().collectionGroup("recordings").get();
+
+    let output = [];
+
+    // console.log(clusters.docs);
+
+    for (let cluster of clusters.docs) {
+      //for each cluster, get the records for that person:
+      // console.log(records.docs);
+      // const foruser = filter(records.docs, (d) => {
+      //   console.log(d.ref.parent.parent.id);
+      //   return d.ref.parent.parent.id == cluster.ref.parent.parent.id;
+      // });
+
+      let outt = cluster.data();
+      outt.quotes = [];
+
+      for (const recording of records.docs) {
+        for (const quote of recording.data().transcription.results) {
+          // console.log(quote);
+
+          if ("" + quote.cluster === "" + cluster.ref.id && quote.highlighted)
+            outt.quotes.push(quote);
+        }
+
+        // console.log(foruser);
+      }
+
+      output.push(outt);
+    }
+
+    return output;
+  } else {
+    return [];
   }
 });

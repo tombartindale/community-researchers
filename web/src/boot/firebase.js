@@ -1,10 +1,31 @@
 import { defineBoot } from "#q-app/wrappers";
-import { VueFire, VueFireAuth, VueFireFirestoreOptionsAPI } from "vuefire";
+import {
+  VueFire,
+  VueFireAuth,
+  VueFireFirestoreOptionsAPI,
+  firestoreDefaultConverter,
+  globalFirestoreOptions,
+} from "vuefire";
+
+globalFirestoreOptions.converter = {
+  // the default converter just returns the data: (data) => data
+  toFirestore: firestoreDefaultConverter.toFirestore,
+  fromFirestore: (snapshot, options) => {
+    const data = firestoreDefaultConverter.fromFirestore(snapshot, options);
+    // if the document doesn't exist, return null
+    if (!data) return null;
+    // add anything custom to the returned object
+    // console.log(snapshot.ref.parent.parent);
+    data.parent = snapshot.ref.parent?.parent?.id;
+    return data;
+  },
+};
 
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 export const firebaseApp = initializeApp({
   // your application settings
@@ -21,15 +42,18 @@ export const firebaseApp = initializeApp({
 export const db = getFirestore(firebaseApp);
 export const auth = getAuth(firebaseApp);
 export const storage = getStorage(firebaseApp);
+export const functions = getFunctions(firebaseApp);
 
 import { connectFirestoreEmulator } from "firebase/firestore";
 import { connectAuthEmulator } from "firebase/auth";
 import { connectStorageEmulator } from "firebase/storage";
+import { connectFunctionsEmulator } from "firebase/functions";
 
 if (process.env.VUE_APP_EMULATORS) {
   connectAuthEmulator(auth, "http://localhost:9099");
   connectFirestoreEmulator(db, "localhost", 8080);
   connectStorageEmulator(storage, "localhost", 9199);
+  connectFunctionsEmulator(functions, "localhost", 5001);
 }
 
 export default defineBoot(({ app }) => {
@@ -44,3 +68,8 @@ export default defineBoot(({ app }) => {
     ],
   });
 });
+
+export const getClustersForRegion = httpsCallable(
+  functions,
+  "getClustersForRegion"
+);
