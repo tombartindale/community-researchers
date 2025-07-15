@@ -28,8 +28,8 @@ q-page(padding).text-center
                     q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
             span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}
             span . 
-    .col-md-1.md
-      div.text-overline Legend
+    .col-md-1.gt-md
+      div.text-overline Codes
       div.transcript.line(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
   
   q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg I've finished coding

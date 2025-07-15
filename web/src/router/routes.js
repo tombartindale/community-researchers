@@ -41,6 +41,14 @@ const routes = [
     },
   },
   {
+    path: "/describe/:email",
+    component: () => import("pages/Describe.vue"),
+    props: true,
+    meta: {
+      requiresAuth: true, // This route does not require authentication
+    },
+  },
+  {
     path: "/codebook",
     component: () => import("pages/Codebook.vue"),
     props: true,

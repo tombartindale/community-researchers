@@ -81,12 +81,20 @@ q-page(padding)
             q-card-section(side)
               q-checkbox(readonly size="lg" :model-value="isGrouped()" color="black")
             q-card-section 
-              .text-h6 Group codes into themes
+              .text-h6 Cluster codes into stories
             q-space
             q-card-section
-              q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right") Group
-            //- router-link(:to="`/code/${recording.id}`" v-if="canCode(recording)") Code transcript
-            //- div(v-else) Code transcript
+              q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right") Cluster
+        q-card(bordered flat).q-mb-md
+          q-card-section(horizontal).items-center
+            q-card-section(side)
+              q-checkbox(readonly size="lg" :model-value="isDescribed()" color="black")
+            q-card-section 
+              .text-h6 Describe Your insights
+            q-space
+            q-card-section
+              q-btn(no-caps :to="`/describe/${user.email}`" flat icon-right="chevron_right") Describe
+            
         .row.q-my-md.items-center
           .col 
             q-separator
@@ -99,9 +107,10 @@ q-page(padding)
               q-checkbox(readonly size="lg" :model-value="isReviewed()" color="black")
             q-card-section 
               .text-h6 Review themes
+              .text-body1.text-grey Across {{user.profile.region}}
             q-space
             q-card-section
-              q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right") Review
+              q-btn(no-caps :to="`/review/${user.email}`" flat icon-right="chevron_right") Review
 
 </template>
 
@@ -151,7 +160,13 @@ export default defineComponent({
       return recording.status == "coded";
     },
     isGrouped() {
-      return this.userProfile.status == "grouped";
+      return (
+        this.userProfile.status == "clustered" ||
+        this.userProfile.status == "described"
+      );
+    },
+    isDescribed() {
+      return this.userProfile.status == "described";
     },
     isReviewed() {
       return this.userProfile.status == "reviewed";

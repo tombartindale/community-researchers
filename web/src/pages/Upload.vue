@@ -2,15 +2,15 @@
 q-page(padding)
   .row.justify-center
     .col.col-md-8
-      .text-h4.text-center.q-mb-md Upload new interview
+      .text-h4.text-center.q-mb-lg.q-mt-sm Upload new interview
       q-form(@submit.prevent="upload" v-if="!uploading")
         .column.q-col-gutter-sm
-          q-file(v-model="inputVal" label="Select File" filled accept="audio/*, video/*, .docx")
-          q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options )
-          .text-caption If the language you require is listed, please transcribe the audio yourself and upload the transcript.
-          q-input(v-model="who" label="Who" filled :rules="[val => !!val || 'Who is required']")
+          q-file(v-model="inputVal" label="Which file to upload?" filled accept="audio/*, video/*, .docx")
+          .text-caption Upload any recording file, or an existing transcript (.docx). If the language you require is not listed, please transcribe the audio yourself and upload the transcript.
+          q-select(v-model="language" :options="languageOptions" label="What language was the interview conducted in?" filled :rules="[val => !!val || 'Language is required']" emit-value map-options )
+          q-input(v-model="who" label="Who did you interview?" filled :rules="[val => !!val || 'Who is required']")
           .col
-            q-input(:rules="[val => !!val || 'When is required']" v-model="when" readonly filled label="When")
+            q-input(:rules="[val => !!val || 'When is required']" v-model="when" readonly filled label="When did you conduct the interview?")
               template(v-slot:append)
                 q-icon(name="event").cursor-pointer
                   q-popup-proxy(cover)

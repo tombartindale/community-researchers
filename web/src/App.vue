@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout.view
+q-layout(view="hHh lpR fFf").view
   q-header 
     q-toolbar.bg-white.text-primary
       q-btn(to="/" flat dense icon="home")

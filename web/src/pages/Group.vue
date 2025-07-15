@@ -3,74 +3,31 @@ q-page(padding).text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
-        .text-body1 Group codes together that make sense.
+        .text-body1 Create clusters of quotes that tell a story when put together. You do not have to use all quotes.
       //- div {{codeBook}}
     
     //- div {{allCodes}}
-    //- div {{group1}}
+    //- div {{list1}}
 
-    .row
-      .col-4
-        div All Codes/Quotes
-        draggable(
-          tag="transition-group"
-          :component-data="{ tag: 'ul', type: 'transition-group', name: !drag ? 'flip-list' : null }"
-          v-model="list1"
-          v-bind="dragOptions"
-          @start="drag = true"
-          @end="drag = false"
-          item-key="id")
-          template(#item="{ element }")
-            q-card(class="list-group-item").text-left.q-mb-sm
-              q-card-section {{ element.alternatives[0].transcript }}
-      .col-4
-        div Group 1
-        draggable(
-          tag="transition-group"
-          :component-data="{ tag: 'ul', type: 'transition-group', name: !drag ? 'flip-list' : null }"
-          v-model="group1"
-          v-bind="dragOptions"
-          @start="drag = true"
-          @end="drag = false"
-          item-key="id")
-          template(#item="{ element }")
-            q-card(class="list-group-item").text-left.q-mb-sm
-              q-card-section {{ element.alternatives[0].transcript }}
-      .col-4
-        div Group 2
-        draggable(
-          tag="transition-group"
-          :component-data="{ tag: 'ul', type: 'transition-group', name: !drag ? 'flip-list' : null }"
-          v-model="group2"
-          v-bind="dragOptions"
-          @start="drag = true"
-          @end="drag = false"
-          item-key="id")
-          template(#item="{ element }")
-            q-card(class="list-group-item").text-left.q-mb-sm
-              q-card-section {{ element.alternatives[0].transcript }}
-
-  //- .row.justify-center(v-if="record")
-  //-   .col-md-8.col
-  //-     q-card().text-justify
-  //-       q-card-section.text-body1
-  //-         span(v-for="(line,id) of record.transcription.results" :key="id" ).transcript
-  //-           //- div {{line.codes}}
-  //-           q-menu(touch-position)
-  //-             q-list(separator)
-  //-               q-item-label(header) Select a code
-  //-               q-separator
-  //-               q-item(v-for="code in codeBook" :key="code.id" @click="addCode(line, code)" clickable v-close-popup :active="isActiveCode(line, code)")
-  //-                 q-item-section
-  //-                   q-item-label {{code.name}}
-  //-                   q-item-label(caption lines="2") {{code.description}}
-  //-           span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}
-  //-           span . 
-    //- .col-md-1.md
-    //-   div.text-overline Legend
-    //-   div.transcript.line(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name}} 
+  .row
+    .col-12
+      q-scroll-area(style="height:50vh;width:100%;")
+        .row.q-col-gutter-sm
+          .col-4(v-for="i in [0,1,2,3]")
+            .column.q-col-gutter-sm
+              .col(v-for="element of list1[i]")
+                //- div {{element.record}}
+                Cluster(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale")
+  q-separator.q-my-sm
+  .row.q-col-gutter-sm
+    .col-4(v-for="cluster of clusters")
+      .text-h6 {{cluster.name}}
+      .column.q-col-gutter-sm
+        .col( v-for="element of getItemsForCluster(cluster.id)")
+          Cluster(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale")
+     
   
-  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg I've finished grouping
+  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg I've finished clustering
 
 </template>
 
@@ -84,6 +41,25 @@ import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage 
 import { doc, collection, setDoc, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
 
 import filter from "lodash/filter";
+import find from "lodash/find";
+import map from "lodash/map";
+import extend from "lodash/extend";
+
+import Cluster from "src/components/Cluster.vue";
+// import groupBy from "lodash/groupBy";
+
+import { useI18n } from "vue-i18n";
+
+const partitionBy = (arr, fn) => [
+  ...arr
+    .reduce((acc, val, i, arr) => {
+      const current = fn(val, i, arr);
+      if (acc.has(current)) acc.get(current).push(val);
+      else acc.set(current, [val]);
+      return acc;
+    }, new Map())
+    .values(),
+];
 
 const toggleElement = (arr, val) =>
   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
@@ -95,6 +71,7 @@ export default defineComponent({
   props: ["email"],
   components: {
     draggable,
+    Cluster,
   },
   data() {
     return {
@@ -105,9 +82,14 @@ export default defineComponent({
         disabled: false,
         ghostClass: "ghost",
       },
+      clusters: [
+        { id: 1, name: "Cluster 1" },
+        { id: 2, name: "Cluster 2" },
+        { id: 3, name: "Cluster 3" },
+      ],
       list1: [],
-      group1: [],
-      group2: [],
+      // group1: [],
+      // group2: [],
     };
   },
   setup(props) {
@@ -117,26 +99,12 @@ export default defineComponent({
       collection(db, `users/${props.email}/recordings`)
     );
 
-    //get all transcripts with a code:
-    // const allCodes = computed(() => {
-    //   const tmp = [];
-
-    //   for (let record of records.value) {
-    //     let all = filter(
-    //       record.transcription?.results,
-    //       (f) => f.codes?.length > 0
-    //     );
-
-    //     tmp.push(...all);
-    //   }
-
-    //   return tmp;
-    // });
+    const { locale } = useI18n();
 
     const codeBook = useCollection(collection(db, `codebook`));
 
     // console.log("record", record);
-    return { user, records, codeBook };
+    return { user, records, codeBook, locale };
   },
   computed: {
     allCodes() {
@@ -148,6 +116,10 @@ export default defineComponent({
           (f) => f.codes?.length > 0
         );
 
+        all = map(all, (o) => {
+          return extend(o, { record: record.id });
+        });
+
         tmp.push(...all);
       }
 
@@ -155,16 +127,44 @@ export default defineComponent({
     },
   },
   watch: {
-    allCodes() {
-      this.list1 = this.allCodes;
+    allCodes: {
+      deep: true,
+      handler() {
+        if (this.list1.length === 0)
+          this.list1 = partitionBy(this.allCodes, (n, i) => {
+            return i % 3;
+          });
+        else {
+          // console.log(this.allCodes);
+
+          //this.records is the ground truth:
+
+          // console.log(this.records);
+
+          //for each record doc:
+          for (const record of this.records) {
+            updateDoc(
+              doc(db, `users/${this.user.email}/recordings/${record.id}`),
+              {
+                transcription: record.transcription,
+              }
+            );
+          }
+        }
+      },
     },
   },
   methods: {
+    getItemsForCluster(cluster) {
+      return filter(this.allCodes, {
+        cluster: cluster,
+      });
+    },
     done() {
       setDoc(
         doc(db, `users/${this.user.email}`),
         {
-          status: "grouped",
+          status: "clustered",
         },
         { merge: true }
       );
@@ -214,15 +214,6 @@ export default defineComponent({
 }
 
 .transcript {
-  font-size: 1.4em;
-  line-height: 2.5em;
-  font-family: serif;
-
-  // text-decoration-style: wavy;
-
-  :hover {
-    background-color: #f0f0f0;
-    cursor: pointer;
-  }
+  font-size: 1em;
 }
 </style>
