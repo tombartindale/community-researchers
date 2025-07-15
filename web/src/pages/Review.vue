@@ -16,8 +16,8 @@ q-page(padding).text-center
 
 
   .row.q-col-gutter-sm.q-mt-lg
-    .col-4(v-for="(cluster,index) of clusters")
-      q-card(flat bordered)
+    .col-4(v-for="(cluster,index) of clusters" )
+      q-card(flat bordered v-if="cluster?.quotes.length>0")
         q-card-section
           .column.q-col-gutter-sm 
             .col

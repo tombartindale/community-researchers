@@ -1,11 +1,12 @@
 <template lang="pug">
 q-page(padding).text-center
-  .text-h4 Admin
-  router-link(to="/admin/users") Users
-  span  &middot; 
-  router-link(to="/admin") Recordings
-  span  &middot; 
-  router-link(to="/admin/researchplans") Research Plans
+  .text-h6 Admin
+  div
+    router-link(to="/admin/users") Users
+    span  &middot; 
+    router-link(to="/admin") Recordings
+    span  &middot; 
+    router-link(to="/admin/researchplans") Research Plans
   router-view
 
 </template>

@@ -84,7 +84,7 @@ q-page(padding)
               .text-h6 Cluster codes into stories
             q-space
             q-card-section
-              q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right") Cluster
+              q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right" v-if="canGroup()") Cluster
         q-card(bordered flat).q-mb-md
           q-card-section(horizontal).items-center
             q-card-section(side)
@@ -93,7 +93,7 @@ q-page(padding)
               .text-h6 Describe Your insights
             q-space
             q-card-section
-              q-btn(no-caps :to="`/describe/${user.email}`" flat icon-right="chevron_right") Describe
+              q-btn(no-caps :to="`/describe/${user.email}`" flat icon-right="chevron_right" v-if="canDescribe()") Describe
             
         .row.q-my-md.items-center
           .col 
@@ -111,7 +111,7 @@ q-page(padding)
               .text-body1.text-grey Across {{user.profile.region}}
             q-space
             q-card-section
-              q-btn(no-caps :to="`/review/${user.profile.region}`" flat icon-right="chevron_right") Review
+              q-btn(no-caps :to="`/review/${user.profile.region}`" flat icon-right="chevron_right" v-if="canReview()") Review
 
 </template>
 
@@ -124,6 +124,8 @@ import { useCurrentUser } from "vuefire";
 
 import { collection, doc } from "firebase/firestore";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase Firestore setup
+
+import some from "lodash/some";
 
 export default defineComponent({
   name: "DashboardPage",
@@ -156,6 +158,23 @@ export default defineComponent({
           return "check";
         }
       }
+    },
+    canGroup() {
+      // console.log(this.recordings);
+
+      return some(this.recordings, { status: "coded" });
+    },
+    canDescribe() {
+      return (
+        this.user.profile.status == "clustered" ||
+        this.user.profile.status == "described"
+      );
+    },
+    canReview() {
+      return (
+        this.user.profile.status == "described" ||
+        this.user.profile.status == "clustered"
+      );
     },
     isComplete(recording) {
       return recording.status == "coded";

@@ -1,6 +1,6 @@
 <template lang="pug">
 q-page(padding).text-center
-  .text-h4 Users
+  .text-h6 Users
   q-list(separator).text-left
     q-item
       q-item-section.text-grey Email

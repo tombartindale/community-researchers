@@ -6,7 +6,7 @@ q-card(class="list-group-item" :bordered="!simple" flat).text-left.q-pa-none
       q-checkbox(:model-value="element.highlighted || false" @update:model-value="element.highlighted = $event")  
     q-card-section.q-pl-sm.q-pb-none.q-pr-sm.q-pt-sm.transcription.text-secondary
       .scroll-me {{ element.alternatives[0].transcript }}
-  q-separator(inset v-if="!simple").q-mt-sm
+  q-separator(inset v-if="!simple || (simple && clusters.length)").q-mt-sm
   q-card-actions(align="between" v-if="clusters.length")
     //- div {{element}}
     div

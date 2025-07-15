@@ -2,9 +2,10 @@
 q-page(padding).text-center
   .row.justify-center
     .col.col-md-8
-      .text-h4 Research Plans
-      .text-h6 To check
+      
+      .text-h6 Research plans to check
       .text-caption Check each research plan. Contact the researcher directly if you need them to make changes to their research plan
+      q-separator
       q-list(separator).text-left
         div(v-for="plan of plans")
           q-item( v-if="!plan?.isResearchPlanChecked") 
@@ -14,18 +15,26 @@ q-page(padding).text-center
             q-item-section(side)
               q-btn(flat icon="check" dense @click="approve(plan)") 
                 q-tooltip OK to move forward
-      .text-h6 In operation
+        //- span(v-if="plans.length==0").text-overline nothing here
+        .text-center
+          q-spinner(v-if="loading" size="md").q-ma-md
+
+      .text-h6 Research plans in operation
+      q-separator
       q-list(separator).text-left
         div(v-for="plan of plans")
           q-item( v-if="plan?.isResearchPlanChecked") 
             q-item-section {{plan.id}}
             q-item-section(side) 
               q-btn(flat icon="download" @click="download(plan.latestResearchPlan)" dense)
+      .text-center
+          q-spinner(v-if="loading" size="md").q-ma-md
+          
            
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref as vueRef } from "vue";
 
 import { useCollection, useCurrentUser } from "vuefire";
 import { db, storage } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
@@ -53,10 +62,15 @@ export default defineComponent({
     //   doc(db, `users/${user.value.email}/recordings/${props.id}`)
     // );
 
-    const plans = useCollection(collection(db, `users`));
+    const { data: plans, promise } = useCollection(collection(db, `users`));
+
+    const loading = vueRef(true);
+    promise.value.then(() => {
+      loading.value = false;
+    });
 
     // console.log("record", record);
-    return { user, plans };
+    return { user, plans, loading };
   },
   // watch: {
   //   record: {
