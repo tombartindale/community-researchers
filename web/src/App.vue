@@ -5,7 +5,7 @@ q-layout(view="hHh lpR fFf").view
       q-btn(to="/" flat dense icon="home")
       q-btn(to="/codebook" flat dense icon="book" v-if="user?.profile?.isEditor || user?.profile?.isAdmin")
         q-tooltip Codebook
-      q-btn(to="/admin" flat dense icon="library_books" v-if="user?.profile?.isAdmin")
+      q-btn(to="/admin" flat dense icon="settings" v-if="user?.profile?.isAdmin")
         q-tooltip Admin
       q-space
       span Community Researcher Dashboard &middot; {{ user ? user.email : 'Not signed in' }}

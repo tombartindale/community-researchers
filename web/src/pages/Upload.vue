@@ -16,7 +16,7 @@ q-page(padding)
                 q-icon(name="event").cursor-pointer
                   q-popup-proxy(cover)
                     q-date(v-model="when" label="When" filled landscape v-close-popup)
-          .col.text-right
+          .col.text-center
             q-btn.q-mt-md(type="submit" label="Upload" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
       
       .row.justify-center

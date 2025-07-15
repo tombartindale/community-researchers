@@ -7,37 +7,48 @@ q-page(padding).text-center
     q-item
       q-item-section.col-1.text-grey Color
       q-item-section.col-2.text-grey Code
-      q-item-section.col-2.text-grey Name
+      q-item-section.col-3.text-grey Name
       q-item-section.text-grey Description
     q-item(v-for="code of codeBook")
       q-item-section.col-1
         q-avatar(round :style="{'background-color':code.color}" size="2.5em")
       q-item-section.col-2 {{code.code}}
-      q-item-section.col-2 
+      q-item-section.col-3.text-left 
         div(v-for="(n,l) of code.name") 
-          span.text-grey {{l}}&nbsp;
-          span {{n}} 
-      q-item-section
+          .row
+            .col-1
+              .q-pr-sm
+                span.text-grey {{l}}&nbsp;
+            .col
+              span {{n}} 
+      q-item-section.col-3.text-left
         div(v-for="(n,l) of code.description") 
-          span.text-grey {{l}}&nbsp;
-          span {{n}} 
-    q-item
-      q-item-section.col-1
-        q-avatar(round :style="{'background-color':newCode.color}" size="2.5em")
-          q-icon(name="colorize" class="cursor-pointer" size="sm" color="grey")
-            q-popup-proxy(cover transition-show="scale" transition-hide="scale")
-              q-color(v-model="newCode.color")
-      q-item-section.col-2
-        q-input(filled v-model="newCode.code" dense)
-      q-item-section.col-2
-        div(v-for="l of langs")
-          q-input(filled v-model="newCode.name[l]" :label="l" dense)
-      q-item-section
-        .row
-          .col
-            div(v-for="l of langs")
-              q-input(filled v-model="newCode.description[l]" :label="l" dense)
-          q-btn(icon="add" flat @click="addCode")
+          .row
+            .col-1
+              .q-pr-sm
+                span.text-grey {{l}}&nbsp;
+            .col
+              span {{n}} 
+    q-form(@submit="addCode")
+      q-separator
+      q-item
+      
+        q-item-section.col-1.self-start
+          q-avatar(round :style="{'background-color':newCode.color}" size="2.5em")
+            q-icon(name="colorize" class="cursor-pointer" size="sm" color="grey")
+              q-popup-proxy(cover transition-show="scale" transition-hide="scale")
+                q-color(v-model="newCode.color")
+        q-item-section.col-2.self-start
+          q-input(filled v-model="newCode.code" dense :rules="[val => !!val || 'Code is required']")
+        q-item-section.col-3
+          div(v-for="l of langs")
+            q-input(filled v-model="newCode.name[l]" :label="l" dense :rules="[val => !!val || 'Required']")
+        q-item-section
+          .row
+            .col
+              div(v-for="l of langs")
+                q-input(filled v-model="newCode.description[l]" :label="l" dense :rules="[val => !!val || 'Required']")
+            q-btn(icon="add" flat type="submit")
       
 
     
