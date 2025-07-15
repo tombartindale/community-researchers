@@ -19,7 +19,7 @@ q-card(class="list-group-item" :bordered="!simple" flat).text-left.q-pa-none
               q-item-label {{cluster.title}}
           q-item(@click="delete element.cluster" clickable v-close-popup)
             q-item-section
-              q-item-label() Remove from cluster
+              q-item-label() {{ $t('remove-from-cluster') }}
 </template>
 
 <script>

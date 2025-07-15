@@ -69,5 +69,6 @@
   "who-did-you-interview": "Who did you interview?",
   "when-is-required": "When is required",
   "when-did-you-conduct-the-interview": "When did you conduct the interview?",
-  "when": "When"
+  "when": "When",
+  "remove-from-cluster": "Remove from cluster"
 }
