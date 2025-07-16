@@ -96,9 +96,14 @@ export default defineComponent({
             latestResearchPlan: filename,
           });
           this.$router.push("/"); // Redirect to the dashboard or any other page
-        } catch (er) {
-          console.error(er);
-          alert(this.$t("error-uploading-file-please-try-again"));
+        } catch {
+          // console.error(er);
+          // alert(this.$t("error-uploading-file-please-try-again"));
+
+          this.q.notify({
+            type: "negative",
+            message: this.$t("error-uploading-file-please-try-again"),
+          });
         }
 
         this.uploading = false;

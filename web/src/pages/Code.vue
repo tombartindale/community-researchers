@@ -52,6 +52,7 @@ const toggleElement = (arr, val) =>
 // const user = useCurrentUser()
 
 import { useI18n } from "vue-i18n";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "CodePage",
@@ -69,9 +70,10 @@ export default defineComponent({
     const codeBook = useCollection(collection(db, `codebook`));
 
     const { locale } = useI18n();
+    const q = useQuasar();
 
     // console.log("record", record);
-    return { user, record, codeBook, locale };
+    return { user, record, codeBook, locale, q };
   },
   // watch: {
   //   record: {
@@ -87,16 +89,30 @@ export default defineComponent({
     editLine(val, line) {
       // console.log(val);
       // console.log(line);
-      line.alternatives[0].transcript = val;
-      updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-        transcription: this.record.transcription,
-      });
+      try {
+        line.alternatives[0].transcript = val;
+        updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
+          transcription: this.record.transcription,
+        });
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
     done() {
-      updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-        status: "coded",
-      });
-      this.$router.push("/");
+      try {
+        updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
+          status: "coded",
+        });
+        this.$router.push("/");
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
     isActiveCode(line, code) {
       return line.codes?.includes(code.code);
@@ -111,10 +127,17 @@ export default defineComponent({
 
       line.codes = toggleElement(line.codes, code.code);
 
-      // line.codes.push(code.code);
-      updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-        transcription: this.record.transcription,
-      });
+      try {
+        // line.codes.push(code.code);
+        updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
+          transcription: this.record.transcription,
+        });
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
       // console.log(line, code);
     },
     getLineColor(line) {

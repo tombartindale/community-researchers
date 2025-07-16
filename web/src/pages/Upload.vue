@@ -40,6 +40,7 @@ import { storage, db } from "src/boot/firebase"; // Assuming you have a Firebase
 import { ref, uploadBytesResumable } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore"; // Importing dbRef for database operations
 
+import { useQuasar } from "quasar";
 // const user = useCurrentUser()
 
 export default defineComponent({
@@ -63,7 +64,8 @@ export default defineComponent({
   },
   setup() {
     const user = useCurrentUser();
-    return { user };
+    const q = useQuasar();
+    return { user, q };
   },
   methods: {
     async upload() {
@@ -105,7 +107,12 @@ export default defineComponent({
           });
           this.$router.push("/"); // Redirect to the dashboard or any other page
         } catch {
-          alert(this.$t("error-uploading-file-please-try-again"));
+          this.q.notify({
+            type: "negative",
+            message: this.$t("error-uploading-file-please-try-again"),
+          });
+
+          // alert(this.$t("error-uploading-file-please-try-again"));
         }
 
         this.uploading = false;

@@ -57,6 +57,7 @@ import Cluster from "src/components/Cluster.vue";
 // import groupBy from "lodash/groupBy";
 
 import { useI18n } from "vue-i18n";
+import { useQuasar } from "quasar";
 
 // const toggleElement = (arr, val) =>
 //   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
@@ -92,6 +93,7 @@ export default defineComponent({
   },
   setup(props) {
     const user = useCurrentUser();
+    const q = useQuasar();
 
     // const records = useCollection(
     //   collection(db, `users/${props.email}/recordings`)
@@ -132,7 +134,7 @@ export default defineComponent({
     // const codeBook = useCollection(collection(db, `codebook`));
 
     // console.log("record", record);
-    return { user, locale, regionData };
+    return { user, locale, regionData, q };
   },
   computed: {
     allCodes() {
@@ -156,12 +158,19 @@ export default defineComponent({
     async "regionData.description"() {},
   },
   methods: {
-    async saveDesc(ev, data) {
-      console.log(data);
+    async saveDesc() {
+      // console.log(data);
 
-      await updateDoc(doc(db, `regions/${this.region}`), {
-        description: this.regionData.description,
-      });
+      try {
+        await updateDoc(doc(db, `regions/${this.region}`), {
+          description: this.regionData.description,
+        });
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
     getItemsForCluster(cluster) {
       return filter(this.allCodes, {
@@ -169,15 +178,22 @@ export default defineComponent({
       });
     },
     done() {
-      this.save();
-      setDoc(
-        doc(db, `users/${this.user.email}`),
-        {
-          status: "described",
-        },
-        { merge: true }
-      );
-      this.$router.push("/");
+      try {
+        this.save();
+        setDoc(
+          doc(db, `users/${this.user.email}`),
+          {
+            status: "described",
+          },
+          { merge: true }
+        );
+        this.$router.push("/");
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
   },
 });

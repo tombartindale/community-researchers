@@ -64,6 +64,7 @@ import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage 
 import { collection, addDoc } from "firebase/firestore"; // Importing dbRef for database operations
 
 import { useI18n } from "vue-i18n";
+import { useQuasar } from "quasar";
 
 // import find from "lodash/find";
 
@@ -96,9 +97,10 @@ export default defineComponent({
     const codeBook = useCollection(collection(db, `codebook`));
 
     const { locale } = useI18n({ useScope: "global" });
+    const q = useQuasar();
 
     // console.log("record", record);
-    return { user, codeBook, locale };
+    return { user, codeBook, locale, q };
   },
   // watch: {
   //   record: {
@@ -120,13 +122,19 @@ export default defineComponent({
       // };
       // translated.name[this.locale] = this.newCode.name;
       // translated.description[this.locale] = this.newCode.description;
-
-      addDoc(collection(db, `codebook`), this.newCode);
-      // this.$router.push("/");
-      this.newCode.color = "";
-      this.newCode.code = "";
-      this.newCode.name = {};
-      this.newCode.description = {};
+      try {
+        addDoc(collection(db, `codebook`), this.newCode);
+        // this.$router.push("/");
+        this.newCode.color = "";
+        this.newCode.code = "";
+        this.newCode.name = {};
+        this.newCode.description = {};
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
   },
 });

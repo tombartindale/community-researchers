@@ -56,6 +56,7 @@ import Cluster from "src/components/Cluster.vue";
 // import groupBy from "lodash/groupBy";
 
 import { useI18n } from "vue-i18n";
+import { useQuasar } from "quasar";
 
 // const toggleElement = (arr, val) =>
 //   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
@@ -123,8 +124,10 @@ export default defineComponent({
 
     const codeBook = useCollection(collection(db, `codebook`));
 
+    const q = useQuasar();
+
     // console.log("record", record);
-    return { user, records, codeBook, locale, clusters };
+    return { user, records, codeBook, locale, clusters, q };
   },
   computed: {
     allCodes() {
@@ -159,13 +162,20 @@ export default defineComponent({
           this.clustered = arr;
         } else {
           console.log("update records");
-          for (const record of this.records) {
-            updateDoc(
-              doc(db, `users/${this.user.email}/recordings/${record.id}`),
-              {
-                transcription: record.transcription,
-              }
-            );
+          try {
+            for (const record of this.records) {
+              updateDoc(
+                doc(db, `users/${this.user.email}/recordings/${record.id}`),
+                {
+                  transcription: record.transcription,
+                }
+              );
+            }
+          } catch (e) {
+            this.q.notify({
+              type: "negative",
+              message: e,
+            });
           }
         }
       },
@@ -182,10 +192,19 @@ export default defineComponent({
     async save() {
       //save clusters to db:
       // console.log(this.clusters);
-
-      for (let cluster of this.clusters) {
-        await updateDoc(doc(db, `users/${this.email}/clusters/${cluster.id}`), {
-          ...cluster,
+      try {
+        for (let cluster of this.clusters) {
+          await updateDoc(
+            doc(db, `users/${this.email}/clusters/${cluster.id}`),
+            {
+              ...cluster,
+            }
+          );
+        }
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
         });
       }
     },
@@ -196,18 +215,25 @@ export default defineComponent({
     },
     done() {
       this.save();
-      setDoc(
-        doc(db, `users/${this.user.email}`),
-        {
-          status: "described",
-        },
-        { merge: true }
-      );
-      this.$router.push("/");
+      try {
+        setDoc(
+          doc(db, `users/${this.user.email}`),
+          {
+            status: "described",
+          },
+          { merge: true }
+        );
+        this.$router.push("/");
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
-    isActiveCode(line, code) {
-      return line.codes?.includes(code.code);
-    },
+    // isActiveCode(line, code) {
+    //   return line.codes?.includes(code.code);
+    // },
   },
 });
 </script>

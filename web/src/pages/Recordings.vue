@@ -90,9 +90,9 @@ export default defineComponent({
           console.log(err);
         });
     },
-    getCoding(record) {
-      console.log(record);
-    },
+    // getCoding(record) {
+    //   console.log(record);
+    // },
   },
 });
 </script>

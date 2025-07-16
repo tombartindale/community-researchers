@@ -33,7 +33,7 @@ import { useCollection, useCurrentUser } from "vuefire";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 // import { ref, uploadBytesResumable } from "firebase/storage";
 import { doc, collection, updateDoc, setDoc } from "firebase/firestore"; // Importing dbRef for database operations
-
+import { useQuasar } from "quasar";
 // import find from "lodash/find";
 
 // const toggleElement = (arr, val) =>
@@ -59,8 +59,10 @@ export default defineComponent({
 
     const users = useCollection(collection(db, `users`));
 
+    const q = useQuasar();
+
     // console.log("record", record);
-    return { users, currentUser };
+    return { users, currentUser, q };
   },
   // watch: {
   //   record: {
@@ -75,27 +77,57 @@ export default defineComponent({
   methods: {
     async addNew() {
       if (this.newEmail.length) {
-        await setDoc(doc(db, `users/${this.newEmail}`), {
-          isAdmin: false,
-          isEditor: false,
-        });
+        try {
+          // throw Error();
+          await setDoc(doc(db, `users/${this.newEmail}`), {
+            isAdmin: false,
+            isEditor: false,
+          });
+          this.newEmail = "";
+        } catch (e) {
+          this.q.notify({
+            type: "negative",
+            message: e,
+          });
+        }
       }
     },
     async changeAdmin(user) {
-      await updateDoc(doc(db, `users/${user.id}`), {
-        isAdmin: !user.isAdmin,
-      });
+      try {
+        await updateDoc(doc(db, `users/${user.id}`), {
+          isAdmin: !user.isAdmin,
+        });
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
     async changeEditor(user) {
-      await updateDoc(doc(db, `users/${user.id}`), {
-        isEditor: !user.isEditor,
-      });
+      try {
+        await updateDoc(doc(db, `users/${user.id}`), {
+          isEditor: !user.isEditor,
+        });
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
     async changeRegion(ev, user) {
-      // console.log(ev);
-      await updateDoc(doc(db, `users/${user.id}`), {
-        region: ev,
-      });
+      try {
+        // console.log(ev);
+        await updateDoc(doc(db, `users/${user.id}`), {
+          region: ev,
+        });
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
   },
 });

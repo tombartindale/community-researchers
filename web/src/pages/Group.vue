@@ -65,6 +65,7 @@ import Cluster from "src/components/Cluster.vue";
 // import groupBy from "lodash/groupBy";
 
 import { useI18n } from "vue-i18n";
+import { useQuasar } from "quasar";
 
 const partitionBy = (arr, fn) => [
   ...arr
@@ -110,6 +111,8 @@ export default defineComponent({
       { once: true }
     );
 
+    const q = useQuasar();
+
     const { locale, t } = useI18n();
     const loading = ref(true);
 
@@ -143,7 +146,7 @@ export default defineComponent({
     });
 
     // console.log("record", record);
-    return { user, records, codeBook, locale, clusters, loading };
+    return { user, records, codeBook, locale, clusters, loading, q };
   },
   computed: {
     allCodes() {
@@ -195,7 +198,10 @@ export default defineComponent({
                   }
                 );
             } catch (e) {
-              console.error(e);
+              this.q.notify({
+                type: "negative",
+                message: e,
+              });
             }
           }
         }
@@ -214,10 +220,17 @@ export default defineComponent({
   },
   methods: {
     updateName(cluster) {
-      console.log(cluster.id);
-      updateDoc(doc(db, `users/${this.user.email}/clusters/${cluster.id}`), {
-        title: cluster.title,
-      });
+      // console.log(cluster.id);
+      try {
+        updateDoc(doc(db, `users/${this.user.email}/clusters/${cluster.id}`), {
+          title: cluster.title,
+        });
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
     getItemsForCluster(cluster) {
       return filter(this.allCodes, {
@@ -225,14 +238,21 @@ export default defineComponent({
       });
     },
     done() {
-      setDoc(
-        doc(db, `users/${this.user.email}`),
-        {
-          status: "clustered",
-        },
-        { merge: true }
-      );
-      this.$router.push("/");
+      try {
+        setDoc(
+          doc(db, `users/${this.user.email}`),
+          {
+            status: "clustered",
+          },
+          { merge: true }
+        );
+        this.$router.push("/");
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
   },
 });

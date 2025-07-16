@@ -2,11 +2,10 @@
 q-page(padding).text-center
   .text-h6 Admin
   div
-    router-link(to="/admin/users") Users
-    span  &middot; 
-    router-link(to="/admin") Recordings
-    span  &middot; 
-    router-link(to="/admin/researchplans") Research Plans
+    q-tabs
+      q-route-tab(to="/admin/users") Users
+      q-route-tab(to="/admin") Recordings
+      q-route-tab(to="/admin/researchplans") Research Plans
   router-view
 
 </template>
