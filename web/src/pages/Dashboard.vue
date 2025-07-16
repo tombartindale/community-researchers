@@ -1,10 +1,8 @@
 <template lang="pug">
 q-page(padding)
     .row.justify-center
-      .col.col-md-8
-        //- .text-center.q-mb-lg
-          //- q-btn(to="/upload" color="primary" size="lg" no-caps) Upload New Recording
-        //- div {{recordings}}
+      .col.col-md-6
+
         .text-h4.q-mb-lg.q-mt-sm.text-center {{ $t('your-research-tasks') }}
 
         .text-center(v-if="loading")
@@ -13,10 +11,10 @@ q-page(padding)
         div(v-if="!loading")
           .row.q-my-md.items-center
             .col 
-              q-separator
+              q-separator(inset)
             .col-auto.q-px-md.text-caption.text-grey {{ $t('plan-your-research') }}
             .col 
-              q-separator
+              q-separator(inset)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
@@ -29,10 +27,10 @@ q-page(padding)
                 q-btn(to="/researchplan" flat icon-right="chevron_right" no-caps v-if="!user.profile.isResearchPlanChecked") {{ $t('upload') }}
           .row.q-my-md.items-center
             .col 
-              q-separator
+              q-separator(inset)
             .col-auto.q-px-md.text-caption.text-grey {{ $t('collect-your-data') }}
             .col 
-              q-separator
+              q-separator(inset)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
@@ -41,46 +39,33 @@ q-page(padding)
                 .text-h6 {{ $t('upload-new-interview') }}
               q-space
               q-card-section
-                //- .row
-                  //- .col-auto
-                    //- q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
-                  //- .col  Automatic audio transcription
+
                 q-btn(to="/upload" flat icon-right="chevron_right" no-caps) {{ $t('upload') }}
           .row.q-my-md.items-center
             .col 
-              q-separator
+              q-separator(inset)
             .col-auto.q-px-md.text-caption.text-grey {{ $t('code-your-data') }}
             .col 
-              q-separator
+              q-separator(inset)
           q-card(v-for="recording in recordings" :key="recording.id" class="my-card" bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
                 q-checkbox(readonly size="lg" :model-value="isComplete(recording)" color="black")
-                //- q-icon(:name="getIcon(recording.status, 'coding')" color="green" size="md") 
+
               q-card-section 
                 .text-h6 {{ $t('code-transcript') }}
                 .text-body1.text-grey {{ recording.who }} &middot; {{ recording.when }}
               q-space
               q-card-section
-                //- .row
-                  //- .col-auto
-                    //- q-icon(:name="getIcon(recording.status, 'transcribing')" color="green" size="16px") 
-                  //- .col  Automatic audio transcription
                 q-btn(no-caps :to="`/code/${recording.id}`" v-if="canCode(recording)" flat icon-right="chevron_right") {{ $t('code') }}
                 div(v-else) {{ $t('waiting-for-automatic-transcription') }}
               
-              //- q-space
-              //- q-separator(vertical)
-              //- q-card-section(horizontal)
-              //-   q-btn(flat) Code
-              //-   q-separator(vertical)
-              //-   q-btn(flat) Group
           .row.q-my-md.items-center
             .col 
-              q-separator
+              q-separator(inset)
             .col-auto.q-px-md.text-caption.text-grey {{ $t('develop-your-insights') }}
             .col 
-              q-separator
+              q-separator(inset)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
@@ -102,10 +87,10 @@ q-page(padding)
               
           .row.q-my-md.items-center
             .col 
-              q-separator
+              q-separator(inset)
             .col-auto.q-px-md.text-caption.text-grey {{ $t('share-and-reflect-on-your-findings') }}
             .col 
-              q-separator
+              q-separator(inset)
           q-card(flat bordered).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
@@ -116,7 +101,7 @@ q-page(padding)
                 .text-body1.text-grey {{ $t('across-user-profile-region', [user.profile.region]) }}
               q-space
               q-card-section
-                q-btn(no-caps :to="`/review/${user.profile.region}`" flat icon-right="chevron_right" v-if="canReview()") Review
+                q-btn(no-caps :to="`/review/${user.profile.region}`" flat icon-right="chevron_right" v-if="canReview()") {{ $t('review') }}
 
 </template>
 

@@ -65,10 +65,13 @@
   "what-language-was-the-interview-conducted-in": "What language was the interview conducted in?",
   "language-is-required": "Language is required",
   "who-is-required": "Who is required",
-  "label-who-did-you-interview": "label=\"Who did you interview?",
   "who-did-you-interview": "Who did you interview?",
   "when-is-required": "When is required",
   "when-did-you-conduct-the-interview": "When did you conduct the interview?",
   "when": "When",
-  "remove-from-cluster": "Remove from cluster"
+  "remove-from-cluster": "Remove from cluster",
+  "community-researcher-dashboard-0": "Community Researcher dashboard",
+  "participate-in-community-data-collection-and-analysis": "Participate in community data collection and analysis.",
+  "should-have-access": "If you think you should have access to this dashboard, please contact the person organising your research activity.",
+  "review": "Review"
 }

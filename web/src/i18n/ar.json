@@ -32,7 +32,6 @@
   "ive-finished-coding": "لقد انتهيت من الترميز",
   "ive-finished-describing": "لقد انتهيت من وصف",
   "ive-finished-reviewing": "لقد انتهيت من المراجعة",
-  "label-who-did-you-interview": "Label = \"من قمت بإجراء مقابلة؟",
   "language-is-required": "اللغة مطلوبة",
   "links-to-research-questions": "روابط لأسئلة البحث",
   "login-to-continue": "تسجيل الدخول للمتابعة",
@@ -70,5 +69,9 @@
   "who-did-you-interview": "من قابلت؟",
   "who-is-required": "من المطلوب",
   "your-research-plan-has-been-uploaded-and-is-being-reviewed": "تم تحميل خطة البحث الخاصة بك ويجري مراجعتها",
-  "your-research-tasks": "مهام البحث الخاصة بك"
+  "your-research-tasks": "مهام البحث الخاصة بك",
+  "community-researcher-dashboard-0": "لوحة معلومات الباحث المجتمع",
+  "participate-in-community-data-collection-and-analysis": "المشاركة في جمع بيانات المجتمع وتحليله.",
+  "should-have-access": "إذا كنت تعتقد أنك يجب أن تتمكن من الوصول إلى لوحة القيادة هذه ، فيرجى الاتصال بالشخص الذي ينظم نشاطك البحثي.",
+  "review": "مراجعة"
 }

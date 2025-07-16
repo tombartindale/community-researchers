@@ -1,12 +1,19 @@
 <template lang="pug">
-q-page.flex.flex-center
-  .column.items-center.q-col-gutter-md
-    .col
-      .text-h4 {{ $t('login-to-continue') }}
-    .col
-      q-input(v-model="email" :label="$t('enter-your-email-address')" type="email" outlined style="min-width:300px;")
-    .col
-      q-btn(@click="signinPopup" :label="$t('send-login-link')" no-caps flat size="lg" icon-right="chevron_right")
+q-page(padding).flex.flex-center
+  .row.justify-center.text-center
+    .col-md-6.col
+      .column.items-center.q-col-gutter-md
+        .col.q-mb-md
+          .text-h4 {{ $t('community-researcher-dashboard-0') }}
+          .text-body2 {{ $t('participate-in-community-data-collection-and-analysis') }}
+        //- .col
+        //-   .text-body1.q-mt-lg {{ $t('login-to-continue') }}
+        .col
+          q-input(v-model="email" :label="$t('enter-your-email-address')" type="email" outlined style="min-width:300px;" filled)
+        .col
+          q-btn(@click="signinPopup" :label="$t('send-login-link')" no-caps flat size="lg" icon-right="chevron_right")
+        .col.q-mt-lg
+          .text-body2.text-grey {{ $t('should-have-access') }}
 </template>
 
 <script>

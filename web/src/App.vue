@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf").view
-  q-header 
+  q-header(v-if="user")
     q-toolbar.bg-white.text-primary
       q-btn(to="/" flat dense icon="home")
       q-btn(to="/codebook" flat dense icon="book" v-if="user?.profile?.isEditor || user?.profile?.isAdmin")
@@ -38,20 +38,21 @@ import { watch } from "vue";
 import { useQuasar } from "quasar";
 import ar from "quasar/lang/ar";
 import en from "quasar/lang/en-US";
+import languageMappingList from "./language-mapping-list";
 
 export default defineComponent({
   name: "App",
   setup() {
     const user = useCurrentUser();
 
-    const { locale, t } = useI18n({ useScope: "global" });
+    const { locale } = useI18n({ useScope: "global" });
 
     const localeOptions = [
-      { value: "en", label: t("english") },
-      { value: "ar", label: t("arabic") },
-      { value: "fr", label: t("french") },
-      { value: "zh", label: t("chinese") },
-      { value: "es", label: t("spanish") },
+      { value: "en", label: languageMappingList.en.nativeName },
+      { value: "ar", label: languageMappingList.ar.nativeName },
+      { value: "fr", label: languageMappingList.fr.nativeName },
+      { value: "zh", label: languageMappingList.zh.nativeName },
+      { value: "es", label: languageMappingList.es.nativeName },
     ];
 
     const $q = useQuasar();
