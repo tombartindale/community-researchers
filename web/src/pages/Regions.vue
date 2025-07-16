@@ -1,24 +1,15 @@
 <template lang="pug">
 q-page(padding).text-center
-  .text-h6 Users
+  .text-h6 Regions
   q-list(separator).text-left
     q-item
-      q-item-section.text-grey Email
-      q-item-section.col-3.text-grey Region
-      q-item-section(side) Admin
-      q-item-section(side) Editor
-    q-item(v-for="user of users")
-      q-item-section {{user.id}}
-      q-item-section.col-3
-        q-select(:options="regions" option-value="id" option-label="id" :model-value="user.region" emit-value @update:model-value="changeRegion($event,user)" dense filled)
-      q-item-section(side) 
-        q-checkbox(:model-value="user.isAdmin" @update:model-value="changeAdmin(user)" :disable="currentUser.email === user.id")
-      q-item-section(side) 
-        q-checkbox(:model-value="user.isEditor" @update:model-value="changeEditor(user)" :disable="currentUser.email === user.id")
+      q-item-section.text-grey Region
+    q-item(v-for="region of regions")
+      q-item-section {{region.id}}
     
     q-item
       q-item-section
-        q-input(v-model="newEmail" label="New researcher's email address" filled)
+        q-input(v-model="newRegion" label="Region name" filled)
       
       q-item-section(side)
         q-btn(flat @click="addNew" icon="add")
@@ -42,11 +33,11 @@ import { useQuasar } from "quasar";
 // const user = useCurrentUser()
 
 export default defineComponent({
-  name: "CodePage",
+  name: "RegionsPage",
   // props: ["id"],
   data() {
     return {
-      newEmail: "",
+      newRegion: "",
       // regions: ["Europe (French)", "Asia", "Americas (Spanish)"],
     };
   },
@@ -57,13 +48,12 @@ export default defineComponent({
     //   doc(db, `users/${user.value.email}/recordings/${props.id}`)
     // );
 
-    const users = useCollection(collection(db, `users`));
     const regions = useCollection(collection(db, `regions`));
 
     const q = useQuasar();
 
     // console.log("record", record);
-    return { users, currentUser, q, regions };
+    return { regions, currentUser, q };
   },
   // watch: {
   //   record: {
@@ -77,14 +67,13 @@ export default defineComponent({
   // },
   methods: {
     async addNew() {
-      if (this.newEmail.length) {
+      if (this.newRegion.length) {
         try {
           // throw Error();
-          await setDoc(doc(db, `users/${this.newEmail}`), {
-            isAdmin: false,
-            isEditor: false,
+          await setDoc(doc(db, `regions/${this.newRegion}`), {
+            description: "",
           });
-          this.newEmail = "";
+          this.newRegion = "";
         } catch (e) {
           this.q.notify({
             type: "negative",
@@ -97,31 +86,6 @@ export default defineComponent({
       try {
         await updateDoc(doc(db, `users/${user.id}`), {
           isAdmin: !user.isAdmin,
-        });
-      } catch (e) {
-        this.q.notify({
-          type: "negative",
-          message: e,
-        });
-      }
-    },
-    async changeEditor(user) {
-      try {
-        await updateDoc(doc(db, `users/${user.id}`), {
-          isEditor: !user.isEditor,
-        });
-      } catch (e) {
-        this.q.notify({
-          type: "negative",
-          message: e,
-        });
-      }
-    },
-    async changeRegion(ev, user) {
-      try {
-        // console.log(ev);
-        await updateDoc(doc(db, `users/${user.id}`), {
-          region: ev,
         });
       } catch (e) {
         this.q.notify({

@@ -3,7 +3,7 @@ q-page(padding).text-center
   .row.justify-center
     .col.col-md-8
       
-      .text-h6 Research plans to check
+      .text-h6.q-mb-md Research plans to check
       .text-caption Check each research plan. Contact the researcher directly if you need them to make changes to their research plan
       q-separator
       q-list(separator).text-left
@@ -11,15 +11,15 @@ q-page(padding).text-center
           q-item( v-if="!plan?.isResearchPlanChecked") 
             q-item-section {{plan.id}}
             q-item-section(side) 
-              q-btn(flat icon="download" @click="download(plan.latestResearchPlan)" dense)
+              q-btn(flat icon="download" @click="download(plan.latestResearchPlan)" dense v-if="plan.latestResearchPlan")
             q-item-section(side)
-              q-btn(flat icon="check" dense @click="approve(plan)") 
+              q-btn(flat icon="check" dense @click="approve(plan)" v-if="plan.latestResearchPlan") 
                 q-tooltip OK to move forward
         //- span(v-if="plans.length==0").text-overline nothing here
         .text-center
           q-spinner(v-if="loading" size="md").q-ma-md
 
-      .text-h6 Research plans in operation
+      .text-h6.q-mt-xl.q-mb-md Research plans in operation
       q-separator
       q-list(separator).text-left
         div(v-for="plan of plans")

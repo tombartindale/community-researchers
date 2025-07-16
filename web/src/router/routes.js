@@ -90,6 +90,11 @@ const routes = [
         component: () => import("pages/ResearchPlans.vue"),
         props: true,
       },
+      {
+        path: "regions",
+        component: () => import("pages/Regions.vue"),
+        props: true,
+      },
     ],
   },
 

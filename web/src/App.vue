@@ -8,7 +8,9 @@ q-layout(view="hHh lpR fFf").view
       q-btn(to="/admin" flat dense icon="settings" v-if="user?.profile?.isAdmin")
         q-tooltip {{ $t('admin') }}
       q-space
-      span {{ $t('community-researcher-dashboard') }} &middot; {{ user ? user.email : $t('not-signed-in') }}
+      span 
+        span.gt-sm {{ $t('community-researcher-dashboard') }} &middot; 
+        span {{ user ? user.email : $t('not-signed-in') }}
       q-space
       q-select(
         v-model="locale"
