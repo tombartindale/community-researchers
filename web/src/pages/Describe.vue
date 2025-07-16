@@ -9,30 +9,31 @@ q-page(padding).text-center
     //- div {{clustered}}
     //- div {{clusters}}
 
+  .row.justify-center
+    .col-md-8.col
+      q-stepper(v-model="step" ref="stepper" v-if="clusters.length" flat)
+        q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title")
+          //- div {{clusters[index]}}
+          .column.q-col-gutter-sm 
+            .col
+              q-input(filled v-model="clusters[index].title" :label="$t('give-this-cluster-a-name')")
+            .col
+              q-input(filled v-model="clusters[index].description" :label="$t('enter-a-2-line-description-of-this-cluster')")
+            .col
+              q-input(filled v-model="clusters[index].learn" :label="$t('what-should-someone-else-learn-from-this')")
+            .col
+              q-input(filled v-model="clusters[index].questions" :label="$t('links-to-research-questions')")
+            .col
+              q-input(filled v-model="clusters[index].bullets" :label="$t('take-home-messages-bullets')")
+            .col {{ $t('select-3-of-the-following-quotes-that-best-represent-this-cluster') }}
+            .col( v-for="element of cluster.quotes")
+              Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true")
 
-  q-stepper(v-model="step" ref="stepper" v-if="clusters.length" flat)
-    q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title")
-      //- div {{clusters[index]}}
-      .column.q-col-gutter-sm 
-        .col
-          q-input(filled v-model="clusters[index].title" :label="$t('give-this-cluster-a-name')")
-        .col
-          q-input(filled v-model="clusters[index].description" :label="$t('enter-a-2-line-description-of-this-cluster')")
-        .col
-          q-input(filled v-model="clusters[index].learn" :label="$t('what-should-someone-else-learn-from-this')")
-        .col
-          q-input(filled v-model="clusters[index].questions" :label="$t('links-to-research-questions')")
-        .col
-          q-input(filled v-model="clusters[index].bullets" :label="$t('take-home-messages-bullets')")
-        .col {{ $t('select-3-of-the-following-quotes-that-best-represent-this-cluster') }}
-        .col( v-for="element of cluster.quotes")
-          Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true")
-
-    template(v-slot:navigation)
-      q-stepper-navigation
-        .row.justify-between
-          q-btn(:disable="step == 0" flat @click="$refs.stepper.previous()" ) {{ $t('previous-cluster') }}
-          q-btn(@click="$refs.stepper.next()" flat :disable="step == Object.keys(clustered).length-1" ) {{ $t('next-cluster') }}
+        template(v-slot:navigation)
+          q-stepper-navigation
+            .row.justify-between
+              q-btn(:disable="step == 0" flat @click="$refs.stepper.previous()" ) {{ $t('previous-cluster') }}
+              q-btn(@click="$refs.stepper.next()" flat :disable="step == Object.keys(clustered).length-1" ) {{ $t('next-cluster') }}
   
   q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-describing') }}
 

@@ -1,11 +1,13 @@
 <template lang="pug">
 q-page(padding).flex.flex-center
+  //- q-spinner(v-if="waitingForUser")
   .row.justify-center.text-center
     .col-md-6.col
       .column.items-center.q-col-gutter-md
         .col.q-mb-md
           .text-h4 {{ $t('community-researcher-dashboard-0') }}
           .text-body2 {{ $t('participate-in-community-data-collection-and-analysis') }}
+          .text-body2.text-negative.q-mt-lg(v-if="error") We don't recognise this email address, are you registered using another one?
         //- .col
         //-   .text-body1.q-mt-lg {{ $t('login-to-continue') }}
         .col
@@ -33,16 +35,29 @@ const actionCodeSettings = {
 };
 
 import { useQuasar } from "quasar";
+// import { useCurrentUser } from "vuefire";
 
 export default defineComponent({
   name: "IndexPage",
   data() {
     return {
       email: "",
+      // waitingForUser: true,
     };
   },
+  props: ["error"],
+  // watch: {
+  // user() {
+  //   if (this.user) this.waitingForUser = false;
+  // },
+  // },
   setup() {
     const q = useQuasar();
+    // const user = useCurrentUser();
+    // console.log(user);
+    // watch(user,(v)=>{
+    //   if
+    // })
     return { q };
   },
   methods: {

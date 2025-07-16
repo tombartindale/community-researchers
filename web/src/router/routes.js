@@ -7,8 +7,9 @@ const routes = [
     },
   },
   {
-    path: "/login",
+    path: "/login/:error?",
     component: () => import("pages/Login.vue"),
+    props: true,
   },
   {
     path: "/upload",

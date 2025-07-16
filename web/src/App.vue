@@ -22,8 +22,10 @@ q-layout(view="hHh lpR fFf").view
       q-btn(@click="signOut()" flat dense v-if="user" icon="logout")
     q-separator
   q-page-container
-    //- div {{user}}
-    router-view
+    //- div {{loggingIn}}
+    
+    q-spinner(size="3em" v-if="loggingIn").absolute-center
+    router-view(v-if="!loggingIn")
 </template>
 
 <script>
@@ -71,21 +73,34 @@ export default defineComponent({
 
     return { user, locale, localeOptions };
   },
+  data: function () {
+    return {
+      loggingIn: false,
+    };
+  },
   methods: {
     signOut() {
       auth
         .signOut()
         .then(() => {
-          this.$router.push("/login"); // Redirect to login page after sign out
+          // this.$router.push("/login"); // Redirect to login page after sign out
+          this.$router.go();
         })
         .catch((error) => {
           console.error("Sign out error:", error);
         });
     },
+    // loggingIn() {
+    //   console.log(window.location.search);
+    //   return window.location.search;
+    // },
   },
   mounted() {
     // This is where you can initialize any global state or perform actions
     // that should happen when the app is mounted.
+
+    console.log("href", window.location.search.includes("mode=signIn"));
+    if (window.location.search.includes("mode=signIn")) this.loggingIn = true;
 
     // Confirm the link is a sign-in with email link.
     // const auth = getAuth()
@@ -114,12 +129,18 @@ export default defineComponent({
           // getAdditionalUserInfo(result)?.profile
           // You can check if the user is new or existing:
           // getAdditionalUserInfo(result)?.isNewUser
+          this.loggingIn = false;
+
+          console.log("got this far");
+          // this.$router.go();
           this.$router.push("/"); // Redirect to the dashboard or any other page
         })
         .catch(() => {
           // Some error occurred, you can inspect the code: error.code
           // Common errors could be invalid email and invalid or expired OTPs.
         });
+    } else {
+      this.loggingIn = false;
     }
   },
 });

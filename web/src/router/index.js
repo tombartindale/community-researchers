@@ -36,9 +36,11 @@ export default defineRouter(function (/* { store, ssrContext } */) {
   Router.beforeEach(async (to) => {
     // console.log('Navigating to:', to.meta)
     // Add any global navigation guards here if needed
+    const currentUser = await getCurrentUser();
+    if (to.path.includes("login") && currentUser) return "/";
+
     if (to.meta.requiresAuth) {
       console.log("This route requires authentication:", to.fullPath);
-      const currentUser = await getCurrentUser();
       console.log("Current user:", currentUser);
       // if the user is not logged in, redirect to the login page
       if (!currentUser) {
@@ -48,7 +50,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
             // we keep the current path in the query so we can
             // redirect to it after login with
             // `router.push(route.query.redirect || '/')`
-            redirect: to.fullPath,
+            // redirect: to.fullPath,
           },
         };
       }
@@ -59,7 +61,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
       if (!userDat.exists()) {
         await getAuth().signOut();
         return {
-          path: "/login",
+          path: "/login/notuser",
         };
       }
 
