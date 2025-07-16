@@ -22,7 +22,7 @@ import { defineComponent } from "vue";
 import { sendSignInLinkToEmail } from "firebase/auth";
 import { auth } from "src/boot/firebase";
 
-console.log(process.env.VUE_APP_URL);
+// console.log(process.env.VUE_APP_URL);
 
 const actionCodeSettings = {
   // URL you want to redirect back to. The domain (www.example.com) for this
