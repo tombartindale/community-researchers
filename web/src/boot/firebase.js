@@ -42,7 +42,7 @@ export const firebaseApp = initializeApp({
 export const db = getFirestore(firebaseApp);
 export const auth = getAuth(firebaseApp);
 export const storage = getStorage(firebaseApp);
-export const functions = getFunctions(firebaseApp);
+export const functions = getFunctions(firebaseApp, "europe-west1");
 
 import { connectFirestoreEmulator } from "firebase/firestore";
 import { connectAuthEmulator } from "firebase/auth";
