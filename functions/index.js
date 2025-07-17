@@ -25,6 +25,9 @@ import fs from "fs";
 import reader from "any-text";
 import flatten from "lodash/flatten.js";
 import { convertMarkdownToDocx } from "./md-to-docx-main/dist/index.js";
+import * as XLSX from "xlsx/xlsx.mjs";
+// import * as fs from "fs";
+// Set internal fs instance
 
 // import { Storage } from "@google-cloud/storage";
 // const storage = new Storage();
@@ -378,11 +381,12 @@ export const getClustersForRegion = onCall(
 export const startExport = onCall({ region: region }, async (request) => {
   if (request.auth) {
     console.log("Starting Export");
-    const [clusters, records, regions, users] = await Promise.all([
+    const [clusters, records, regions, users, codebook_db] = await Promise.all([
       getFirestore().collectionGroup("clusters").get(),
       getFirestore().collectionGroup("recordings").get(),
       getFirestore().collection("regions").get(),
       getFirestore().collection("users").get(),
+      getFirestore().collection("codebook").get(),
     ]);
 
     let output = [];
@@ -406,12 +410,16 @@ export const startExport = onCall({ region: region }, async (request) => {
       for (const recording of records.docs) {
         // console.log(recording.ref.parent.parent.id);
         if (reg_out.users.includes(recording.ref.parent.parent.id))
-          reg_out.recordings.push(recording.data());
+          reg_out.recordings.push({
+            ...recording.data(),
+            researcher: recording.ref.parent.parent.id,
+          });
       }
 
       //for each cluster
       for (let cluster of clusters.docs) {
         let outt = cluster.data();
+        outt.id = cluster.id;
         outt.quotes = [];
 
         //for each recording:
@@ -433,8 +441,9 @@ export const startExport = onCall({ region: region }, async (request) => {
       output.push(reg_out);
     }
 
-    console.log(output);
+    // console.log(output);
 
+    //MARKDOWN:s
     let markdown = `# Community Research Analysis\n${new Date().toUTCString()}\n\\pagebreak\n[TOC]\n\\pagebreak\n`;
 
     //create markdown:
@@ -488,9 +497,98 @@ export const startExport = onCall({ region: region }, async (request) => {
 
     const docx = await convertMarkdownToDocx(markdown);
 
-    // console.log(docx);
+    //XLSX:
+    const rows = [];
+    const clusters_data = [];
+    const codebook = [];
+    for (const region of output) {
+      let row = {};
+      // console.log(region);
+
+      //for each recording:
+      //if its coded, push it
+      for (const recording of region.recordings) {
+        //for each transcription line:
+        // console.log(recording);
+        for (const line of recording.transcription.results) {
+          // console.log(line);
+          if (line.codes) {
+            row.region = region.name;
+            row.content = line.alternatives[0].transcript;
+            row.codes = line.codes.join(",");
+            row.highlighted = line.highlighted;
+            row.researcher = recording.researcher;
+            row.cluster = `${recording.researcher}_${line.cluster}`;
+            row.who = recording.who;
+            row.when = recording.when;
+            row.language = recording.language;
+            rows.push(row);
+          }
+        }
+      }
+
+      for (const cluster of region.clusters) {
+        clusters_data.push({
+          region: cluster.region,
+          researcher: cluster.parent,
+          title: cluster.title,
+          description: cluster.description,
+          lessons: cluster.learn,
+          id: `${cluster.parent}_${cluster.id}`,
+        });
+      }
+
+      // markdown += `# ${region.name}\n`;
+
+      // markdown += `Contributions by `;
+      // // for (const user of region.users) {
+      // markdown += `${region.users.join(", ")}`;
+      // // }
+
+      // markdown += `\n`;
+      // //summary
+      // markdown += `## Summary\n ${region.summary}\n`;
+
+      //clusters:
+      // markdown += `## Clusters\n`;
+      // for (const cluster of region.clusters) {
+      //   markdown += `### ${cluster.title}\n`;
+      //   //meta:
+      //   markdown += `${cluster.description}\n\n`;
+      //   markdown += `${cluster.learn}\n\n`;
+      //   // markdown += `${cluster.questions}\n`;
+      //   //quotes:
+      //   for (const quote of cluster.quotes) {
+      //     markdown += `> ${
+      //       quote.alternatives[0].transcript
+      //     } [${quote.codes.join(",")}]\n\n`;
+      //   }
+      // }
+    }
+
+    for (const code of codebook_db.docs) {
+      codebook.push({
+        code: code.data().code,
+        description: code.data().description.en,
+        name: code.data().name.en,
+      });
+    }
+
+    // console.log(rows);
+
+    // XLSX.set_fs(fs);
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Codes");
+    const worksheet1 = XLSX.utils.json_to_sheet(clusters_data);
+    XLSX.utils.book_append_sheet(workbook, worksheet1, "Clusters");
+    const worksheet2 = XLSX.utils.json_to_sheet(codebook);
+    XLSX.utils.book_append_sheet(workbook, worksheet2, "Codebook");
+
+    const excel = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
 
     await Promise.all([
+      getStorage().bucket().file(`exports/latestExport.xlsx`).save(excel),
       getStorage()
         .bucket()
         .file(`exports/latestExport.docx`)
