@@ -344,15 +344,19 @@ export const getClustersForRegion = onCall(
           outt.quotes = [];
 
           for (const recording of records.docs) {
-            for (const quote of recording.data().transcription?.results) {
-              // console.log(quote);
+            if (
+              recording.data().transcription &&
+              recording.data().transcription.results
+            )
+              for (const quote of recording.data().transcription?.results) {
+                // console.log(quote);
 
-              if (
-                "" + quote.cluster === "" + cluster.ref.id &&
-                quote.highlighted
-              )
-                outt.quotes.push(quote);
-            }
+                if (
+                  "" + quote.cluster === "" + cluster.ref.id &&
+                  quote.highlighted
+                )
+                  outt.quotes.push(quote);
+              }
 
             // console.log(foruser);
           }
