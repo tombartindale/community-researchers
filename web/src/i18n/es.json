@@ -4,11 +4,11 @@
   "arabic": "árabe",
   "chinese": "Chino",
   "cluster": "Grupo",
-  "cluster-codes-into-stories": "Códigos de clúster en historias",
+  "cluster-codes-into-stories": "Clúster etiquetas en historias",
   "cluster-i": "Clúster {0}",
   "clusters": "Racimos",
-  "code": "Código",
-  "code-transcript": "Transcripción del código",
+  "code": "Etiqueta",
+  "code-transcript": "Transcripción de etiqueta",
   "code-your-data": "Codifique sus datos",
   "codebook": "Libro de códigos",
   "codes": "Codos",
@@ -77,5 +77,6 @@
   "as-such-there-may-problems-with-the-platform-which-we-did-not-have-chance-to-fix": "Como tal, pueden haber problemas con la plataforma que no tuvimos la oportunidad de arreglar.",
   "if-you-have-issues": "Si tiene problemas, comuníquese con el canal de soporte técnico en su comunidad de redes sociales o hable con su mentor.",
   "ok": "DE ACUERDO",
-  "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "Este tablero se ha construido específicamente para apoyar a los investigadores de la comunidad para este proyecto."
+  "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "Este tablero se ha construido específicamente para apoyar a los investigadores de la comunidad para este proyecto.",
+  "error-transcription": "Hubo un error en la transcripción. \nPor favor, suba la grabación de su entrevista nuevamente."
 }

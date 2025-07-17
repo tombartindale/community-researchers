@@ -6,7 +6,7 @@
   "admin": "مسؤل",
   "cluster-i": "الكتلة {0}",
   "clusters": "مجموعات",
-  "code": "شفرة",
+  "code": "ملصق",
   "code-your-data": "رمز بياناتك",
   "codes": "الرموز",
   "community-researcher-dashboard": "لوحة معلومات الباحث المجتمع",
@@ -22,8 +22,8 @@
   "error-sending-email": "خطأ إرسال البريد الإلكتروني:",
   "error-uploading-file-please-try-again": "خطأ في تحميل ملف. \nمن فضلك حاول مرة أخرى.",
   "codebook": "دفتر الكود",
-  "code-transcript": "نص الكود",
-  "cluster-codes-into-stories": "رموز الكتلة في القصص",
+  "code-transcript": "نسخة تسمية",
+  "cluster-codes-into-stories": "العلامات التجارية في القصص",
   "collect-your-data": "جمع بياناتك",
   "for-each-cluster-follow-the-prompts": "لكل مجموعة ، اتبع المطالبات.",
   "french": "فرنسي",
@@ -77,5 +77,6 @@
   "as-such-there-may-problems-with-the-platform-which-we-did-not-have-chance-to-fix": "على هذا النحو ، قد تكون هناك مشاكل مع المنصة التي لم يكن لدينا فرصة لإصلاحها.",
   "if-you-have-issues": "إذا كانت لديك مشكلات ، فيرجى الاتصال بقناة الدعم الفني في مجتمع وسائل التواصل الاجتماعي الخاصة بك ، أو التحدث إلى مرشدك.",
   "ok": "نعم",
-  "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "تم بناء لوحة القيادة هذه خصيصًا لدعم الباحثين في المجتمع لهذا المشروع."
+  "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "تم بناء لوحة القيادة هذه خصيصًا لدعم الباحثين في المجتمع لهذا المشروع.",
+  "error-transcription": "كان هناك خطأ في النسخ. \nيرجى تحميل تسجيل المقابلة الخاص بك مرة أخرى."
 }

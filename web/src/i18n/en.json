@@ -25,11 +25,11 @@
   "collect-your-data": "Collect Your data",
   "upload-new-interview": "Upload new interview",
   "code-your-data": "Code Your data",
-  "code-transcript": "Code transcript",
-  "code": "Code",
+  "code-transcript": "Label transcript",
+  "code": "Label",
   "waiting-for-automatic-transcription": "Waiting for automatic transcription",
   "develop-your-insights": "Develop Your insights",
-  "cluster-codes-into-stories": "Cluster codes into stories",
+  "cluster-codes-into-stories": "Cluster labels into stories",
   "cluster": "Cluster",
   "describe-your-insights": "Describe Your insights",
   "describe": "Describe",
@@ -77,5 +77,7 @@
   "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "This dashboard has been built specifically to support community researchers for this project.",
   "as-such-there-may-problems-with-the-platform-which-we-did-not-have-chance-to-fix": "As such, there may problems with the platform which we did not have chance to fix.",
   "if-you-have-issues": "If you have issues, please contact the Technical Support channel in your social media community, or speak to your mentor.",
-  "ok": "OK"
+  "ok": "OK",
+  "error-transcription": "There was an error in transcription. Please upload your interview recording again.",
+  "why-did-you-think-this-is-interesting": "Why did you think this is interesting?"
 }

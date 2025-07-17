@@ -4,11 +4,11 @@
   "arabic": "阿拉伯",
   "chinese": "中国人",
   "cluster": "簇",
-  "cluster-codes-into-stories": "集群代码成故事",
+  "cluster-codes-into-stories": "集群标签成故事",
   "cluster-i": "集群{0}",
   "clusters": "集群",
-  "code": "代码",
-  "code-transcript": "代码成绩单",
+  "code": "标签",
+  "code-transcript": "标签成绩单",
   "code-your-data": "编码您的数据",
   "codebook": "代码本",
   "codes": "代码",
@@ -77,5 +77,6 @@
   "as-such-there-may-problems-with-the-platform-which-we-did-not-have-chance-to-fix": "因此，我们没有机会解决的平台可能存在问题。",
   "if-you-have-issues": "如果您有问题，请联系社交媒体社区中的技术支持渠道，或与您的导师交谈。",
   "ok": "好的",
-  "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "该仪表板是专门为支持该项目的社区研究人员而建造的。"
+  "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "该仪表板是专门为支持该项目的社区研究人员而建造的。",
+  "error-transcription": "转录错误。\n请再次上传您的面试记录。"
 }
