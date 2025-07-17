@@ -56,8 +56,9 @@ q-page(padding)
                 .text-h6 {{ $t('code-transcript') }}
                 .text-body1.text-grey {{ recording.who }} &middot; {{ recording.when }}
               q-space
-              q-card-section
+              q-card-section(align="right" style="max-width:50%")
                 q-btn(no-caps :to="`/code/${recording.id}`" v-if="canCode(recording)" flat icon-right="chevron_right") {{ $t('code') }}
+                div(v-else-if="recording.status=='error'" ) {{ $t('error-transcription') }}
                 div(v-else) {{ $t('waiting-for-automatic-transcription') }}
               
           .row.q-my-md.items-center
@@ -128,8 +129,10 @@ export default defineComponent({
   },
   methods: {
     canCode(recording) {
-      return !(
-        recording.status === "uploaded" || recording.status === "converted"
+      return (
+        !(
+          recording.status === "uploaded" || recording.status === "converted"
+        ) && recording.status != "error"
       );
     },
     getIcon(status, step) {

@@ -54,11 +54,11 @@ export default defineComponent({
       who: "",
       when: "",
       languageOptions: [
-        { value: "en", label: this.$t("english") },
-        { value: "ar", label: this.$t("arabic") },
-        { value: "fr", label: this.$t("french") },
-        { value: "zh", label: this.$t("chinese") },
-        { value: "es", label: this.$t("spanish") },
+        { value: "en-US", label: this.$t("english") },
+        { value: "ar-EG", label: this.$t("arabic") },
+        { value: "fr-FR", label: this.$t("french") },
+        { value: "zh-CN", label: this.$t("chinese") },
+        { value: "es-ES", label: this.$t("spanish") },
       ],
     };
   },

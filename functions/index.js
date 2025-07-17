@@ -317,44 +317,54 @@ export const getClustersForRegion = onCall(
       // return data:
 
       //get clusters from this region:
-      const clusters = await getFirestore()
-        .collectionGroup("clusters")
-        .where("region", "==", request.data.region)
-        .get();
+      try {
+        const clusters = await getFirestore()
+          .collectionGroup("clusters")
+          .where("region", "==", request.data.region)
+          .get();
 
-      //get all records :
-      const records = await getFirestore().collectionGroup("recordings").get();
+        //get all records :
+        const records = await getFirestore()
+          .collectionGroup("recordings")
+          .get();
 
-      let output = [];
+        let output = [];
 
-      // console.log(clusters.docs);
+        // console.log(clusters.docs);
 
-      for (let cluster of clusters.docs) {
-        //for each cluster, get the records for that person:
-        // console.log(records.docs);
-        // const foruser = filter(records.docs, (d) => {
-        //   console.log(d.ref.parent.parent.id);
-        //   return d.ref.parent.parent.id == cluster.ref.parent.parent.id;
-        // });
+        for (let cluster of clusters.docs) {
+          //for each cluster, get the records for that person:
+          // console.log(records.docs);
+          // const foruser = filter(records.docs, (d) => {
+          //   console.log(d.ref.parent.parent.id);
+          //   return d.ref.parent.parent.id == cluster.ref.parent.parent.id;
+          // });
 
-        let outt = cluster.data();
-        outt.quotes = [];
+          let outt = cluster.data();
+          outt.quotes = [];
 
-        for (const recording of records.docs) {
-          for (const quote of recording.data().transcription.results) {
-            // console.log(quote);
+          for (const recording of records.docs) {
+            for (const quote of recording.data().transcription?.results) {
+              // console.log(quote);
 
-            if ("" + quote.cluster === "" + cluster.ref.id && quote.highlighted)
-              outt.quotes.push(quote);
+              if (
+                "" + quote.cluster === "" + cluster.ref.id &&
+                quote.highlighted
+              )
+                outt.quotes.push(quote);
+            }
+
+            // console.log(foruser);
           }
 
-          // console.log(foruser);
+          output.push(outt);
         }
 
-        output.push(outt);
+        return output;
+      } catch (e) {
+        console.log(e);
+        throw e;
       }
-
-      return output;
     } else {
       return [];
     }

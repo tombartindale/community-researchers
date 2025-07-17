@@ -3,10 +3,10 @@ q-card(class="list-group-item" :bordered="!simple" flat).text-left.q-pa-none
   //- div {{clusters}}
   q-card-section(horizontal)
     q-card-section(side v-if="highlight")
-      q-checkbox(:model-value="element.highlighted || false" @update:model-value="element.highlighted = $event")  
-    q-card-section.q-pl-sm.q-pb-none.q-pr-sm.q-pt-sm.transcription.text-secondary
+      q-checkbox(:model-value="element.highlighted || false" @update:model-value="updateHigh(element,$event)")  
+    q-card-section.q-pl-sm.q-pb-none.q-pr-sm.q-pt-sm.transcription.text-secondary.q-mb-sm
       .scroll-me {{ element.alternatives[0].transcript }}
-  q-separator(inset v-if="!simple || (simple && clusters.length)").q-mt-sm
+  q-separator(inset v-if="(!simple || (simple && clusters.length)) && !cluster").q-mt-sm
   q-card-actions(align="between" v-if="clusters.length")
     //- div {{element}}
     div
@@ -25,11 +25,38 @@ q-card(class="list-group-item" :bordered="!simple" flat).text-left.q-pa-none
 <script>
 import { defineComponent } from "vue";
 import find from "lodash/find";
+import filter from "lodash/filter";
+import { useQuasar } from "quasar";
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
   name: "ErrorNotFound",
-  props: ["element", "codeBook", "clusters", "locale", "highlight", "simple"],
+  props: [
+    "element",
+    "codeBook",
+    "clusters",
+    "locale",
+    "highlight",
+    "simple",
+    "cluster",
+  ],
+  setup() {
+    const q = useQuasar();
+    const { t } = useI18n();
+    return { q, t };
+  },
   methods: {
+    updateHigh(element, event) {
+      const count = filter(this.cluster.quotes, { highlighted: true });
+      console.log(count);
+      if (event == false) element.highlighted = false;
+      else if (count.length < 3) element.highlighted = true;
+      else
+        this.q.notify({
+          type: "negative",
+          message: this.t("select-a-maximum-of-3-quotes"),
+        });
+    },
     // updateCheck(val) {
     // console.log(val);
     // if (val) this.element.highlighted = true;

@@ -111,23 +111,21 @@ export default defineComponent({
     // }
     // });
 
-    const { data: regionData, promise } = useDocument(
-      doc(db, `regions/${props.region}`)
-    );
+    const regionData = useDocument(doc(db, `regions/${props.region}`));
 
     // console.log(promise);
 
-    promise.value.then(async function (val) {
-      // console.log("region loaded");
-      // console.log(val);
-      if (!val) {
-        // console.log("adding clusters");
+    // promise.value.then(async function (val) {
+    //   console.log("region loaded");
+    //   console.log(val);
+    //   if (!val) {
+    //     console.log("adding clusters");
 
-        await setDoc(doc(db, `regions/${props.region}`), {
-          description: "",
-        });
-      }
-    });
+    //     await setDoc(doc(db, `regions/${props.region}`), {
+    //       description: "",
+    //     });
+    //   }
+    // });
 
     const { locale } = useI18n();
 

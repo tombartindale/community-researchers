@@ -11,23 +11,26 @@ q-page(padding).text-center
 
   .row.justify-center
     .col-md-8.col
-      q-stepper(v-model="step" ref="stepper" v-if="clusters.length" flat)
+      q-stepper(v-model="step" ref="stepper" v-if="clusters.length" flat :contracted="$q.screen.lt.md")
         q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title")
           //- div {{clusters[index]}}
-          .column.q-col-gutter-sm 
+          .column.q-col-gutter-sm.text-left
+            .col {{$t('give-this-cluster-a-name')}}
             .col
-              q-input(filled v-model="clusters[index].title" :label="$t('give-this-cluster-a-name')")
+              q-input(filled v-model="clusters[index].title" )
+            .col {{$t('enter-a-2-line-description-of-this-cluster')}}
             .col
-              q-input(filled v-model="clusters[index].description" :label="$t('enter-a-2-line-description-of-this-cluster')")
+              q-input(filled v-model="clusters[index].description")
+            .col {{$t('why-did-you-think-this-is-interesting')}}
             .col
-              q-input(filled v-model="clusters[index].learn" :label="$t('what-should-someone-else-learn-from-this')")
-            .col
-              q-input(filled v-model="clusters[index].questions" :label="$t('links-to-research-questions')")
-            .col
-              q-input(filled v-model="clusters[index].bullets" :label="$t('take-home-messages-bullets')")
+              q-input(filled v-model="clusters[index].learn")
+            //- .col
+            //-   q-input(filled v-model="clusters[index].questions" :label="$t('links-to-research-questions')")
+            //- .col
+            //-   q-input(filled v-model="clusters[index].bullets" :label="$t('take-home-messages-bullets')")
             .col {{ $t('select-3-of-the-following-quotes-that-best-represent-this-cluster') }}
             .col( v-for="element of cluster.quotes")
-              Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true")
+              Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true" :cluster="cluster")
 
         template(v-slot:navigation)
           q-stepper-navigation
@@ -91,7 +94,8 @@ export default defineComponent({
     const loading = ref(true);
 
     const { data: records, promise } = useCollection(
-      collection(db, `users/${props.email}/recordings`)
+      collection(db, `users/${props.email}/recordings`),
+      { once: true }
     );
 
     const { data: clusters, promise: promise1 } = useCollection(
@@ -165,14 +169,17 @@ export default defineComponent({
           console.log("update records");
           try {
             for (const record of this.records) {
-              updateDoc(
-                doc(db, `users/${this.user.email}/recordings/${record.id}`),
-                {
-                  transcription: record.transcription,
-                }
-              );
+              if (record.transcription) {
+                updateDoc(
+                  doc(db, `users/${this.user.email}/recordings/${record.id}`),
+                  {
+                    transcription: record.transcription,
+                  }
+                );
+              }
             }
           } catch (e) {
+            console.log(e);
             this.q.notify({
               type: "negative",
               message: e,
@@ -192,6 +199,7 @@ export default defineComponent({
   methods: {
     async save() {
       //save clusters to db:
+      console.log("saving clusters");
       // console.log(this.clusters);
       try {
         for (let cluster of this.clusters) {
