@@ -16,38 +16,40 @@ q-page(padding).text-center
   div(v-for="region of regions").q-mt-lg.q-mb-xl
     .row.items-center
       .col
-        q-separator
+        q-separator(inset)
       .col-auto
         .text-h6 {{region.id}}
       .col
-        q-separator
+        q-separator(inset)
     .row
       .col.text-body1.text-grey.q-py-md(:html="region.description || 'Summary not written yet...'")
     .row.q-col-gutter-sm.q-mb-md
       .col(v-if="!region.clusters")
         q-spinner( size="2em")
-      .col-4(v-for="cluster of region.clusters") 
-        //- div {{cluster}}
-        .column.q-col-gutter-sm 
-          .col
-            .text-body1 {{cluster.title}}
-          .col 
-            .text-body2 {{cluster.description }}
-          .col 
-            .text-body2 {{cluster.learn}}
-          .col    
-            .text-body2 {{cluster.bullets}}
-          .col( v-for="element of cluster.quotes")
-            Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
-            q-separator(inset).q-mt-sm
+      .col-4(v-for="cluster of region.clusters")
+        q-card(flat bordered)
+          q-card-section 
+            //- div {{cluster}}
+            .column.q-col-gutter-sm 
+              .col
+                .text-body1 {{cluster.title}}
+              .col 
+                .text-body2 {{cluster.description }}
+              .col 
+                .text-body2 {{cluster.learn}}
+              .col    
+                .text-body2 {{cluster.bullets}}
+              .col( v-for="element of cluster.quotes")
+                Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
+                q-separator(inset).q-mt-sm
     .row.items-center
       .col
-        q-separator
+        q-separator(inset)
       .col-auto
         .text-caption Source Data
       .col
-        q-separator
-    .row.q-col-gutter-sm
+        q-separator(inset)
+    .row.q-col-gutter-sm.q-mt-sm
       .col-4(v-for="user of getRegionalUsers(region.id)")
         q-card(bordered flat)
           q-card-section
@@ -59,6 +61,7 @@ q-page(padding).text-center
                   q-tooltip Clustering
                 q-btn(icon="description" dense flat :to="`/describe/${user.id}`" no-caps)
                   q-tooltip Describe
+          q-separator(inset)
           q-list(separator).text-left
             q-item(v-for="recording of getRecordingsForUser(user.id)") 
               q-item-section {{recording.who}}
