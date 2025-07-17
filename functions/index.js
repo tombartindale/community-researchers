@@ -24,11 +24,15 @@ import os from "os";
 import fs from "fs";
 import reader from "any-text";
 import flatten from "lodash/flatten.js";
+import { convertMarkdownToDocx } from "./md-to-docx-main/dist/index.js";
+
+// import { Storage } from "@google-cloud/storage";
+// const storage = new Storage();
 // import filter from "lodash/filter.js";
 
 const region = "europe-west1";
 
-export const convertfile = onDocumentCreated(
+export const convert_file_1 = onDocumentCreated(
   {
     memory: "4GiB",
     document: "users/{email}/recordings/{recordingId}",
@@ -168,7 +172,7 @@ export const convertfile = onDocumentCreated(
 );
 
 //TODO: make them long running:
-export const transcribe = onObjectFinalized(
+export const transcribe2 = onObjectFinalized(
   { region: region },
   async (event) => {
     //if its a transcription file
@@ -356,3 +360,130 @@ export const getClustersForRegion = onCall(
     }
   }
 );
+
+export const startExport = onCall({ region: region }, async (request) => {
+  if (request.auth) {
+    console.log("Starting Export");
+    const [clusters, records, regions, users] = await Promise.all([
+      getFirestore().collectionGroup("clusters").get(),
+      getFirestore().collectionGroup("recordings").get(),
+      getFirestore().collection("regions").get(),
+      getFirestore().collection("users").get(),
+    ]);
+
+    let output = [];
+
+    //for each region:
+    for (let region of regions.docs) {
+      let reg_out = {
+        name: region.id,
+        summary: region.data().description,
+        clusters: [],
+        recordings: [],
+        users: [],
+      };
+
+      //users for this region
+      for (const user of users.docs) {
+        if (user.data().region == region.id) reg_out.users.push(user.id);
+      }
+
+      //recordings from users from this region
+      for (const recording of records.docs) {
+        // console.log(recording.ref.parent.parent.id);
+        if (reg_out.users.includes(recording.ref.parent.parent.id))
+          reg_out.recordings.push(recording.data());
+      }
+
+      //for each cluster
+      for (let cluster of clusters.docs) {
+        let outt = cluster.data();
+        outt.quotes = [];
+
+        //for each recording:
+        for (const recording of records.docs) {
+          for (const quote of recording.data().transcription.results) {
+            // console.log(quote);
+
+            if ("" + quote.cluster === "" + cluster.ref.id && quote.highlighted)
+              outt.quotes.push(quote);
+          }
+
+          // console.log(foruser);
+        }
+
+        // output.push(outt);
+        reg_out.clusters.push(outt);
+      }
+
+      output.push(reg_out);
+    }
+
+    console.log(output);
+
+    let markdown = `# Community Research Analysis\n${new Date().toUTCString()}\n\\pagebreak\n[TOC]\n\\pagebreak\n`;
+
+    //create markdown:
+
+    for (const region of output) {
+      markdown += `# ${region.name}\n`;
+
+      markdown += `Contributions by `;
+      // for (const user of region.users) {
+      markdown += `${region.users.join(", ")}`;
+      // }
+
+      markdown += `\n`;
+      //summary
+      markdown += `## Summary\n ${region.summary}\n`;
+
+      //clusters:
+      markdown += `## Clusters\n`;
+      for (const cluster of region.clusters) {
+        markdown += `### ${cluster.title}\n`;
+        //meta:
+        markdown += `${cluster.description}\n`;
+        markdown += `${cluster.learn}\n`;
+        markdown += `${cluster.questions}\n`;
+        //quotes:
+        for (const quote of cluster.quotes) {
+          markdown += `> ${quote.alternatives[0].transcript}\n`;
+        }
+      }
+
+      //recordings:
+      markdown += `## Interviews\n`;
+      for (const recording of region.recordings) {
+        markdown += `### ${recording.who} on ${recording.when}\n`;
+        markdown += ``;
+
+        for (const line of recording.transcription.results) {
+          if (line.codes)
+            markdown += `**${
+              line.alternatives[0].transcript
+            }.** *[${line.codes.join(",")}]* `;
+          else markdown += `${line.alternatives[0].transcript}. `;
+        }
+        markdown += `\n`;
+      }
+
+      markdown += `\n\\pagebreak\n`;
+    }
+
+    const docx = await convertMarkdownToDocx(markdown);
+
+    // console.log(docx);
+
+    await Promise.all([
+      getStorage()
+        .bucket()
+        .file(`exports/latestExport.docx`)
+        .save(docx.stream()),
+      getStorage().bucket().file(`exports/latestExport.md`).save(markdown),
+      getStorage()
+        .bucket()
+        .file(`exports/latestExport.json`)
+        .save(JSON.stringify(output)),
+    ]);
+  }
+});
