@@ -23,7 +23,7 @@ q-page(padding)
                 .text-h6 {{ $t('upload-your-research-plan') }}
                 span(v-if="user.profile.latestResearchPlan && !user.profile.isResearchPlanChecked").text-grey {{ $t('your-research-plan-has-been-uploaded-and-is-being-reviewed') }}
               q-space
-              q-card-section
+              q-card-actions(style="min-width:110px;" align="right")
                 q-btn(to="/researchplan" flat icon-right="chevron_right" no-caps v-if="!user.profile.isResearchPlanChecked") {{ $t('upload') }}
           .row.q-my-md.items-center
             .col 
@@ -38,7 +38,7 @@ q-page(padding)
               q-card-section 
                 .text-h6 {{ $t('upload-new-interview') }}
               q-space
-              q-card-section
+              q-card-actions(style="min-width:110px;" align="right")
 
                 q-btn(to="/upload" flat icon-right="chevron_right" no-caps) {{ $t('upload') }}
           .row.q-my-md.items-center
@@ -56,7 +56,7 @@ q-page(padding)
                 .text-h6 {{ $t('code-transcript') }}
                 .text-body1.text-grey {{ recording.who }} &middot; {{ recording.when }}
               q-space
-              q-card-section(align="right" style="max-width:50%")
+              q-card-actions(style="min-width:110px;max-width:50%" align="right")
                 q-btn(no-caps :to="`/code/${recording.id}`" v-if="canCode(recording)" flat icon-right="chevron_right") {{ $t('code') }}
                 div(v-else-if="recording.status=='error'" ) {{ $t('error-transcription') }}
                 div(v-else) {{ $t('waiting-for-automatic-transcription') }}
@@ -74,7 +74,7 @@ q-page(padding)
               q-card-section 
                 .text-h6 {{ $t('cluster-codes-into-stories') }}
               q-space
-              q-card-section
+              q-card-actions(style="min-width:110px;" align="right")
                 q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right" v-if="canGroup()") {{ $t('cluster') }}
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
@@ -83,7 +83,7 @@ q-page(padding)
               q-card-section 
                 .text-h6 {{ $t('describe-your-insights') }}
               q-space
-              q-card-section
+              q-card-actions(style="min-width:120px;" align="right")
                 q-btn(no-caps :to="`/describe/${user.email}`" flat icon-right="chevron_right" v-if="canDescribe()") {{ $t('describe') }}
               
           .row.q-my-md.items-center
@@ -101,7 +101,7 @@ q-page(padding)
                 .text-h6 {{ $t('review-themes') }}
                 .text-body1.text-grey {{ $t('across-user-profile-region', [user.profile.region]) }}
               q-space
-              q-card-section
+              q-card-actions(style="min-width:110px;" align="right")
                 q-btn(no-caps :to="`/review/${user.profile.region}`" flat icon-right="chevron_right" v-if="canReview()") {{ $t('review') }}
 
 </template>

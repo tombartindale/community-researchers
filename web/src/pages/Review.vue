@@ -28,8 +28,8 @@ q-page(padding).text-center
               .text-body2 {{clusters[index].description }}
             .col 
               .text-body2 {{clusters[index].learn}}
-            .col 
-              .text-body2 {{clusters[index].questions}}
+            //- .col 
+              //- .text-body2 {{clusters[index].questions}}
             .col    
               .text-body2 {{clusters[index].bullets}}
             .col( v-for="element of cluster.quotes")
