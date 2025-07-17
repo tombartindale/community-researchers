@@ -28,7 +28,7 @@ q-layout(view="hHh lpR fFf").view
     q-spinner(size="3em" v-if="loggingIn").absolute-center
     router-view(v-if="!loggingIn")
     q-page-sticky(position="bottom-right" :offset="[18, 18]")
-      q-btn(fab icon="question_mark" color="primary" @click="showHelp = true")
+      q-btn(fab icon="question_mark" color="primary" @click="showHelp = true" outline)
     q-dialog(v-model="showHelp")
       q-card(style="width:400px;max-width:90vw")
         q-card-section

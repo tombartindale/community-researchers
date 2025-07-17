@@ -101,7 +101,7 @@ import {
 
 import { ref, getDownloadURL } from "firebase/storage";
 import { openURL, useQuasar } from "quasar";
-import Cluster from "src/components/Cluster.vue";
+import Cluster from "src/components/Quote.vue";
 import { useI18n } from "vue-i18n";
 
 import filter from "lodash/filter";

@@ -1,9 +1,14 @@
 <template lang="pug">
 q-page(padding).text-center
   .row.justify-center
-    .col-md-8.col
-      q-banner.text-center.q-mb-md
-        .text-body1 {{ $t('create-clusters') }}
+    q-dialog(v-model="firstRun")
+      q-card
+        q-card-section
+          .text-center.q-mb-md
+            .text-body1 {{ $t('create-clusters') }}
+            .text-body1  {{ $t('in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this') }}
+        q-card-actions(align="right")
+          q-btn(flat v-close-popup) {{$t("ok")}}
       //- div {{codeBook}}
     
     //- div {{list1}}
@@ -13,34 +18,48 @@ q-page(padding).text-center
   .text-center(v-if="loading")
     q-spinner(size="md")
 
-  .row.q-mb-md.items-center
-    .col
-      q-separator
-    .col-auto.q-px-sm.text-grey {{ $t('quotes') }}
-    .col
-      q-separator
-  .row
-    .col-12
-      q-scroll-area(style="height:50vh;width:100%;")
-        .row.q-col-gutter-sm
-          .col-4(v-for="i in [0,1,2,3]")
-            .column.q-col-gutter-sm
-              .col(v-for="element of list1[i]")
-                //- div {{element}}
-                Cluster(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale")
-  .row.q-mb-md.items-center
-    .col
-      q-separator
-    .col-auto.q-px-sm.text-grey {{ $t('clusters') }}
-    .col
-      q-separator
-  .row.q-col-gutter-sm
-    .col-4(v-for="cluster of clusters")
-      
-      q-input(v-model="cluster.title" filled :placeholder="$t('name-of-cluster')" dense @blur="updateName(cluster)").q-mb-sm
-      .column.q-col-gutter-sm
-        .col( v-for="element of getItemsForCluster(cluster.id)")
-          Cluster(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale")
+  //- .row.q-mb-md.items-center
+  //-   .col
+  //-     q-separator
+  //-   .col-auto.q-px-sm.text-grey {{ $t('quotes') }}
+  //-   .col
+  //-     q-separator
+  .row.justify-center
+    .col-md-8.col
+      .q-px-md
+        //- q-linear-progress(:value="progress")
+      .text-smallish(v-if="slide != 'end'") {{slide+1}} of {{allCodes.length}}
+      q-carousel(v-model="slide" swipeable animated control-color="black" arrows transition-prev="slide-right" transition-next="slide-left" style="height:250px;")
+        q-carousel-slide(:name="index" v-for="(element,index) of allCodes").q-mt-none.q-pt-none.q-pb-none
+          .q-px-md.fit
+            QuoteCluster(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale" :saving="saving" :disable="saving")
+        q-carousel-slide(name="end").q-mt-none.q-pt-none.q-pb-none
+          .text-body1.q-mt-lg.q-mx-lg Check your clusters make sense. Select any quote below to change or remove it's cluster.
+  //- .row
+  //-   .col-12
+  //-     q-scroll-area(style="height:50vh;width:100%;")
+  //-       .row.q-col-gutter-sm
+  //-         .col-4(v-for="i in [0,1,2,3]")
+  //-           .column.q-col-gutter-sm
+  //-             .col(v-for="element of list1[i]")
+  //-               //- div {{element}}
+  //-               Cluster(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale")
+  //- .row.q-mb-md.items-center
+  //-   .col
+  //-     q-separator
+  //-   .col-auto.q-px-sm.text-grey {{ $t('clusters') }}
+  //-   .col
+  //-     q-separator
+  .row.q-col-gutter-sm(style="min-height:240px;")
+    .col(v-for="cluster of clusters")
+      q-input(v-model="cluster.title" filled :placeholder="$t('name-of-cluster')" dense @blur="updateName(cluster)").q-mb-xs
+      .column
+        .col-auto
+          .text-tiny {{getItemsForCluster(cluster.id).length}} of 10
+        .col-auto( v-for="element of getItemsForCluster(cluster.id)")
+          QuoteClusterSmall.cursor-pointer(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale" @click="setSlide(element)")
+          q-separator().q-my-xs
+
      
   
   q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-clustering') }}
@@ -61,7 +80,9 @@ import filter from "lodash/filter";
 // import map from "lodash/map";
 // import extend from "lodash/extend";
 
-import Cluster from "src/components/Cluster.vue";
+import QuoteCluster from "src/components/QuoteCluster.vue";
+import Quote from "src/components/Quote.vue";
+import QuoteClusterSmall from "src/components/QuoteClusterSmall.vue";
 // import groupBy from "lodash/groupBy";
 
 import { useI18n } from "vue-i18n";
@@ -87,12 +108,16 @@ export default defineComponent({
   name: "GroupPage",
   props: ["email"],
   components: {
-    Cluster,
+    QuoteCluster,
+    Quote,
+    QuoteClusterSmall,
   },
   data() {
     return {
       drag: false,
-
+      firstRun: true,
+      slide: 0,
+      saving: false,
       // clusters: [
       //   { id: 1, name: "Cluster 1" },
       //   { id: 2, name: "Cluster 2" },
@@ -149,6 +174,9 @@ export default defineComponent({
     return { user, records, codeBook, locale, clusters, loading, q };
   },
   computed: {
+    progress() {
+      return this.slide / this.allCodes.length;
+    },
     allCodes() {
       const tmp = [];
 
@@ -184,8 +212,8 @@ export default defineComponent({
 
           //this.records is the ground truth:
 
-          console.log(this.records);
-
+          // console.log(this.records);
+          this.saving = true;
           //for each record doc:
           for (const record of this.records) {
             try {
@@ -202,6 +230,8 @@ export default defineComponent({
                 type: "negative",
                 message: e,
               });
+            } finally {
+              this.saving = false;
             }
           }
         }
@@ -219,6 +249,10 @@ export default defineComponent({
     // },
   },
   methods: {
+    setSlide(element) {
+      console.log(this.allCodes.indexOf(element));
+      this.slide = this.allCodes.indexOf(element);
+    },
     updateName(cluster) {
       // console.log(cluster.id);
       try {
@@ -267,5 +301,11 @@ export default defineComponent({
 
 .transcript {
   font-size: 1em;
+}
+</style>
+
+<style>
+.text-smallish {
+  font-size: 0.8em;
 }
 </style>

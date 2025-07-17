@@ -56,7 +56,7 @@ import groupBy from "lodash/groupBy";
 import map from "lodash/map";
 import extend from "lodash/extend";
 
-import Cluster from "src/components/Cluster.vue";
+import Cluster from "src/components/Quote.vue";
 // import groupBy from "lodash/groupBy";
 
 import { useI18n } from "vue-i18n";

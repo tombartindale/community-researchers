@@ -15,7 +15,7 @@
   "collect-your-data": "Collectez vos données",
   "community-researcher-dashboard": "Tableau de tableau de bord communautaire",
   "community-researcher-dashboard-0": "Tableau de tableau de bord communautaire",
-  "create-clusters": "Créez des grappes de citations qui racontent une histoire lorsqu'ils sont assemblés. \nVous n'avez pas à utiliser toutes les citations. \nDans la prochaine étape, vous pouvez nous dire plus sur les raisons pour lesquelles vous avez regroupé des trucs comme celui-ci.",
+  "create-clusters": "Créez des grappes de citations qui racontent une histoire lorsqu'ils sont assemblés. \nVous n'avez pas à utiliser toutes les citations.",
   "describe": "Décrire",
   "describe-your-insights": "Décrivez vos idées",
   "develop-your-insights": "Développez vos idées",
@@ -78,5 +78,6 @@
   "if-you-have-issues": "Si vous avez des problèmes, veuillez contacter le canal de support technique de votre communauté de médias sociaux ou parler à votre mentor.",
   "ok": "D'ACCORD",
   "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "Ce tableau de bord a été construit spécifiquement pour soutenir les chercheurs communautaires pour ce projet.",
-  "error-transcription": "Il y a eu une erreur de transcription. \nVeuillez télécharger à nouveau votre enregistrement d'entrevue."
+  "error-transcription": "Il y a eu une erreur de transcription. \nVeuillez télécharger à nouveau votre enregistrement d'entrevue.",
+  "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "À l'étape suivante, vous pouvez nous dire plus pourquoi vous avez regroupé des choses comme celle-ci."
 }

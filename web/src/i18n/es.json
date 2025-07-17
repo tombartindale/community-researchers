@@ -15,7 +15,7 @@
   "collect-your-data": "Recopile sus datos",
   "community-researcher-dashboard": "Panel de investigadores de la comunidad",
   "community-researcher-dashboard-0": "Panel de investigadores de la comunidad",
-  "create-clusters": "Cree grupos de citas que cuenten una historia cuando se junten. \nNo tiene que usar todas las citas. \nEn el siguiente paso, puede contarnos más sobre por qué ha agrupado a Thigns como este.",
+  "create-clusters": "Cree grupos de citas que cuenten una historia cuando se junten. \nNo tiene que usar todas las citas.",
   "describe": "Describir",
   "describe-your-insights": "Describe tus ideas",
   "develop-your-insights": "Desarrolle sus ideas",
@@ -78,5 +78,6 @@
   "if-you-have-issues": "Si tiene problemas, comuníquese con el canal de soporte técnico en su comunidad de redes sociales o hable con su mentor.",
   "ok": "DE ACUERDO",
   "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "Este tablero se ha construido específicamente para apoyar a los investigadores de la comunidad para este proyecto.",
-  "error-transcription": "Hubo un error en la transcripción. \nPor favor, suba la grabación de su entrevista nuevamente."
+  "error-transcription": "Hubo un error en la transcripción. \nPor favor, suba la grabación de su entrevista nuevamente.",
+  "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "En el siguiente paso, puede contarnos más sobre por qué ha agrupado cosas como esta."
 }

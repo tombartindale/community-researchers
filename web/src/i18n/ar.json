@@ -10,7 +10,7 @@
   "code-your-data": "رمز بياناتك",
   "codes": "الرموز",
   "community-researcher-dashboard": "لوحة معلومات الباحث المجتمع",
-  "create-clusters": "إنشاء مجموعات من الاقتباسات التي تحكي قصة عند تجميعها. \nليس لديك لاستخدام جميع الاقتباسات. \nفي الخطوة التالية ، يمكنك إخبارنا بالمزيد عن سبب تجميع مثل هذا.",
+  "create-clusters": "إنشاء مجموعات من الاقتباسات التي تحكي قصة عند تجميعها. \nليس لديك لاستخدام جميع الاقتباسات.",
   "describe": "يصف",
   "describe-your-insights": "صف رؤيتك",
   "develop-your-insights": "تطوير رؤيتك",
@@ -78,5 +78,6 @@
   "if-you-have-issues": "إذا كانت لديك مشكلات ، فيرجى الاتصال بقناة الدعم الفني في مجتمع وسائل التواصل الاجتماعي الخاصة بك ، أو التحدث إلى مرشدك.",
   "ok": "نعم",
   "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "تم بناء لوحة القيادة هذه خصيصًا لدعم الباحثين في المجتمع لهذا المشروع.",
-  "error-transcription": "كان هناك خطأ في النسخ. \nيرجى تحميل تسجيل المقابلة الخاص بك مرة أخرى."
+  "error-transcription": "كان هناك خطأ في النسخ. \nيرجى تحميل تسجيل المقابلة الخاص بك مرة أخرى.",
+  "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "في الخطوة التالية ، يمكنك إخبارنا بالمزيد عن سبب تجميع أشياء مثل هذا."
 }

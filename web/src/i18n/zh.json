@@ -15,7 +15,7 @@
   "collect-your-data": "收集您的数据",
   "community-researcher-dashboard": "社区研究员仪表板",
   "community-researcher-dashboard-0": "社区研究员仪表板",
-  "create-clusters": "创建一组引号，这些引号在整理时讲述一个故事。\n您不必使用所有引号。\n在下一步中，您可以告诉我们更多有关您为何如此聚集的Thigns的信息。",
+  "create-clusters": "创建一组引号，这些引号在整理时讲述一个故事。\n您不必使用所有引号。",
   "describe": "描述",
   "describe-your-insights": "描述您的见解",
   "develop-your-insights": "发展您的见解",
@@ -78,5 +78,6 @@
   "if-you-have-issues": "如果您有问题，请联系社交媒体社区中的技术支持渠道，或与您的导师交谈。",
   "ok": "好的",
   "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "该仪表板是专门为支持该项目的社区研究人员而建造的。",
-  "error-transcription": "转录错误。\n请再次上传您的面试记录。"
+  "error-transcription": "转录错误。\n请再次上传您的面试记录。",
+  "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "在下一步中，您可以向我们介绍为什么您为此类似这样的事情。"
 }
