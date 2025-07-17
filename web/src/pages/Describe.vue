@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page(padding).text-center
+q-page().text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md.q-mt-md
@@ -11,8 +11,8 @@ q-page(padding).text-center
 
   .row.justify-center
     .col-md-8.col
-      q-stepper(v-model="step" ref="stepper" v-if="clusters.length" flat :contracted="$q.screen.lt.md")
-        q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title")
+      q-stepper(v-model="step" ref="stepper" v-if="clusters.length" flat :contracted="$q.screen.lt.md").q-pa-none.q-ma-none
+        q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title").q-pa-none.q-ma-none
           //- div {{clusters[index]}}
           .column.q-col-gutter-sm.text-left
             .col {{$t('give-this-cluster-a-name')}}
@@ -38,7 +38,7 @@ q-page(padding).text-center
               q-btn(:disable="step == 0" flat @click="$refs.stepper.previous()" ) {{ $t('previous-cluster') }}
               q-btn(@click="$refs.stepper.next()" flat :disable="step == Object.keys(clustered).length-1" ) {{ $t('next-cluster') }}
   
-  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-describing') }}
+  q-btn(color="primary" size="lg" @click="done()" no-caps).q-my-lg {{ $t('ive-finished-describing') }}
 
 </template>
 
@@ -256,5 +256,11 @@ export default defineComponent({
 
 .transcript {
   font-size: 1em;
+}
+</style>
+<style>
+.q-stepper__step-inner {
+  padding-left: 0.8em !important;
+  padding-right: 0.8em !important;
 }
 </style>
