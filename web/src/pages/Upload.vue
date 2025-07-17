@@ -1,7 +1,7 @@
 <template lang="pug">
 q-page(padding)
   .row.justify-center
-    .col.col-md-8
+    .col.col-md-6
       .text-h6.text-center.q-my-lg {{ $t('upload-new-interview') }}
       div.q-mt-md &nbsp;
       q-form(@submit.prevent="upload" v-if="!uploading")

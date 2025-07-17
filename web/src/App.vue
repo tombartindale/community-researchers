@@ -26,6 +26,16 @@ q-layout(view="hHh lpR fFf").view
     
     q-spinner(size="3em" v-if="loggingIn").absolute-center
     router-view(v-if="!loggingIn")
+    q-page-sticky(position="bottom-right" :offset="[18, 18]")
+      q-btn(fab icon="question_mark" color="primary" @click="showHelp = true")
+    q-dialog(v-model="showHelp")
+      q-card(style="width:400px;max-width:90vw")
+        q-card-section
+          .text-body1 {{ $t('this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project') }}
+          .text-body2.q-mt-md {{ $t('as-such-there-may-problems-with-the-platform-which-we-did-not-have-chance-to-fix') }}
+          .text-body2.q-mt-md {{ $t('if-you-have-issues') }}
+        q-card-actions(align="right")  
+          q-btn(v-close-popup flat) {{ $t('ok') }}
 </template>
 
 <script>
@@ -76,6 +86,7 @@ export default defineComponent({
   data: function () {
     return {
       loggingIn: false,
+      showHelp: false,
     };
   },
   methods: {
