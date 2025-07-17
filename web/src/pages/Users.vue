@@ -1,6 +1,7 @@
 <template lang="pug">
 q-page(padding).text-center
   .text-h6 Users
+  .text-body2.text-grey Do not change a user's region after analysis has commenced, as existing clustering will remai with the original region and potentially be hidden.
   q-list(separator).text-left
     q-item
       q-item-section.text-grey Email

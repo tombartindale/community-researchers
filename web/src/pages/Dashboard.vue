@@ -47,6 +47,9 @@ q-page(padding)
             .col-auto.q-px-md.text-caption.text-grey {{ $t('code-your-data') }}
             .col 
               q-separator(inset)
+          .row(v-if="recordings.length==0").text-center
+            .col.text-body2.text-grey {{ $t('upload-an-interview-recording-to-get-started') }}
+
           q-card(v-for="recording in recordings" :key="recording.id" class="my-card" bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)

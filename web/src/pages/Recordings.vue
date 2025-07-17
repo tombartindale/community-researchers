@@ -5,12 +5,13 @@ q-page(padding).text-center
   .row.justify-center
     .col-auto
       q-banner(rounded).bg-grey-2.q-my-md
-        q-btn(color="primary" @click="startExport" no-caps).q-mr-md Start Export
+        q-btn(color="primary" @click="startExport" no-caps :loading="loading").q-mr-md Start Export
         q-btn-dropdown( flat dense no-caps label="Download export file")
           q-list
             q-item(@click="getExportFile('docx')" clickable v-close-popup) Word Document (.docx) 
             q-item(@click="getExportFile('md')" clickable v-close-popup) Markdown (.md)
             q-item(@click="getExportFile('json')" clickable v-close-popup) JSON (.json)
+            q-item(@click="getExportFile('xlsx')" clickable v-close-popup) Excel (.xlsx)
 
   div(v-for="region of regions").q-mt-lg.q-mb-xl
     .row.items-center
@@ -21,7 +22,7 @@ q-page(padding).text-center
       .col
         q-separator
     .row
-      .col.text-body1.text-grey.q-py-md {{region.description || 'Summary not written yet...'}}
+      .col.text-body1.text-grey.q-py-md(:html="region.description || 'Summary not written yet...'")
     .row.q-col-gutter-sm.q-mb-md
       .col(v-if="!region.clusters")
         q-spinner( size="2em")
@@ -34,8 +35,6 @@ q-page(padding).text-center
             .text-body2 {{cluster.description }}
           .col 
             .text-body2 {{cluster.learn}}
-          .col 
-            .text-body2 {{cluster.questions}}
           .col    
             .text-body2 {{cluster.bullets}}
           .col( v-for="element of cluster.quotes")
@@ -116,7 +115,7 @@ export default defineComponent({
   props: ["id"],
   components: { Cluster },
   data() {
-    return {};
+    return { loading: false };
   },
   setup() {
     const user = useCurrentUser();
@@ -164,7 +163,16 @@ export default defineComponent({
   // },
   methods: {
     async startExport() {
-      await startExport();
+      this.loading = true;
+      try {
+        await startExport();
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
+      this.loading = false;
     },
     getExportFile(ext) {
       getDownloadURL(ref(storage, `exports/latestExport.${ext}`))
