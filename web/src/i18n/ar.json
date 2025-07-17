@@ -79,5 +79,11 @@
   "ok": "نعم",
   "this-dashboard-has-been-built-specifically-to-support-community-researchers-for-this-project": "تم بناء لوحة القيادة هذه خصيصًا لدعم الباحثين في المجتمع لهذا المشروع.",
   "error-transcription": "كان هناك خطأ في النسخ. \nيرجى تحميل تسجيل المقابلة الخاص بك مرة أخرى.",
-  "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "في الخطوة التالية ، يمكنك إخبارنا بالمزيد عن سبب تجميع أشياء مثل هذا."
+  "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "في الخطوة التالية ، يمكنك إخبارنا بالمزيد عن سبب تجميع أشياء مثل هذا.",
+  "check-your-clusters-make-sense-select-any-quote-below-to-change-or-remove-its-cluster": "تحقق من أن مجموعاتك منطقية. \nحدد أي عرض أسعار أدناه لتغيير أو إزالة الكتلة.",
+  "getitemsforcluster-cluster-id-length-of-10": "{0} من 10",
+  "put-this-quote-in-a-cluster": "ضع هذا الاقتباس في مجموعة؟",
+  "select-a-maximum-of-3-quotes": "حدد 3 اقتباسات كحد أقصى",
+  "slide-1-of-allcodes-length": "{0} من {1}",
+  "why-did-you-think-this-is-interesting": "لماذا تعتقد أن هذا مثير للاهتمام؟"
 }

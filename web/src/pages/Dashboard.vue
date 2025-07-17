@@ -18,7 +18,7 @@ q-page(padding)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-checkbox(readonly size="lg" :model-value="hasResearchPlan()" color="black")
+                q-checkbox(readonly size="md" :model-value="hasResearchPlan()" color="black")
               q-card-section 
                 .text-h6 {{ $t('upload-your-research-plan') }}
                 span(v-if="user.profile.latestResearchPlan && !user.profile.isResearchPlanChecked").text-grey {{ $t('your-research-plan-has-been-uploaded-and-is-being-reviewed') }}
@@ -34,7 +34,7 @@ q-page(padding)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-icon(name="upload" size="md").q-mx-sm 
+                q-icon(name="upload" size="md").q-mx-xs
               q-card-section 
                 .text-h6 {{ $t('upload-new-interview') }}
               q-space
@@ -50,7 +50,7 @@ q-page(padding)
           q-card(v-for="recording in recordings" :key="recording.id" class="my-card" bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-checkbox(readonly size="lg" :model-value="isComplete(recording)" color="black")
+                q-checkbox(readonly size="md" :model-value="isComplete(recording)" color="black")
 
               q-card-section 
                 .text-h6 {{ $t('code-transcript') }}
@@ -70,7 +70,7 @@ q-page(padding)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-checkbox(readonly size="lg" :model-value="isGrouped()" color="black")
+                q-checkbox(readonly size="md" :model-value="isGrouped()" color="black")
               q-card-section 
                 .text-h6 {{ $t('cluster-codes-into-stories') }}
               q-space
@@ -79,7 +79,7 @@ q-page(padding)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-checkbox(readonly size="lg" :model-value="isDescribed()" color="black")
+                q-checkbox(readonly size="md" :model-value="isDescribed()" color="black")
               q-card-section 
                 .text-h6 {{ $t('describe-your-insights') }}
               q-space
@@ -95,7 +95,7 @@ q-page(padding)
           q-card(flat bordered).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-icon(size="lg" name="forum").q-mx-sm
+                q-icon(size="md" name="forum").q-mx-xs
                 //- q-checkbox(readonly size="lg" :model-value="isReviewed()" color="black")
               q-card-section 
                 .text-h6 {{ $t('review-themes') }}

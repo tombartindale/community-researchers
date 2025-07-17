@@ -10,6 +10,7 @@ q-page(padding).text-center
   .row(v-if="regionData").justify-center
     .col-md-8.col
       q-editor.text-left(type="textarea" v-model="regionData.description" @blur="saveDesc" filled :label="$t('summary-of-findings')" content-class="bg-grey-1")
+      .text-body2.text-grey Please coordinate with other researchers in your National Society so one person edits this text at a time.
 
 
     //- div {{clusters}}
@@ -80,6 +81,10 @@ export default defineComponent({
       this.loading = false;
     } catch (e) {
       console.error(e);
+      this.q.notify({
+        type: "negative",
+        message: e,
+      });
     }
   },
   data() {

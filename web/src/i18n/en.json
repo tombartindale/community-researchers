@@ -81,5 +81,9 @@
   "error-transcription": "There was an error in transcription. Please upload your interview recording again.",
   "why-did-you-think-this-is-interesting": "Why did you think this is interesting?",
   "select-a-maximum-of-3-quotes": "Select a maximum of 3 quotes",
-  "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "In the next step you can tell us more about why you have clustered things like this."
+  "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "In the next step you can tell us more about why you have clustered things like this.",
+  "check-your-clusters-make-sense-select-any-quote-below-to-change-or-remove-its-cluster": "Check your clusters make sense. Select any quote below to change or remove it's cluster.",
+  "slide-1-of-allcodes-length": "{0} of {1}",
+  "getitemsforcluster-cluster-id-length-of-10": "{0} of 10",
+  "put-this-quote-in-a-cluster": "Put this quote in a cluster?"
 }
