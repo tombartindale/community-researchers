@@ -24,7 +24,8 @@
     "fs-extra": "^11.3.0",
     "lodash": "^4.17.21",
     "docx": "^9.5.0",
-    "file-saver": "^2.0.5"
+    "file-saver": "^2.0.5",
+    "xlsx": "0.18.5"
   },
   "devDependencies": {
     "firebase-functions-test": "^3.1.0"
