@@ -47,7 +47,9 @@ export default defineConfig((ctx) => {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: {
+        VUE_APP_VERSION: require("./package.json").version,
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,

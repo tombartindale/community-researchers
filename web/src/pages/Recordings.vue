@@ -2,6 +2,15 @@
 q-page(padding).text-center
   //- .text-h6.q-mb-lg Analysis
   //- div For each region, put summary, then clusters, then users, then recordings
+  .row.justify-center
+    .col-auto
+      q-banner(rounded).bg-grey-2.q-my-md
+        q-btn(color="primary" @click="startExport" no-caps).q-mr-md Start Export
+        q-btn-dropdown( flat dense no-caps label="Download export file")
+          q-list
+            q-item(@click="getExportFile('docx')" clickable v-close-popup) Word Document (.docx) 
+            q-item(@click="getExportFile('md')" clickable v-close-popup) Markdown (.md)
+            q-item(@click="getExportFile('json')" clickable v-close-popup) JSON (.json)
 
   div(v-for="region of regions").q-mt-lg.q-mb-xl
     .row.items-center
@@ -14,7 +23,9 @@ q-page(padding).text-center
     .row
       .col.text-body1.text-grey.q-py-md {{region.description || 'Summary not written yet...'}}
     .row.q-col-gutter-sm.q-mb-md
-      .col-3(v-for="cluster of region.clusters") 
+      .col(v-if="!region.clusters")
+        q-spinner( size="2em")
+      .col-4(v-for="cluster of region.clusters") 
         //- div {{cluster}}
         .column.q-col-gutter-sm 
           .col
@@ -38,7 +49,7 @@ q-page(padding).text-center
       .col
         q-separator
     .row.q-col-gutter-sm
-      .col-3(v-for="user of getRegionalUsers(region.id)")
+      .col-4(v-for="user of getRegionalUsers(region.id)")
         q-card(bordered flat)
           q-card-section
             .row.text-left.items-center
@@ -74,7 +85,12 @@ q-page(padding).text-center
 import { defineComponent } from "vue";
 
 import { useCollection, useCurrentUser } from "vuefire";
-import { db, storage, getClustersForRegion } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
+import {
+  db,
+  storage,
+  getClustersForRegion,
+  startExport,
+} from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 // import { ref, uploadBytesResumable } from "firebase/storage";
 import {
   // doc,
@@ -84,7 +100,7 @@ import {
 } from "firebase/firestore"; // Importing dbRef for database operations
 
 import { ref, getDownloadURL } from "firebase/storage";
-import { openURL } from "quasar";
+import { openURL, useQuasar } from "quasar";
 import Cluster from "src/components/Cluster.vue";
 import { useI18n } from "vue-i18n";
 
@@ -131,8 +147,10 @@ export default defineComponent({
 
     const codeBook = useCollection(collection(db, `codebook`), { once: true });
 
+    const q = useQuasar();
+
     // console.log("record", record);
-    return { user, records, codeBook, regions, locale, users };
+    return { user, records, codeBook, regions, locale, users, q };
   },
   // watch: {
   //   record: {
@@ -145,6 +163,22 @@ export default defineComponent({
   //   },
   // },
   methods: {
+    async startExport() {
+      await startExport();
+    },
+    getExportFile(ext) {
+      getDownloadURL(ref(storage, `exports/latestExport.${ext}`))
+        .then((url) => {
+          console.log(url);
+          openURL(url);
+        })
+        .catch((e) => {
+          this.q.notify({
+            type: "negative",
+            message: e,
+          });
+        });
+    },
     getRecordingsForUser(user) {
       return filter(this.records, (r) => r.parent == user);
     },

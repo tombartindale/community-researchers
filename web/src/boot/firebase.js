@@ -73,3 +73,4 @@ export const getClustersForRegion = httpsCallable(
   functions,
   "getClustersForRegion"
 );
+export const startExport = httpsCallable(functions, "startExport");

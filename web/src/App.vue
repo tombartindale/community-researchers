@@ -7,6 +7,7 @@ q-layout(view="hHh lpR fFf").view
         q-tooltip {{ $t('codebook') }}
       q-btn(to="/admin" flat dense icon="settings" v-if="user?.profile?.isAdmin")
         q-tooltip {{ $t('admin') }}
+      .text-grey.text-tiny.q-pt-xs.q-pl-xs v{{version}}
       q-space
       span 
         span.gt-sm {{ $t('community-researcher-dashboard') }} &middot; 
@@ -106,6 +107,12 @@ export default defineComponent({
     //   return window.location.search;
     // },
   },
+  computed: {
+    version() {
+      console.log(process.env.VUE_APP_VERSION);
+      return process.env.VUE_APP_VERSION;
+    },
+  },
   mounted() {
     // This is where you can initialize any global state or perform actions
     // that should happen when the app is mounted.
@@ -156,3 +163,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style>
+.text-tiny {
+  font-size: 0.7em;
+}
+</style>
