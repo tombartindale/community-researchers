@@ -456,12 +456,14 @@ export const startExport = onCall({ region: region }, async (request) => {
       for (const cluster of region.clusters) {
         markdown += `### ${cluster.title}\n`;
         //meta:
-        markdown += `${cluster.description}\n`;
-        markdown += `${cluster.learn}\n`;
-        markdown += `${cluster.questions}\n`;
+        markdown += `${cluster.description}\n\n`;
+        markdown += `${cluster.learn}\n\n`;
+        // markdown += `${cluster.questions}\n`;
         //quotes:
         for (const quote of cluster.quotes) {
-          markdown += `> ${quote.alternatives[0].transcript}\n`;
+          markdown += `> ${
+            quote.alternatives[0].transcript
+          } [${quote.codes.join(",")}]\n\n`;
         }
       }
 
