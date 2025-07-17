@@ -14,5 +14,9 @@ service firebase.storage {
       allow write: if user == request.auth.token.email
 
     }
+
+    match /exports/{file=**} {
+      allow read: if request.auth!=null
+    }
   }
 }
