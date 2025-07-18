@@ -222,7 +222,7 @@ export const transcribe2 = onObjectFinalized(
           encoding: "LINEAR16",
           sampleRateHertz: 16000,
           languageCode: languageCode,
-          model: "latest_long",
+          model: languageCode != "zh-CN" ? "latest_long" : "default",
         };
 
         const audio = {
