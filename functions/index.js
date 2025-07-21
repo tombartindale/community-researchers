@@ -424,12 +424,16 @@ export const startExport = onCall({ region: region }, async (request) => {
 
         //for each recording:
         for (const recording of records.docs) {
-          for (const quote of recording.data().transcription.results) {
-            // console.log(quote);
+          if (recording.data().transcription)
+            for (const quote of recording.data().transcription.results) {
+              // console.log(quote);
 
-            if ("" + quote.cluster === "" + cluster.ref.id && quote.highlighted)
-              outt.quotes.push(quote);
-          }
+              if (
+                "" + quote.cluster === "" + cluster.ref.id &&
+                quote.highlighted
+              )
+                outt.quotes.push(quote);
+            }
 
           // console.log(foruser);
         }
@@ -482,13 +486,14 @@ export const startExport = onCall({ region: region }, async (request) => {
         markdown += `### ${recording.who} on ${recording.when}\n`;
         markdown += ``;
 
-        for (const line of recording.transcription.results) {
-          if (line.codes)
-            markdown += `**${
-              line.alternatives[0].transcript
-            }.** *[${line.codes.join(",")}]* `;
-          else markdown += `${line.alternatives[0].transcript}. `;
-        }
+        if (recording.transcription)
+          for (const line of recording.transcription.results) {
+            if (line.codes)
+              markdown += `**${
+                line.alternatives[0].transcript
+              }.** *[${line.codes.join(",")}]* `;
+            else markdown += `${line.alternatives[0].transcript}. `;
+          }
         markdown += `\n`;
       }
 
@@ -510,21 +515,22 @@ export const startExport = onCall({ region: region }, async (request) => {
       for (const recording of region.recordings) {
         //for each transcription line:
         // console.log(recording);
-        for (const line of recording.transcription.results) {
-          // console.log(line);
-          if (line.codes) {
-            row.region = region.name;
-            row.content = line.alternatives[0].transcript;
-            row.codes = line.codes.join(",");
-            row.highlighted = line.highlighted;
-            row.researcher = recording.researcher;
-            row.cluster = `${recording.researcher}_${line.cluster}`;
-            row.who = recording.who;
-            row.when = recording.when;
-            row.language = recording.language;
-            rows.push(row);
+        if (recording.transcription)
+          for (const line of recording.transcription.results) {
+            // console.log(line);
+            if (line.codes) {
+              row.region = region.name;
+              row.content = line.alternatives[0].transcript;
+              row.codes = line.codes.join(",");
+              row.highlighted = line.highlighted;
+              row.researcher = recording.researcher;
+              row.cluster = `${recording.researcher}_${line.cluster}`;
+              row.who = recording.who;
+              row.when = recording.when;
+              row.language = recording.language;
+              rows.push(row);
+            }
           }
-        }
       }
 
       for (const cluster of region.clusters) {
