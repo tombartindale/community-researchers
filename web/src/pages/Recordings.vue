@@ -68,9 +68,12 @@ q-page(padding).text-center
               q-item-section(side)
                 q-btn(icon="download" dense flat @click="getRecording(recording)" no-caps)
                   q-tooltip Recording
-              q-item-section(side)
+              q-item-section(side v-if="!recording.error")
                 q-btn(icon="code" dense flat :to="`/code/${recording.id}`" no-caps)
                   q-tooltip Coding
+              q-item-section(side v-if="recording.error")
+                q-icon(name="warning").q-mx-xs
+                  q-tooltip {{recording.error}}
 
   //- q-list(separator).text-left
   //-   q-item(v-for="record of records")
