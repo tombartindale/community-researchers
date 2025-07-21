@@ -424,7 +424,10 @@ export const startExport = onCall({ region: region }, async (request) => {
 
         //for each recording:
         for (const recording of records.docs) {
-          if (recording.data().transcription)
+          if (
+            recording.data().transcription &&
+            recording.data().transcription.results
+          )
             for (const quote of recording.data().transcription.results) {
               // console.log(quote);
 
@@ -486,7 +489,7 @@ export const startExport = onCall({ region: region }, async (request) => {
         markdown += `### ${recording.who} on ${recording.when}\n`;
         markdown += ``;
 
-        if (recording.transcription)
+        if (recording.transcription && recording.transcription.results)
           for (const line of recording.transcription.results) {
             if (line.codes)
               markdown += `**${
@@ -515,7 +518,7 @@ export const startExport = onCall({ region: region }, async (request) => {
       for (const recording of region.recordings) {
         //for each transcription line:
         // console.log(recording);
-        if (recording.transcription)
+        if (recording.transcription && recording.transcription.results)
           for (const line of recording.transcription.results) {
             // console.log(line);
             if (line.codes) {
