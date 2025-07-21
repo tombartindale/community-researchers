@@ -18,7 +18,9 @@ q-page(padding)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-checkbox(readonly size="md" :model-value="hasResearchPlan()" color="black")
+                q-icon(name="check_box_outline_blank" size="md" v-if="!hasResearchPlan()")
+                q-icon(name="check_box" size="md" v-if="hasResearchPlan()")
+                //- q-checkbox(readonly size="md" :model-value="hasResearchPlan()" color="black")
               q-card-section 
                 .text-h6 {{ $t('upload-your-research-plan') }}
                 span(v-if="user.profile.latestResearchPlan && !user.profile.isResearchPlanChecked").text-grey {{ $t('your-research-plan-has-been-uploaded-and-is-being-reviewed') }}
@@ -34,7 +36,7 @@ q-page(padding)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-icon(name="upload" size="md").q-mx-xs
+                q-icon(name="upload" size="md")
               q-card-section 
                 .text-h6 {{ $t('upload-new-interview') }}
               q-space
@@ -53,8 +55,9 @@ q-page(padding)
           q-card(v-for="recording in recordings" :key="recording.id" class="my-card" bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-checkbox(readonly size="md" :model-value="isComplete(recording)" color="black")
-
+                //- q-checkbox(readonly size="md" :model-value="" color="black")
+                q-icon(name="check_box_outline_blank" size="md" v-if="!isComplete(recording)")
+                q-icon(name="check_box" size="md" v-if="isComplete(recording)")
               q-card-section 
                 .text-h6 {{ $t('code-transcript') }}
                 .text-body1.text-grey {{ recording.who }} &middot; {{ recording.when }}
@@ -73,7 +76,9 @@ q-page(padding)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-checkbox(readonly size="md" :model-value="isGrouped()" color="black")
+                //- q-checkbox(readonly size="md" :model-value="isGrouped()" color="black")
+                q-icon(name="check_box_outline_blank" size="md" v-if="!isGrouped()")
+                q-icon(name="check_box" size="md" v-if="isGrouped()")
               q-card-section 
                 .text-h6 {{ $t('cluster-codes-into-stories') }}
               q-space
@@ -82,7 +87,9 @@ q-page(padding)
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-checkbox(readonly size="md" :model-value="isDescribed()" color="black")
+                //- q-checkbox(readonly size="md" :model-value="isDescribed()" color="black")
+                q-icon(name="check_box_outline_blank" size="md" v-if="!isDescribed()")
+                q-icon(name="check_box" size="md" v-if="isDescribed()")
               q-card-section 
                 .text-h6 {{ $t('describe-your-insights') }}
               q-space
@@ -98,7 +105,7 @@ q-page(padding)
           q-card(flat bordered).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
-                q-icon(size="md" name="forum").q-mx-xs
+                q-icon(size="md" name="forum")
                 //- q-checkbox(readonly size="lg" :model-value="isReviewed()" color="black")
               q-card-section 
                 .text-h6 {{ $t('review-themes') }}
