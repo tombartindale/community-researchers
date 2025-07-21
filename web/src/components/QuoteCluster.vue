@@ -14,13 +14,13 @@ div(class="list-group-item").q-pa-none.full-height
         //- div {{element}}
     //- .col-auto
     //-   span(v-for="code of element.codes" :style="{'color':getCode(code)?.color}") {{getCode(code)?.name[locale]}}&nbsp;
-    .col-auto.text-smallish {{ $t('put-this-quote-in-a-cluster') }}
+    .col-auto.text-smallish.q-pt-sm {{ $t('put-this-quote-in-a-cluster') }}
     .col-auto
       //- div {{element.cluster}}
       //- q-btn-toggle(v-model="element.cluster" :options="clusterOptions" clearable no-caps outline)  
       .row.justify-between
         .col-auto(v-for="(cluster,index) of clusters" @click="updateCluster(element,index)")
-          q-btn(icon="arrow_downward" flat size="lg" :color="(index == element.cluster)?'primary':''" :loading="saving")
+          q-btn(icon="arrow_downward" dense flat size="lg" :color="(index == element.cluster)?'primary':''" :loading="saving")
       //- q-btn(@click="delete element.cluster" clickable v-close-popup) {{ $t('remove-from-cluster') }}
 </template>
 

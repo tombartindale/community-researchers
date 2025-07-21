@@ -28,12 +28,13 @@ q-page(padding).text-center
     .col-md-8.col
       .q-px-md
         //- q-linear-progress(:value="progress")
-      .text-smallish(v-if="slide != 'end'") {{ $t('slide-1-of-allcodes-length', [slide+1, allCodes.length]) }}
+      .text-smallish() &nbsp;
+        span(v-show="slide != 'end'") {{ $t('slide-1-of-allcodes-length', [slide+1, allCodes.length]) }}
       q-carousel(v-model="slide" swipeable animated control-color="black" arrows transition-prev="slide-right" transition-next="slide-left" style="height:250px;")
         q-carousel-slide(:name="index" v-for="(element,index) of allCodes").q-mt-none.q-pt-none.q-pb-none
           .q-px-md.fit
             QuoteCluster(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale" :saving="saving" :disable="saving")
-        q-carousel-slide(name="end").q-mt-none.q-pt-none.q-pb-none
+        q-carousel-slide(name="end").q-mt-none.q-pt-none.q-pb-none.overflow-hidden
           .text-body1.q-mt-lg.q-mx-lg {{ $t('check-your-clusters-make-sense-select-any-quote-below-to-change-or-remove-its-cluster') }}
   //- .row
   //-   .col-12
@@ -58,11 +59,11 @@ q-page(padding).text-center
           .text-tiny {{ $t('getitemsforcluster-cluster-id-length-of-10', [getItemsForCluster(cluster.id).length]) }}
         .col-auto( v-for="element of getItemsForCluster(cluster.id)")
           QuoteClusterSmall.cursor-pointer(:element="element" :codeBook="codeBook" :clusters="clusters" :locale="locale" @click="setSlide(element)")
-          q-separator().q-my-xs
+          q-separator(inset).q-my-xs
 
      
   
-  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-clustering') }}
+  q-btn(color="primary" size="md" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-clustering') }}
 
 </template>
 
@@ -306,6 +307,6 @@ export default defineComponent({
 
 <style>
 .text-smallish {
-  font-size: 0.8em;
+  font-size: 0.9em;
 }
 </style>

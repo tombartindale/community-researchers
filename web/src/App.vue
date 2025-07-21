@@ -166,6 +166,6 @@ export default defineComponent({
 
 <style>
 .text-tiny {
-  font-size: 0.7em;
+  font-size: 0.8em;
 }
 </style>

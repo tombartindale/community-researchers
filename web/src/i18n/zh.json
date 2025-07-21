@@ -82,7 +82,7 @@
   "in-the-next-step-you-can-tell-us-more-about-why-you-have-clustered-things-like-this": "在下一步中，您可以向我们介绍为什么您为此类似这样的事情。",
   "check-your-clusters-make-sense-select-any-quote-below-to-change-or-remove-its-cluster": "检查您的群集很有意义。\n选择下面的任何引用以更改或删除其群集。",
   "getitemsforcluster-cluster-id-length-of-10": "{0} 10",
-  "put-this-quote-in-a-cluster": "将此报价放在集群中？",
+  "put-this-quote-in-a-cluster": "使用箭头将此报价放在集群中：",
   "select-a-maximum-of-3-quotes": "最多选择3个报价",
   "slide-1-of-allcodes-length": "{1}的{0}",
   "why-did-you-think-this-is-interesting": "您为什么认为这很有趣？",
