@@ -24,14 +24,14 @@ q-page(padding).text-center
           .column.q-col-gutter-sm 
             .col
               .text-body1 {{clusters[index].title}}
-            .col 
-              .text-body2 {{clusters[index].description }}
+            //- .col 
+              //- .text-body2 {{clusters[index].description }}
             .col 
               .text-body2 {{clusters[index].learn}}
             //- .col 
               //- .text-body2 {{clusters[index].questions}}
-            .col    
-              .text-body2 {{clusters[index].bullets}}
+            //- .col    
+            //-   .text-body2 {{clusters[index].bullets}}
             .col( v-for="element of cluster.quotes")
               Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
               q-separator(inset).q-mt-sm

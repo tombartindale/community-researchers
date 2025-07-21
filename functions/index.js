@@ -352,10 +352,10 @@ export const getClustersForRegion = onCall(
               recording.data().transcription.results
             )
               for (const quote of recording.data().transcription?.results) {
-                // console.log(quote);
+                console.log(quote);
 
                 if (
-                  "" + quote.cluster === "" + cluster.ref.id &&
+                  quote.codes?.includes(cluster.data().code) &&
                   quote.highlighted
                 )
                   outt.quotes.push(quote);
@@ -432,7 +432,7 @@ export const startExport = onCall({ region: region }, async (request) => {
               // console.log(quote);
 
               if (
-                "" + quote.cluster === "" + cluster.ref.id &&
+                quote.codes?.includes(cluster.data().code) &&
                 quote.highlighted
               )
                 outt.quotes.push(quote);

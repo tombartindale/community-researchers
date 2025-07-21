@@ -2,7 +2,7 @@
 q-page().text-center
   .row.justify-center
     .col-md-8.col
-      q-banner.text-center.q-mb-md.q-mt-md
+      q-banner.text-center.q-mt-md
         .text-body1 {{ $t('for-each-cluster-follow-the-prompts') }}
         
     //- div {{records}}
@@ -10,35 +10,41 @@ q-page().text-center
     //- div {{clusters}}
 
   .row.justify-center
-    .col-md-8.col
-      q-stepper(v-model="step" ref="stepper" v-if="clusters.length" flat :contracted="$q.screen.lt.md").q-pa-none.q-ma-none
-        q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title").q-pa-none.q-ma-none
+    .col-md-6.col
+      .text-center
+        span(size="lg" v-for="i of clusters.length" style="font-size:2em;line-height:0px" :class="{'text-primary':step+1==i}").q-mr-xs &middot;
+      q-tab-panels(v-model="step" swipeable ref="stepper" v-if="clusters.length" flat animated)
+        q-tab-panel(:name="index" v-for="(cluster,index) of clusters")
+          .text-h6.q-mb-md {{clusters[index].title}}
+              //- q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title").q-pa-none.q-ma-none
           //- div {{clusters[index]}}
           .column.q-col-gutter-sm.text-left
-            .col {{$t('give-this-cluster-a-name')}}
-            .col
-              q-input(filled v-model="clusters[index].title" )
-            .col {{$t('enter-a-2-line-description-of-this-cluster')}}
-            .col
-              q-input(filled v-model="clusters[index].description")
+            //- .col {{$t('give-this-cluster-a-name')}}
+            //- .col
+            //-   q-input(filled v-model="clusters[index].title" )
+            //- .col {{$t('enter-a-2-line-description-of-this-cluster')}}
+            //- .col
+              //- q-input(filled v-model="clusters[index].description")
             .col {{$t('why-did-you-think-this-is-interesting')}}
             .col
-              q-input(filled v-model="clusters[index].learn")
+              q-input(filled type="textarea" autogrow v-model="clusters[index].learn")
             //- .col
             //-   q-input(filled v-model="clusters[index].questions" :label="$t('links-to-research-questions')")
             //- .col
             //-   q-input(filled v-model="clusters[index].bullets" :label="$t('take-home-messages-bullets')")
             .col {{ $t('select-3-of-the-following-quotes-that-best-represent-this-cluster') }}
-            .col( v-for="element of cluster.quotes")
+            .col( v-for="element of getQuotesForCode(cluster.code)")
               Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true" :cluster="cluster")
 
-        template(v-slot:navigation)
-          q-stepper-navigation
-            .row.justify-between
-              q-btn(:disable="step == 0" flat @click="$refs.stepper.previous()" ) {{ $t('previous-cluster') }}
-              q-btn(@click="$refs.stepper.next()" flat :disable="step == Object.keys(clustered).length-1" ) {{ $t('next-cluster') }}
-  
-  q-btn(color="primary" size="lg" @click="done()" no-caps).q-my-lg {{ $t('ive-finished-describing') }}
+      //- div {{allCodes}}
+          
+      .row.justify-between.q-mx-md.q-mb-xl.q-pb-xl
+        .col-auto
+          q-btn(:disable="step == 0" outline @click="$refs.stepper.previous()" no-caps color="primary") {{ $t('previous-cluster') }}
+        .col-auto(v-if="step < Object.keys(clusters).length-1")
+          q-btn(@click="$refs.stepper.next()" no-caps color="primary") {{ $t('next-cluster') }}
+        .col-auto(v-if="step == Object.keys(clusters).length-1")
+          q-btn(color="primary" @click="done()" no-caps) {{ $t('ive-finished-describing') }}
 
 </template>
 
@@ -52,7 +58,7 @@ import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage 
 import { doc, collection, setDoc, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
 
 import filter from "lodash/filter";
-import groupBy from "lodash/groupBy";
+// import groupBy from "lodash/groupBy";
 import map from "lodash/map";
 import extend from "lodash/extend";
 
@@ -61,7 +67,8 @@ import Cluster from "src/components/Quote.vue";
 
 import { useI18n } from "vue-i18n";
 import { useQuasar } from "quasar";
-
+// import { scroll } from "quasar";
+// const { setVerticalScrollPosition } = scroll;
 // const toggleElement = (arr, val) =>
 //   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
 
@@ -98,13 +105,48 @@ export default defineComponent({
       { once: true }
     );
 
+    const { data: codeBook, promise: promiseCodes } = useCollection(
+      collection(db, `codebook`),
+      { once: true }
+    );
+
     const { data: clusters, promise: promise1 } = useCollection(
       collection(db, `users/${props.email}/clusters`)
     );
 
-    Promise.all([promise, promise1]).then(() => {
-      loading.value = false;
-    });
+    const { locale } = useI18n();
+
+    Promise.all([promiseCodes.value, promise1.value, promise.value]).then(
+      async function (val) {
+        // console.log(val[1]);
+        //if no clusters added yet:
+        if (val[1].length == 0) {
+          console.log("adding groups");
+
+          let i = 0;
+          for (let code of val[0]) {
+            // console.log(code.name);
+            // console.log(locale);
+            const obj = {
+              title: code.name[locale.value],
+              code: code.code,
+              description: "",
+              learn: "",
+              questions: "",
+              bullets: "",
+              region: user.value.profile.region,
+            };
+
+            console.log(obj);
+            await setDoc(doc(db, `users/${props.email}/clusters/${i}`), obj);
+            i++;
+          }
+        }
+        loading.value = false;
+      }
+    );
+
+    // Promise.all([promise, promise1]).then(() => {});
 
     // console.log(user);
 
@@ -125,9 +167,9 @@ export default defineComponent({
     //   }
     // });
 
-    const { locale } = useI18n();
+    // const { locale } = useI18n();
 
-    const codeBook = useCollection(collection(db, `codebook`));
+    // const codeBook = useCollection(collection(db, `codebook`));
 
     const q = useQuasar();
 
@@ -137,9 +179,10 @@ export default defineComponent({
   computed: {
     allCodes() {
       const tmp = [];
+      // console.log(this.records);
       for (let record of this.records) {
-        let all = filter(record.transcription?.results, (f) => f.cluster);
-        all = map(all, (o) => {
+        // let all = filter(record.transcription?.results, (f) => f.cluster);
+        let all = map(record.transcription?.results, (o) => {
           return extend(o, { record: record.id });
         });
         tmp.push(...all);
@@ -149,54 +192,61 @@ export default defineComponent({
     // clustered() {},
   },
   watch: {
-    allCodes: {
+    records: {
       deep: true,
       handler() {
-        if (this.clustered.length === 0) {
-          console.log("watch allcodes");
-          const grouped = groupBy(this.allCodes, "cluster");
+        // if (this.clustered.length === 0) {
+        //   console.log("watch allcodes");
+        //   // const grouped = groupBy(this.allCodes, "code");
 
-          const arr = [];
+        //   console.log(grouped);
 
-          for (let i of Object.keys(grouped)) {
-            arr.push({
-              id: i,
-              quotes: grouped[i],
-            });
-          }
-          this.clustered = arr;
-        } else {
-          console.log("update records");
-          try {
-            for (const record of this.records) {
-              if (record.transcription) {
-                updateDoc(
-                  doc(db, `users/${this.user.email}/recordings/${record.id}`),
-                  {
-                    transcription: record.transcription,
-                  }
-                );
-              }
+        //   const arr = [];
+
+        //   for (let i of Object.keys(grouped)) {
+        //     arr.push({
+        //       id: i,
+        //       quotes: grouped[i],
+        //     });
+        //   }
+        //   this.clustered = arr;
+        // } else {
+        console.log("update records");
+        try {
+          for (const record of this.records) {
+            if (record.transcription) {
+              updateDoc(
+                doc(db, `users/${this.user.email}/recordings/${record.id}`),
+                {
+                  transcription: record.transcription,
+                }
+              );
             }
-          } catch (e) {
-            console.log(e);
-            this.q.notify({
-              type: "negative",
-              message: e,
-            });
           }
+        } catch (e) {
+          console.log(e);
+          this.q.notify({
+            type: "negative",
+            message: e,
+          });
         }
       },
+      // },
     },
 
     step: {
       handler() {
+        window.scrollTo(0, 0);
         //save to db:
         this.save();
       },
     },
   },
   methods: {
+    getQuotesForCode(code) {
+      // console.log(this.allCodes);
+      return filter(this.allCodes, (e) => e.codes?.includes(code));
+    },
     async save() {
       //save clusters to db:
       console.log("saving clusters");

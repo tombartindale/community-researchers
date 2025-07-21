@@ -73,28 +73,28 @@ q-page(padding)
             .col-auto.q-px-md.text-caption.text-grey {{ $t('develop-your-insights') }}
             .col 
               q-separator(inset)
-          q-card(bordered flat).q-mb-md
-            q-card-section(horizontal).items-center
-              q-card-section(side)
-                //- q-checkbox(readonly size="md" :model-value="isGrouped()" color="black")
-                q-icon(name="check_box_outline_blank" size="md" v-if="!isGrouped()")
-                q-icon(name="check_box" size="md" v-if="isGrouped()")
-              q-card-section 
-                .text-h6 {{ $t('cluster-codes-into-stories') }}
-              q-space
-              q-card-actions(style="min-width:110px;" align="right")
-                q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right" v-if="canGroup()") {{ $t('cluster') }}
+          //- q-card(bordered flat).q-mb-md
+          //-   q-card-section(horizontal).items-center
+          //-     q-card-section(side)
+          //-       //- q-checkbox(readonly size="md" :model-value="isGrouped()" color="black")
+          //-       q-icon(name="check_box_outline_blank" size="md" v-if="!isGrouped()")
+          //-       q-icon(name="check_box" size="md" v-if="isGrouped()")
+          //-     q-card-section 
+          //-       .text-h6 {{ $t('cluster-codes-into-stories') }}
+          //-     q-space
+          //-     q-card-actions(style="min-width:110px;" align="right")
+          //-       q-btn(no-caps :to="`/group/${user.email}`" flat icon-right="chevron_right" v-if="canGroup()") {{ $t('cluster') }}
           q-card(bordered flat).q-mb-md
             q-card-section(horizontal).items-center
               q-card-section(side)
                 //- q-checkbox(readonly size="md" :model-value="isDescribed()" color="black")
-                q-icon(name="check_box_outline_blank" size="md" v-if="!isDescribed()")
-                q-icon(name="check_box" size="md" v-if="isDescribed()")
+                q-icon(name="check_box_outline_blank" size="md" v-if="!canGroup()")
+                q-icon(name="check_box" size="md" v-if="canGroup()")
               q-card-section 
                 .text-h6 {{ $t('describe-your-insights') }}
               q-space
               q-card-actions(style="min-width:120px;" align="right")
-                q-btn(no-caps :to="`/describe/${user.email}`" flat icon-right="chevron_right" v-if="canDescribe()") {{ $t('describe') }}
+                q-btn(no-caps :to="`/describe/${user.email}`" flat icon-right="chevron_right" v-if="canGroup()") {{ $t('describe') }}
               
           .row.q-my-md.items-center
             .col 

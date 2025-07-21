@@ -53,7 +53,7 @@ q-page(padding).text-center
   //-     q-separator
   .row.q-col-gutter-sm(style="min-height:240px;")
     .col(v-for="cluster of clusters")
-      q-input(v-model="cluster.title" filled :placeholder="$t('name-of-cluster')" dense @blur="updateName(cluster)").q-mb-xs
+      q-input(v-model="cluster.title" type="textarea" autogrow filled :placeholder="$t('name-of-cluster')" dense @blur="updateName(cluster)").q-mb-xs
       .column
         .col-auto
           .text-tiny {{ $t('getitemsforcluster-cluster-id-length-of-10', [getItemsForCluster(cluster.id).length]) }}

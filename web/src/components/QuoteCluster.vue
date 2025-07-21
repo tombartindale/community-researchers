@@ -10,8 +10,8 @@ div(class="list-group-item").q-pa-none.full-height
       .q-pl-sm.q-pr-sm.text-secondary.text-body1.q-mb-none.fit
         .scroll-me {{ element.alternatives[0].transcript }}
       //- q-separator(inset v-if="(!simple || (simple && clusters.length)) && !cluster").q-mt-sm
-      //- .row
-        //- div {{element}}
+    .col
+      div {{element.codes}}
     //- .col-auto
     //-   span(v-for="code of element.codes" :style="{'color':getCode(code)?.color}") {{getCode(code)?.name[locale]}}&nbsp;
     .col-auto.text-smallish.q-pt-sm {{ $t('put-this-quote-in-a-cluster') }}

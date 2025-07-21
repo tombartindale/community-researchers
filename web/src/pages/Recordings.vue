@@ -27,7 +27,7 @@ q-page(padding).text-center
       .col(v-if="!region.clusters")
         q-spinner( size="2em")
       .col-4(v-for="cluster of region.clusters")
-        q-card(flat bordered)
+        q-card(flat bordered).fit
           q-card-section 
             //- div {{cluster}}
             .column.q-col-gutter-sm 
@@ -50,8 +50,9 @@ q-page(padding).text-center
       .col
         q-separator(inset)
     .row.q-col-gutter-sm.q-mt-sm
+      //- div {{users}}
       .col-4(v-for="user of getRegionalUsers(region.id)")
-        q-card(bordered flat)
+        q-card(bordered flat).fit
           q-card-section
             .row.text-left.items-center
               .col
@@ -65,6 +66,7 @@ q-page(padding).text-center
           q-list(separator).text-left
             q-item(v-for="recording of getRecordingsForUser(user.id)") 
               q-item-section {{recording.who}}
+              q-item-section(side).text-caption {{recording.language}}
               q-item-section(side)
                 q-btn(icon="download" dense flat @click="getRecording(recording)" no-caps)
                   q-tooltip Recording
@@ -130,7 +132,7 @@ export default defineComponent({
       once: true,
     });
 
-    const users = useCollection(collectionGroup(db, `users`));
+    const users = useCollection(collection(db, `users`));
 
     const { data: regions, promise } = useCollection(
       collection(db, `regions`),
@@ -141,7 +143,7 @@ export default defineComponent({
       console.log("regions loaded");
       //for each region, call the ep for the cluster summary:
       for (let r of val) {
-        // console.log(r);
+        console.log(r);
         const dat = await getClustersForRegion({ region: r.id });
         // console.log(dat);
         r.clusters = dat.data;
