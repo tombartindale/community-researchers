@@ -4,7 +4,7 @@ q-page(padding)
     .col.col-md-6
       .text-h6.text-center.q-my-lg {{ $t('upload-new-interview') }}
       div.q-mt-md &nbsp;
-      q-form(@submit.prevent="upload" v-if="!uploading")
+      q-form(@submit.prevent="upload" v-if="!uploading && !completed")
         .column.q-col-gutter-sm
           q-file(v-model="inputVal" :label="$t('which-file-to-upload')" filled accept="audio/*, video/*, .docx")
           .text-caption {{ $t('upload-any-recording-file') }}
@@ -29,6 +29,15 @@ q-page(padding)
               size="6em"
             )
             .text-body1 {{ $t('do-not-close-this-page-while-uploading') }}
+      .row.justify-center(v-if="completed")
+        .col-auto.text-center
+          q-banner( text-color="white" class="q-mt-md").bg-positive.rounded-borders.text-white.text-center
+            .text-body1 {{ $t('upload-complete') }}
+            .text-center
+              q-icon.q-my-md(name="check" size="lg")
+            .text-body1 {{$t('waiting-for-automatic-transcription')}}
+          q-btn(to="/" color="primary" size="lg" no-caps).q-mt-lg {{ $t('back-to-your-task-list') }} 
+
     
 </template>
 
@@ -53,6 +62,7 @@ export default defineComponent({
       language: "",
       who: "",
       when: "",
+      completed: false,
       languageOptions: [
         { value: "en-US", label: this.$t("english") },
         { value: "ar-EG", label: this.$t("arabic") },
@@ -105,7 +115,8 @@ export default defineComponent({
             status: "uploaded",
             createdAt: new Date().valueOf(),
           });
-          this.$router.push("/"); // Redirect to the dashboard or any other page
+          this.completed = true;
+          // this.$router.push("/"); // Redirect to the dashboard or any other page
         } catch {
           this.q.notify({
             type: "negative",

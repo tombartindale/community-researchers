@@ -4,7 +4,7 @@ q-page(padding)
     .col.col-md-5
       .text-h6.text-center.q-my-lg {{ $t('upload-your-research-plan-0') }}
       div.q-mt-md &nbsp;
-      q-form(@submit.prevent="upload" v-if="!uploading")
+      q-form(@submit.prevent="upload" v-if="!uploading && !completed")
         .column
           q-file(v-model="inputVal" :label="$t('select-file')" filled)
           //- q-select(v-model="language" :options="languageOptions" label="Language" filled :rules="[val => !!val || 'Language is required']" emit-value map-options)
@@ -25,7 +25,15 @@ q-page(padding)
               size="6em"
             )
             .text-body1 {{ $t('do-not-close-this-page-while-uploading') }}
-    
+            
+      .row.justify-center(v-if="completed")
+        .col-auto.text-center
+          q-banner( text-color="white" class="q-mt-md").bg-positive.rounded-borders.text-white.text-center
+            .text-body1 {{ $t('upload-complete') }}
+            .text-center
+              q-icon.q-my-md(name="check" size="lg")
+            .text-body1 {{ $t('your-research-plan-has-been-uploaded-and-is-being-reviewed') }}
+          q-btn(to="/" color="primary" size="lg" no-caps).q-mt-lg {{ $t('back-to-your-task-list') }} 
 </template>
 
 <script>
@@ -45,6 +53,7 @@ export default defineComponent({
       inputVal: null,
       uploadProgress: 0,
       uploading: false,
+      completed: false,
       // language: "",
       // who: "",
       // when: "",
@@ -95,7 +104,9 @@ export default defineComponent({
           await updateDoc(doc(db, `users/${this.user.email}`), {
             latestResearchPlan: filename,
           });
-          this.$router.push("/"); // Redirect to the dashboard or any other page
+
+          this.completed = true;
+          // this.$router.push("/"); // Redirect to the dashboard or any other page
         } catch {
           // console.error(er);
           // alert(this.$t("error-uploading-file-please-try-again"));

@@ -86,5 +86,7 @@
   "slide-1-of-allcodes-length": "{0} of {1}",
   "getitemsforcluster-cluster-id-length-of-10": "{0} of 10",
   "put-this-quote-in-a-cluster": "Put this quote in a cluster using an arrow:",
-  "upload-an-interview-recording-to-get-started": "Upload an interview recording to get started"
+  "upload-an-interview-recording-to-get-started": "Upload an interview recording to get started",
+  "upload-complete": "Upload Complete",
+  "back-to-your-task-list": "Back to Your task list"
 }
