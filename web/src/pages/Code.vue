@@ -46,8 +46,8 @@ import { doc, collection, updateDoc } from "firebase/firestore"; // Importing db
 
 import find from "lodash/find";
 
-const toggleElement = (arr, val) =>
-  arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
+// const toggleElement = (arr, val) =>
+//   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
 
 // const user = useCurrentUser()
 
@@ -125,7 +125,10 @@ export default defineComponent({
         line.codes = [];
       }
 
-      line.codes = toggleElement(line.codes, code.code);
+      if (line.codes.length == 1 && line.codes[0] == code.code) line.codes = [];
+      else line.codes = [code.code];
+
+      // line.codes = toggleElement(line.codes, code.code);
 
       try {
         // line.codes.push(code.code);
@@ -146,8 +149,10 @@ export default defineComponent({
         if (line.codes && line.codes.length == 1) {
           //find the color of the first code:
           const col = find(this.codeBook, { code: line.codes[0] });
-          if (col) return col.color;
-          else return "transparent";
+          if (col) {
+            if (col.color === "") return "#bbb";
+            return col.color;
+          } else return "transparent";
         } else if (line.codes && line.codes.length > 1) {
           return "grey";
         }
