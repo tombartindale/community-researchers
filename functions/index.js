@@ -24,6 +24,7 @@ import os from "os";
 import fs from "fs";
 import reader from "any-text";
 import flatten from "lodash/flatten.js";
+import find from "lodash/find.js";
 import { convertMarkdownToDocx } from "./md-to-docx-main/dist/index.js";
 import * as XLSX from "xlsx/xlsx.mjs";
 // import * as fs from "fs";
@@ -406,6 +407,8 @@ export const startExport = onCall({ region: region }, async (request) => {
         if (user.data().region == region.id) reg_out.users.push(user.id);
       }
 
+      console.log(reg_out.users);
+
       //recordings from users from this region
       for (const recording of records.docs) {
         // console.log(recording.ref.parent.parent.id);
@@ -419,30 +422,34 @@ export const startExport = onCall({ region: region }, async (request) => {
       //for each cluster
       for (let cluster of clusters.docs) {
         let outt = cluster.data();
-        outt.id = cluster.id;
-        outt.quotes = [];
 
-        //for each recording:
-        for (const recording of records.docs) {
-          if (
-            recording.data().transcription &&
-            recording.data().transcription.results
-          )
-            for (const quote of recording.data().transcription.results) {
-              // console.log(quote);
+        if (outt.region === region.id) {
+          outt.id = cluster.id;
+          outt.code = cluster.data().code;
+          outt.quotes = [];
 
-              if (
-                quote.codes?.includes(cluster.data().code) &&
-                quote.highlighted
-              )
-                outt.quotes.push(quote);
-            }
+          //for each recording:
+          for (const recording of records.docs) {
+            if (
+              recording.data().transcription &&
+              recording.data().transcription.results
+            )
+              for (const quote of recording.data().transcription.results) {
+                // console.log(quote);
 
-          // console.log(foruser);
+                if (
+                  quote.codes?.includes(cluster.data().code) &&
+                  quote.highlighted
+                )
+                  outt.quotes.push(quote);
+              }
+
+            // console.log(foruser);
+          }
+
+          // output.push(outt);
+          reg_out.clusters.push(outt);
         }
-
-        // output.push(outt);
-        reg_out.clusters.push(outt);
       }
 
       output.push(reg_out);
@@ -509,8 +516,16 @@ export const startExport = onCall({ region: region }, async (request) => {
     const rows = [];
     const clusters_data = [];
     const codebook = [];
+
+    for (const code of codebook_db.docs) {
+      codebook.push({
+        code: code.data().code,
+        description: code.data().description.en,
+        name: code.data().name.en,
+      });
+    }
+
     for (const region of output) {
-      let row = {};
       // console.log(region);
 
       //for each recording:
@@ -521,16 +536,27 @@ export const startExport = onCall({ region: region }, async (request) => {
         if (recording.transcription && recording.transcription.results)
           for (const line of recording.transcription.results) {
             // console.log(line);
+
+            //get cluster (assumes limit of 1 code per line):
+
             if (line.codes) {
+              let row = {};
+              // console.log(line.codes[0]);
+
+              // console.log(region.clusters);
+
+              const clus = find(region.clusters, { code: line.codes[0] })?.id;
+              console.log(clus);
               row.region = region.name;
               row.content = line.alternatives[0].transcript;
               row.codes = line.codes.join(",");
-              row.highlighted = line.highlighted;
+              row.highlighted = line?.highlighted || false;
               row.researcher = recording.researcher;
-              row.cluster = `${recording.researcher}_${line.cluster}`;
+              row.cluster = `${recording.researcher}_${clus}`;
               row.who = recording.who;
               row.when = recording.when;
               row.language = recording.language;
+
               rows.push(row);
             }
           }
@@ -541,8 +567,9 @@ export const startExport = onCall({ region: region }, async (request) => {
           region: cluster.region,
           researcher: cluster.parent,
           title: cluster.title,
-          description: cluster.description,
+          // description: cluster.description,
           lessons: cluster.learn,
+          code: cluster.code,
           id: `${cluster.parent}_${cluster.id}`,
         });
       }
@@ -573,15 +600,7 @@ export const startExport = onCall({ region: region }, async (request) => {
       //     } [${quote.codes.join(",")}]\n\n`;
       //   }
       // }
-    }
-
-    for (const code of codebook_db.docs) {
-      codebook.push({
-        code: code.data().code,
-        description: code.data().description.en,
-        name: code.data().name.en,
-      });
-    }
+    } // for each region
 
     // console.log(rows);
 
