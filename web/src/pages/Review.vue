@@ -6,28 +6,29 @@ q-page(padding).text-center
         .text-body1 {{ $t('summarise-across-all-the-insights-from-user-profile-region', [user.profile.region]) }}
     //- div {{records}}
   //- div {{regionData}}
+  //- div {{clusters.length}}
 
   .row(v-if="regionData").justify-center
     .col-md-8.col
       q-editor.text-left(type="textarea" v-model="regionData.description" @blur="saveDesc" filled :label="$t('summary-of-findings')" content-class="bg-grey-1")
-      .text-body2.text-grey Please coordinate with other researchers in your National Society so one person edits this text at a time.
+      .text-body2.text-grey {{ $t('please-coordinate-with-other-researchers-in-your-national-society-so-one-person-edits-this-text-at-a-time') }}
 
 
     //- div {{clusters}}
   .text-center.q-mt-lg(v-if="loading")
     q-spinner(size="md")
 
-  .row.q-col-gutter-sm.q-mt-lg
-    .col-md-4.col-sm(v-for="(cluster,index) of clusters" )
+  .row.q-col-gutter-sm.q-mt-lg.justify-center
+    .col-md-4.col-sm(v-for="cluster of validClusters" )
       q-card(flat bordered v-if="cluster?.quotes.length>0")
         q-card-section
           .column.q-col-gutter-sm 
             .col
-              .text-body1 {{clusters[index].title}}
+              .text-body1 {{cluster.title}}
             //- .col 
               //- .text-body2 {{clusters[index].description }}
             .col 
-              .text-body2 {{clusters[index].learn}}
+              .text-body2 {{cluster.learn}}
             //- .col 
               //- .text-body2 {{clusters[index].questions}}
             //- .col    
@@ -78,6 +79,8 @@ export default defineComponent({
       this.clusters = (
         await getClustersForRegion({ region: this.region })
       ).data;
+
+      console.log(this.clusters);
       this.loading = false;
     } catch (e) {
       console.error(e);
@@ -150,6 +153,10 @@ export default defineComponent({
         tmp.push(...all);
       }
       return tmp;
+    },
+
+    validClusters() {
+      return filter(this.clusters, (c) => c.quotes.length);
     },
 
     // allClusters() {

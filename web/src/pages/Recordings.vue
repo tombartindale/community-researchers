@@ -58,8 +58,8 @@ q-page(padding).text-center
               .col
                 .text-body1 {{user.id}}
               .col-auto
-                q-btn(icon="grain" dense flat :to="`/group/${user.id}`" no-caps)
-                  q-tooltip Clustering
+                //- q-btn(icon="grain" dense flat :to="`/group/${user.id}`" no-caps)
+                //-   q-tooltip Clustering
                 q-btn(icon="description" dense flat :to="`/describe/${user.id}`" no-caps)
                   q-tooltip Describe
           q-separator(inset)
@@ -71,7 +71,7 @@ q-page(padding).text-center
                 q-btn(icon="download" dense flat @click="getRecording(recording)" no-caps)
                   q-tooltip Recording
               q-item-section(side v-if="!recording.error")
-                q-btn(icon="code" dense flat :to="`/code/${recording.id}`" no-caps)
+                q-btn(icon="code" dense flat :to="`/code/${recording.parent}/${recording.id}`" no-caps)
                   q-tooltip Coding
               q-item-section(side v-if="recording.error")
                 q-icon(name="warning").q-mx-xs

@@ -12,10 +12,10 @@ q-page().text-center
   .row.justify-center
     .col-md-6.col
       .text-center
-        span(size="lg" v-for="i of clusters.length" style="font-size:2em;line-height:0px" :class="{'text-primary':step+1==i}").q-mr-xs &middot;
-      q-tab-panels(v-model="step" swipeable ref="stepper" v-if="clusters.length" flat animated)
-        q-tab-panel(:name="index" v-for="(cluster,index) of clusters")
-          .text-h6.q-mb-md {{clusters[index].title}}
+        span(size="lg" v-for="i of usedClusters.length" style="font-size:2em;line-height:0px" :class="{'text-primary':step+1==i}").q-mr-xs &middot;
+      q-tab-panels(v-model="step" swipeable ref="stepper" v-if="usedClusters.length" flat animated)
+        q-tab-panel(:name="cluster.code" v-for="cluster of usedClusters")
+          .text-h6.q-mb-md {{cluster.title}}
               //- q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title").q-pa-none.q-ma-none
           //- div {{clusters[index]}}
           .column.q-col-gutter-sm.text-left
@@ -27,7 +27,7 @@ q-page().text-center
               //- q-input(filled v-model="clusters[index].description")
             .col {{$t('why-did-you-think-this-is-interesting')}}
             .col
-              q-input(filled type="textarea" autogrow v-model="clusters[index].learn")
+              q-input(filled type="textarea" autogrow v-model="cluster.learn")
             //- .col
             //-   q-input(filled v-model="clusters[index].questions" :label="$t('links-to-research-questions')")
             //- .col
@@ -36,14 +36,15 @@ q-page().text-center
             .col( v-for="element of getQuotesForCode(cluster.code)")
               Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true" :cluster="cluster")
 
+
       //- div {{allCodes}}
           
       .row.justify-between.q-mx-md.q-mb-xl.q-pb-xl
         .col-auto
-          q-btn(:disable="step == 0" outline @click="$refs.stepper.previous()" no-caps color="primary") {{ $t('previous-cluster') }}
-        .col-auto(v-if="step < Object.keys(clusters).length-1")
+          q-btn(:disable="step == usedClusters[0].code" outline @click="$refs.stepper.previous()" no-caps color="primary") {{ $t('previous-cluster') }}
+        .col-auto(v-if="step != usedClusters[usedClusters.length-1].code")
           q-btn(@click="$refs.stepper.next()" no-caps color="primary") {{ $t('next-cluster') }}
-        .col-auto(v-if="step == Object.keys(clusters).length-1")
+        .col-auto(v-if="step == usedClusters[usedClusters.length-1].code")
           q-btn(color="primary" @click="done()" no-caps) {{ $t('ive-finished-describing') }}
 
 </template>
@@ -132,8 +133,8 @@ export default defineComponent({
               code: code.code,
               description: "",
               learn: "",
-              questions: "",
-              bullets: "",
+              // questions: "",
+              // bullets: "",
               region: user.value.profile.region,
             };
 
@@ -142,6 +143,7 @@ export default defineComponent({
             i++;
           }
         }
+
         loading.value = false;
       }
     );
@@ -177,6 +179,9 @@ export default defineComponent({
     return { user, records, codeBook, locale, clusters, q };
   },
   computed: {
+    usedClusters() {
+      return filter(this.clusters, (c) => this.getQuotesForCode(c.code).length);
+    },
     allCodes() {
       const tmp = [];
       // console.log(this.records);
@@ -192,6 +197,9 @@ export default defineComponent({
     // clustered() {},
   },
   watch: {
+    usedClusters() {
+      if (this.step == 0) this.step = this.usedClusters[0].code;
+    },
     records: {
       deep: true,
       handler() {
@@ -216,7 +224,7 @@ export default defineComponent({
           for (const record of this.records) {
             if (record.transcription) {
               updateDoc(
-                doc(db, `users/${this.user.email}/recordings/${record.id}`),
+                doc(db, `users/${this.email}/recordings/${record.id}`),
                 {
                   transcription: record.transcription,
                 }
@@ -276,7 +284,7 @@ export default defineComponent({
       this.save();
       try {
         setDoc(
-          doc(db, `users/${this.user.email}`),
+          doc(db, `users/${this.email}`),
           {
             status: "described",
           },

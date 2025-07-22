@@ -26,7 +26,7 @@ const routes = [
     },
   },
   {
-    path: "/code/:id",
+    path: "/code/:email/:id",
     component: () => import("pages/Code.vue"),
     props: true,
     meta: {

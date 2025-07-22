@@ -223,6 +223,7 @@ export const transcribe2 = onObjectFinalized(
           encoding: "LINEAR16",
           sampleRateHertz: 16000,
           languageCode: languageCode,
+          enableAutomaticPunctuation: true,
           model: languageCode != "zh-CN" ? "latest_long" : "default",
         };
 
@@ -353,12 +354,9 @@ export const getClustersForRegion = onCall(
               recording.data().transcription.results
             )
               for (const quote of recording.data().transcription?.results) {
-                console.log(quote);
+                // console.log(quote);
 
-                if (
-                  quote.codes?.includes(cluster.data().code) &&
-                  quote.highlighted
-                )
+                if (quote.codes?.includes(outt.code) && quote.highlighted)
                   outt.quotes.push(quote);
               }
 

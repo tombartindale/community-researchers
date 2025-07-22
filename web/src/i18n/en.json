@@ -12,8 +12,8 @@
   "chinese": "Chinese",
   "spanish": "Spanish",
   "read-the-transcript": "Read the transcript. When you see something that might be relevant to the research questions, select the sentence and then select a 'label' to apply.",
-  "select-a-code": "Select a code",
-  "codes": "Codes",
+  "select-a-code": "Select a label",
+  "codes": "Labels",
   "ive-finished-coding": "I've finished coding",
   "email-sent-please-check-your-inbox": "Email sent! Please check your inbox.",
   "error-sending-email": "Error sending email:",
@@ -65,7 +65,7 @@
   "what-language-was-the-interview-conducted-in": "What language was the interview conducted in?",
   "language-is-required": "Language is required",
   "who-is-required": "Who is required",
-  "who-did-you-interview": "What does this person do?",
+  "who-did-you-interview": "Who is this person and what's their social/cultural background?",
   "when-is-required": "When is required",
   "when-did-you-conduct-the-interview": "When did you conduct the interview?",
   "when": "When",
@@ -89,5 +89,9 @@
   "upload-an-interview-recording-to-get-started": "Upload an interview recording to get started",
   "upload-complete": "Upload Complete",
   "back-to-your-task-list": "Back to Your task list",
-  "aslkdj-aklsdjalksjdal-ksjdlkas-d": "aslkdj aklsdjalksjdal ksjdlkas d"
+  "aslkdj-aklsdjalksjdal-ksjdlkas-d": "aslkdj aklsdjalksjdal ksjdlkas d",
+  "please-coordinate-with-other-researchers-in-your-national-society-so-one-person-edits-this-text-at-a-time": "Please coordinate with other researchers in your National Society so one person edits this text at a time.",
+  "download": "Download",
+  "your-plan-has-been-reviewed-and-you-are-ready-to-collect-data": "Your plan has been reviewed and You are ready to collect data!",
+  "correct-transcript": "Correct transcript"
 }

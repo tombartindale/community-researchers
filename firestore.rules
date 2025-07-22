@@ -15,7 +15,7 @@ service cloud.firestore {
         }
 
         match /users/{user}/{document=**} {
-            allow read, write: if user == request.auth.token.email;
+            allow read, write: if user == request.auth.token.email || get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.isAdmin ;
         }
 
         match /regions/{region} {

@@ -4,9 +4,9 @@ q-page(padding).text-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
         .text-body1 {{ $t('read-the-transcript') }}
-      //- div {{codeBook}}
+  //- div {{codeBook}}
   
-  //- div {{record.transcription.results}}
+  //- div {{record}}
   .row.justify-center(v-if="record")
     .col-md-8.col
       q-card().text-justify
@@ -19,18 +19,19 @@ q-page(padding).text-center
                   q-item-section.text-grey {{ $t('select-a-code') }}
                   q-item-section(side)
                     q-btn(icon="edit" flat dense)
+                      q-tooltip Correct transcript
                       q-popup-edit(:model-value="line.alternatives[0].transcript" anchor="top right" auto-save v-slot="scope" @save="editLine($event,line)")
                         q-input(v-model="scope.value" dense autofocus @keyup.enter="scope.set" borderless style="min-width:50vw;")
                 q-separator
                 q-item(v-for="code in codeBook" :key="code.id" @click="addCode(line, code)" clickable v-close-popup :active="isActiveCode(line, code)")
                   q-item-section
                     q-item-label {{code.name[locale] || code.name['en']}}
-                    q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
+                    //- q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
             span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}
             span . 
-    .col-md-1.gt-md
+    .col-md-1.gt-md.q-pl-md.text-left
       div.text-overline {{ $t('codes') }}
-      div.transcript.line(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
+      div.text-left.line.q-mb-xs(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
   
   q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-coding') }}
 
@@ -56,7 +57,7 @@ import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "CodePage",
-  props: ["id"],
+  props: ["id", "email"],
   data() {
     return {};
   },
@@ -64,7 +65,7 @@ export default defineComponent({
     const user = useCurrentUser();
 
     const record = useDocument(
-      doc(db, `users/${user.value.email}/recordings/${props.id}`)
+      doc(db, `users/${props.email}/recordings/${props.id}`)
     );
 
     const codeBook = useCollection(collection(db, `codebook`));

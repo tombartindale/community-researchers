@@ -24,9 +24,12 @@ q-page(padding)
               q-card-section 
                 .text-h6 {{ $t('upload-your-research-plan') }}
                 span(v-if="user.profile.latestResearchPlan && !user.profile.isResearchPlanChecked").text-grey {{ $t('your-research-plan-has-been-uploaded-and-is-being-reviewed') }}
+                span(v-if="user.profile.latestResearchPlan && user.profile.isResearchPlanChecked").text-grey {{ $t('your-plan-has-been-reviewed-and-you-are-ready-to-collect-data') }}
+                
               q-space
               q-card-actions(style="min-width:110px;" align="right")
                 q-btn(to="/researchplan" flat icon-right="chevron_right" no-caps v-if="!user.profile.isResearchPlanChecked") {{ $t('upload') }}
+                q-btn(v-if="user.profile.latestResearchPlan && user.profile.isResearchPlanChecked" icon-right="download" flat no-caps @click="downloadPlan") {{ $t('download') }}
           .row.q-my-md.items-center
             .col 
               q-separator(inset)
@@ -63,7 +66,7 @@ q-page(padding)
                 .text-body1.text-grey {{ recording.who }} &middot; {{ recording.when }}
               q-space
               q-card-actions(style="min-width:110px;max-width:50%" align="right")
-                q-btn(no-caps :to="`/code/${recording.id}`" v-if="canCode(recording)" flat icon-right="chevron_right") {{ $t('code') }}
+                q-btn(no-caps :to="`/code/${user.email}/${recording.id}`" v-if="canCode(recording)" flat icon-right="chevron_right") {{ $t('code') }}
                 div(v-else-if="recording.status=='error'" ) {{ $t('error-transcription') }}
                 div(v-else) {{ $t('waiting-for-automatic-transcription') }}
               
@@ -122,9 +125,11 @@ import { defineComponent } from "vue";
 import { useCurrentUser } from "vuefire";
 
 // const user = useCurrentUser()
+import { openURL } from "quasar";
 
 import { collection, doc } from "firebase/firestore";
-import { db } from "src/boot/firebase"; // Assuming you have a Firebase Firestore setup
+import { getDownloadURL, ref } from "firebase/storage";
+import { db, storage } from "src/boot/firebase"; // Assuming you have a Firebase Firestore setup
 
 import some from "lodash/some";
 
@@ -138,6 +143,19 @@ export default defineComponent({
     };
   },
   methods: {
+    downloadPlan() {
+      getDownloadURL(ref(storage, `${this.user.profile.latestResearchPlan}`))
+        .then((url) => {
+          console.log(url);
+          openURL(url);
+        })
+        .catch((e) => {
+          this.q.notify({
+            type: "negative",
+            message: e,
+          });
+        });
+    },
     canCode(recording) {
       return (
         !(
