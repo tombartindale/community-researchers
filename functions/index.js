@@ -375,7 +375,8 @@ export const getClustersForRegion = onCall(
           for (const recording of records.docs) {
             if (
               recording.data().transcription &&
-              recording.data().transcription.results
+              recording.data().transcription.results &&
+              recording.ref.parent.parent.id == cluster.ref.parent.parent.id
             )
               for (const quote of recording.data().transcription?.results) {
                 // console.log(quote);
@@ -454,7 +455,8 @@ export const startExport = onCall({ region: region }, async (request) => {
           for (const recording of records.docs) {
             if (
               recording.data().transcription &&
-              recording.data().transcription.results
+              recording.data().transcription.results &&
+              recording.ref.parent.parent.id == cluster.ref.parent.parent.id
             )
               for (const quote of recording.data().transcription.results) {
                 // console.log(quote);
@@ -499,7 +501,7 @@ export const startExport = onCall({ region: region }, async (request) => {
       //clusters:
       markdown += `## Clusters\n`;
       for (const cluster of region.clusters) {
-        markdown += `### ${cluster.title}\n`;
+        markdown += `### ${cluster.title} (${cluster.parent})\n`;
         //meta:
         markdown += `${cluster.description}\n\n`;
         markdown += `${cluster.learn}\n\n`;
