@@ -39,7 +39,7 @@ q-page().text-center
 
       //- div {{allCodes}}
           
-      .row.justify-between.q-mx-md.q-mb-xl.q-pb-xl
+      .row.justify-between.q-mx-md.q-mb-xl.q-pb-xl(v-if="usedClusters.length")
         .col-auto
           q-btn(:disable="step == usedClusters[0].code" outline @click="$refs.stepper.previous()" no-caps color="primary") {{ $t('previous-cluster') }}
         .col-auto(v-if="step != usedClusters[usedClusters.length-1].code")

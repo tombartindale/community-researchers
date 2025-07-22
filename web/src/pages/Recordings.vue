@@ -34,6 +34,7 @@ q-page(padding).text-center
               .column.q-col-gutter-sm 
                 .col
                   .text-body1 {{cluster.title}}
+                  .text-caption {{cluster.parent}}
                 //- .col 
                   //- .text-body2 {{cluster.description }}
                 .col 
