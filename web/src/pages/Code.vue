@@ -19,7 +19,7 @@ q-page(padding).text-center
                   q-item-section.text-grey {{ $t('select-a-code') }}
                   q-item-section(side)
                     q-btn(icon="edit" flat dense)
-                      q-tooltip Correct transcript
+                      q-tooltip {{ $t('correct-transcript') }}
                       q-popup-edit(:model-value="line.alternatives[0].transcript" anchor="top right" auto-save v-slot="scope" @save="editLine($event,line)")
                         q-input(v-model="scope.value" dense autofocus @keyup.enter="scope.set" borderless style="min-width:50vw;")
                 q-separator
