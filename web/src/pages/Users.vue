@@ -20,7 +20,8 @@ q-page(padding).text-center
     q-item
       q-item-section
         q-input(v-model="newEmail" label="New researcher's email address" filled)
-      
+      q-item-section
+        q-select(:options="regions" option-value="id" option-label="id" v-model="newRegion" emit-value filled)
       q-item-section(side)
         q-btn(flat @click="addNew" icon="add")
 
@@ -48,6 +49,7 @@ export default defineComponent({
   data() {
     return {
       newEmail: "",
+      newRegion: "",
       // regions: ["Europe (French)", "Asia", "Americas (Spanish)"],
     };
   },
@@ -78,10 +80,11 @@ export default defineComponent({
   // },
   methods: {
     async addNew() {
-      if (this.newEmail.length) {
+      if (this.newEmail.length && this.newRegion.length) {
         try {
           // throw Error();
           await setDoc(doc(db, `users/${this.newEmail}`), {
+            region: this.newRegion,
             isAdmin: false,
             isEditor: false,
           });
