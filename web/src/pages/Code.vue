@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page(padding).text-center
+q-page(padding v-scroll="onScroll").text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
@@ -7,6 +7,13 @@ q-page(padding).text-center
   //- div {{codeBook}}
   
   //- div {{record}}
+  .row
+    .col-md-1.lt-md.q-mb-md
+      div.text-overline {{ $t('codes') }}: 
+       span.q-mb-xs(v-for="code of codeBook" ) 
+        span.line(:style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
+        span &middot; 
+
   .row.justify-center(v-if="record")
     .col-md-8.col
       q-card().text-justify
@@ -29,9 +36,10 @@ q-page(padding).text-center
                     //- q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
             span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}
             span . 
-    .col-md-1.gt-md.q-pl-md.text-left
-      div.text-overline {{ $t('codes') }}
-      div.text-left.line.q-mb-xs(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
+    .col-md-1.gt-sm.q-pl-md.text-left
+      div(:class="{'fixed':fixed}" style="top:55px;")
+        div.text-overline {{ $t('codes') }}
+        div.text-left.line.q-mb-xs(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
   
   q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-coding') }}
 
@@ -59,7 +67,9 @@ export default defineComponent({
   name: "CodePage",
   props: ["id", "email"],
   data() {
-    return {};
+    return {
+      fixed: false,
+    };
   },
   setup(props) {
     const user = useCurrentUser();
@@ -87,6 +97,11 @@ export default defineComponent({
   //   },
   // },
   methods: {
+    onScroll(position) {
+      // console.log(position);
+      if (position > 100) this.fixed = true;
+      else this.fixed = false;
+    },
     editLine(val, line) {
       // console.log(val);
       // console.log(line);
