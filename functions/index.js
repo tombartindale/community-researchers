@@ -201,10 +201,34 @@ export const transcribe2 = onObjectFinalized(
       const bucket = getStorage().bucket();
       const theFile = await bucket.file(event.data.name).download();
 
+      //TODO: split sentences up:
+      const newTranscriptionList = [];
+      const splitup = JSON.parse(theFile);
+
+      //for each transcription object
+      for (const old of splitup.results) {
+        const text = old.alternatives[0].transcript;
+
+        const split = text.split(".");
+
+        for (const line of split) {
+          if (line.trim().length)
+            newTranscriptionList.push({
+              alternatives: [
+                {
+                  transcript: `${line.trim()}`,
+                },
+              ],
+            });
+        }
+      }
+
+      splitup.results = newTranscriptionList;
+
       const doc = getFirestore().doc(`users/${email}/recordings/${id}`);
       await doc.update({
         status: "transcribed",
-        transcription: JSON.parse(theFile),
+        transcription: splitup,
       });
     }
 
