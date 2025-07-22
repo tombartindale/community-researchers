@@ -26,22 +26,23 @@ q-page(padding).text-center
     .row.q-col-gutter-sm.q-mb-md
       .col(v-if="!region.clusters")
         q-spinner( size="2em")
-      .col-4(v-for="cluster of region.clusters")
-        q-card(flat bordered).fit
-          q-card-section 
-            //- div {{cluster}}
-            .column.q-col-gutter-sm 
-              .col
-                .text-body1 {{cluster.title}}
-              .col 
-                .text-body2 {{cluster.description }}
-              .col 
-                .text-body2 {{cluster.learn}}
-              .col    
-                .text-body2 {{cluster.bullets}}
-              .col( v-for="element of cluster.quotes")
-                Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
-                q-separator(inset).q-mt-sm
+      template(v-for="cluster of region.clusters")
+        .col-4( v-if="cluster.quotes.length")
+          q-card(flat bordered).fit
+            q-card-section 
+              //- div {{cluster}}
+              .column.q-col-gutter-sm 
+                .col
+                  .text-body1 {{cluster.title}}
+                //- .col 
+                  //- .text-body2 {{cluster.description }}
+                .col 
+                  .text-body2 {{cluster.learn}}
+                .col    
+                  .text-body2 {{cluster.bullets}}
+                .col( v-for="element of cluster.quotes")
+                  Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
+                  q-separator(inset).q-mt-sm
     .row.items-center
       .col
         q-separator(inset)
@@ -174,6 +175,10 @@ export default defineComponent({
       this.loading = true;
       try {
         await startExport();
+        this.q.notify({
+          type: "positive",
+          message: "Export complete!",
+        });
       } catch (e) {
         this.q.notify({
           type: "negative",
