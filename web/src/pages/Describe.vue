@@ -12,7 +12,7 @@ q-page().text-center
   .row.justify-center
     .col-md-6.col
       .text-center
-        span(size="lg" v-for="i of usedClusters.length" style="font-size:2em;line-height:0px" :class="{'text-primary':step+1==i}").q-mr-xs &middot;
+        span(size="lg" v-for="clus of usedClusters" style="font-size:2em;line-height:0px" :class="{'text-primary':step==clus.code}").q-mr-xs &middot;
       q-tab-panels(v-model="step" swipeable ref="stepper" v-if="usedClusters.length" flat animated)
         q-tab-panel(:name="cluster.code" v-for="cluster of usedClusters")
           .text-h6.q-mb-md {{cluster.title}}
