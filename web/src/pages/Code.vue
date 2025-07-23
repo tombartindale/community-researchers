@@ -15,7 +15,7 @@ q-page(padding v-scroll="onScroll").text-center
         span &middot; 
 
   .row.justify-center(v-if="record")
-    .col-md-8.col
+    .col-md-8.offset-md-2.col
       q-card().text-justify
         q-card-section.text-body1
           span(v-for="(line,id) of record.transcription.results" :key="id" ).transcript
@@ -36,7 +36,7 @@ q-page(padding v-scroll="onScroll").text-center
                     //- q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
             span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}
             span . 
-    .col-md-1.gt-sm.q-pl-md.text-left
+    .col-md-2.gt-sm.q-pl-md.text-left
       div(:class="{'fixed':fixed}" style="top:55px;")
         div.text-overline {{ $t('codes') }}
         div.text-left.line.q-mb-xs(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
