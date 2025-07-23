@@ -206,7 +206,7 @@ export const transcribe2 = onObjectFinalized(
       const splitup = JSON.parse(theFile);
 
       //for each transcription object
-      for (const old of splitup.results) {
+      for (const old of splitup?.results) {
         const text = old.alternatives[0].transcript;
 
         const split = text.split(".");
