@@ -185,51 +185,66 @@ export const transcribe2 = onObjectFinalized(
       event.data.name.indexOf("transcriptions/") > -1 &&
       event.data.name.endsWith(".json")
     ) {
-      const folders = event.data.name.split("/");
-      const email = folders[1];
-      const id = folders.pop().replace(".json", "").split("_")[1];
+      try {
+        const folders = event.data.name.split("/");
+        const email = folders[1];
+        const id = folders.pop().replace(".json", "").split("_")[1];
 
-      console.log(
-        "Transcription file detected for email:",
-        email,
-        "and id:",
-        id
-      );
+        console.log(
+          "Transcription file detected for email:",
+          email,
+          "and id:",
+          id
+        );
 
-      // const theFile = await getStorage().file(event.data.name).download();
+        // const theFile = await getStorage().file(event.data.name).download();
 
-      const bucket = getStorage().bucket();
-      const theFile = await bucket.file(event.data.name).download();
+        const bucket = getStorage().bucket();
+        const theFile = await bucket.file(event.data.name).download();
 
-      //TODO: split sentences up:
-      const newTranscriptionList = [];
-      const splitup = JSON.parse(theFile);
+        //TODO: split sentences up:
+        const newTranscriptionList = [];
+        const splitup = JSON.parse(theFile);
 
-      //for each transcription object
-      for (const old of splitup?.results) {
-        const text = old.alternatives[0].transcript;
+        //for each transcription object
+        for (const old of splitup?.results) {
+          if (old.alternatives[0] && old.alternatives[0].transcript) {
+            const text = old.alternatives[0].transcript;
 
-        const split = text.split(".");
+            const split = text.split(".");
 
-        for (const line of split) {
-          if (line.trim().length)
-            newTranscriptionList.push({
-              alternatives: [
-                {
-                  transcript: `${line.trim()}`,
-                },
-              ],
-            });
+            for (const line of split) {
+              if (line.trim().length)
+                newTranscriptionList.push({
+                  alternatives: [
+                    {
+                      transcript: `${line.trim()}`,
+                    },
+                  ],
+                });
+            }
+          }
         }
+
+        splitup.results = newTranscriptionList;
+
+        const doc = getFirestore().doc(`users/${email}/recordings/${id}`);
+        await doc.update({
+          status: "transcribed",
+          transcription: splitup,
+        });
+      } catch (error) {
+        console.error("Error during transcription:", error);
+        const folders = event.data.name.split("/");
+        const email = folders[1];
+        const id = folders.pop().replace(".json", "").split("_")[1];
+
+        const doc = getFirestore().doc(`users/${email}/recordings/${id}`);
+        await doc.update({
+          status: "error",
+          error: error.message,
+        });
       }
-
-      splitup.results = newTranscriptionList;
-
-      const doc = getFirestore().doc(`users/${email}/recordings/${id}`);
-      await doc.update({
-        status: "transcribed",
-        transcription: splitup,
-      });
     }
 
     //if its an audio file needing to be transcribed
