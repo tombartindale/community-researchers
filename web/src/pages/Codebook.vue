@@ -8,12 +8,12 @@ q-page(padding).text-center
       q-item-section.col-1.text-grey Color
       q-item-section.col-2.text-grey Code
       q-item-section.col-3.text-grey Name
-      q-item-section.text-grey Description
+      //- q-item-section.text-grey Description
     q-item(v-for="code of codeBook")
       q-item-section.col-1
         q-avatar(round :style="{'background-color':code.color}" size="2.5em")
       q-item-section.col-2 {{code.code}}
-      q-item-section.col-3.text-left 
+      q-item-section.col.text-left 
         div(v-for="(n,l) of code.name") 
           .row
             .col-1
@@ -21,14 +21,14 @@ q-page(padding).text-center
                 span.text-grey {{l}}&nbsp;
             .col
               span {{n}} 
-      q-item-section.text-left
-        div(v-for="(n,l) of code.description") 
-          .row
-            .col-1
-              .q-pr-sm
-                span.text-grey {{l}}&nbsp;
-            .col
-              span {{n}} 
+      //- q-item-section.text-left
+      //-   div(v-for="(n,l) of code.description") 
+      //-     .row
+      //-       .col-1
+      //-         .q-pr-sm
+      //-           span.text-grey {{l}}&nbsp;
+      //-       .col
+      //-         span {{n}} 
       q-item-section(side)
         q-btn(flat icon="remove" @click="remove(code)")
     q-form(@submit="addCode")
@@ -45,8 +45,8 @@ q-page(padding).text-center
           .row(v-for="l of langs").items-top.q-col-gutter-sm
             .col-4
               q-input(filled v-model="newCode.name[l]" :label="l" dense :rules="[val => !!val || 'Required']")
-            .col
-              q-input(type="textarea" autogrow filled v-model="newCode.description[l]" :label="l" dense :rules="[val => !!val || 'Required']")
+            //- .col
+              //- q-input(type="textarea" autogrow filled v-model="newCode.description[l]" :label="l" dense :rules="[val => !!val || 'Required']")
         //- q-item-section
           .row(v-for="l of langs")
             .col
@@ -88,7 +88,7 @@ export default defineComponent({
         color: "",
         code: "",
         name: {},
-        description: {},
+        // description: {},
       },
     };
   },
