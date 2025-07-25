@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf").view
-  q-header(v-if="user")
+  q-header()
     q-toolbar.bg-white.text-primary
       q-btn(to="/" flat dense icon="home")
       q-btn(to="/codebook" flat dense icon="book" v-if="user?.profile?.isEditor || user?.profile?.isAdmin")
@@ -62,6 +62,8 @@ export default defineComponent({
 
     const { locale } = useI18n({ useScope: "global" });
 
+    console.log(locale.value);
+
     const localeOptions = [
       { value: "en", label: languageMappingList.en.nativeName },
       { value: "ar", label: languageMappingList.ar.nativeName },
@@ -74,13 +76,17 @@ export default defineComponent({
 
     watch(locale, (val) => {
       if (val === "ar") {
-        // console.log(ar);
+        console.log("setting to ar");
         $q.lang.set(ar);
       } else {
         $q.lang.set(en);
       }
       console.log("Changing language to:", val);
     });
+
+    locale.value = $q.lang.getLocale();
+
+    console.log($q.lang.getLocale());
 
     return { user, locale, localeOptions };
   },

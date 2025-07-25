@@ -24,6 +24,7 @@ import { defineComponent } from "vue";
 import { sendSignInLinkToEmail } from "firebase/auth";
 import { auth } from "src/boot/firebase";
 
+auth.useDeviceLanguage();
 // console.log(process.env.VUE_APP_URL);
 
 const actionCodeSettings = {
