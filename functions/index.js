@@ -354,6 +354,48 @@ export const transcribe2 = onObjectFinalized(
   }
 );
 
+export const downloadTranscript = onCall(
+  { region: region },
+  async (request) => {
+    if (request.auth) {
+      //create word document for transcript and put in the drive, then send back the path of the file:
+      const recording = (
+        await getFirestore()
+          .doc(`users/${request.data.email}/recordings/${request.data.id}`)
+          .get()
+      ).data();
+
+      let markdown = `# ${request.data.email} - ${request.data.id}\n\n`;
+
+      if (recording.transcription && recording.transcription.results)
+        for (const line of recording.transcription.results) {
+          if (line.codes)
+            markdown += `**${
+              line.alternatives[0].transcript
+            }.** *[${line.codes.join(",")}]* `;
+          else markdown += `${line.alternatives[0].transcript}. `;
+        }
+
+      console.log(markdown);
+
+      const docx = await convertMarkdownToDocx(markdown);
+
+      getStorage()
+        .bucket()
+        .file(
+          `recordings/${request.data.email}/transcriptions/${request.data.id}.docx`
+        )
+        .save(docx.stream());
+
+      return {
+        doc: `recordings/${request.data.email}/transcriptions/${request.data.id}.docx`,
+      };
+
+      // console.log(recording.data());
+    }
+  }
+);
+
 export const getClustersForRegion = onCall(
   { region: region },
   async (request) => {

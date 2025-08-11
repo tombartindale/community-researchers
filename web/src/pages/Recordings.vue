@@ -70,8 +70,11 @@ q-page(padding).text-center
               q-item-section {{recording.who}}
               q-item-section(side).text-caption {{recording.language}}
               q-item-section(side)
-                q-btn(icon="download" dense flat @click="getRecording(recording)" no-caps)
+                q-btn(icon="graphic_eq" dense flat @click="getRecording(recording)" no-caps)
                   q-tooltip Recording
+              q-item-section(side)
+                q-btn(icon="article" dense flat @click="getTranscript(recording)" no-caps)
+                  q-tooltip Transcript
               q-item-section(side v-if="!recording.error")
                 q-btn(icon="code" dense flat :to="`/code/${recording.parent}/${recording.id}`" no-caps)
                   q-tooltip Coding
@@ -99,6 +102,7 @@ import {
   storage,
   getClustersForRegion,
   startExport,
+  downloadTranscript,
 } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 // import { ref, uploadBytesResumable } from "firebase/storage";
 import {
@@ -206,6 +210,52 @@ export default defineComponent({
     },
     getRegionalUsers(region) {
       return filter(this.users, { region: region });
+    },
+    async getTranscript(record) {
+      try {
+        console.log(record);
+        let doc = await downloadTranscript({
+          email: record.parent,
+          id: record.id,
+        });
+
+        // console.log(doc.data.doc);
+
+        //HACK: artificically sleep to wait for the document to exist:
+        await new Promise((r) => setTimeout(r, 1000));
+
+        // console.log(record);
+        getDownloadURL(ref(storage, doc.data.doc))
+          .then((url) => {
+            // `url` is the download URL for 'images/stars.jpg'
+
+            // This can be downloaded directly:
+            // const xhr = new XMLHttpRequest();
+            // xhr.responseType = "blob";
+            // xhr.onload = () => {
+            //   const blob = xhr.response;
+            // };
+            // xhr.open("GET", url);
+            // xhr.send();
+
+            // console.log(url);
+
+            openURL(url);
+
+            // Or inserted into an <img> element
+            // const img = document.getElementById("myimg");
+            // img.setAttribute("src", url);
+          })
+          .catch((err) => {
+            // Handle any errors
+            console.log(err);
+          });
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      }
     },
     getRecording(record) {
       // console.log(record);
