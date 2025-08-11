@@ -12,8 +12,9 @@ const routes = [
     props: true,
   },
   {
-    path: "/upload",
+    path: "/upload/:email?",
     component: () => import("pages/Upload.vue"),
+    props: true,
     meta: {
       requiresAuth: true, // This route does not require authentication
     },

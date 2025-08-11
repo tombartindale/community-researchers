@@ -3,6 +3,7 @@ q-page(padding)
   .row.justify-center
     .col.col-md-6
       .text-h6.text-center.q-my-lg {{ $t('upload-new-interview') }}
+      .text-h6.text-warning.text-center(v-if="email") Uploading on behalf of {{email}}
       div.q-mt-md &nbsp;
       q-form(@submit.prevent="upload" v-if="!uploading && !completed")
         .column.q-col-gutter-sm
@@ -54,6 +55,7 @@ import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "UploadPage",
+  props: ["email"],
   data() {
     return {
       inputVal: null,
@@ -82,13 +84,11 @@ export default defineComponent({
       if (this.inputVal) {
         this.uploading = true;
         try {
-          // const uuid = await import("uuid");
-
-          // console.log(state.user);
+          const theRealUser = this.email || this.user.email;
 
           const uploadRef = ref(
             storage,
-            `recordings/${this.user.email}/${this.language}_${Date.now()}_${this.inputVal.name}`
+            `recordings/${theRealUser}/${this.language}_${Date.now()}_${this.inputVal.name}`
           );
 
           const uploadResult = uploadBytesResumable(uploadRef, this.inputVal);
@@ -105,7 +105,7 @@ export default defineComponent({
           await uploadResult;
 
           //on completion -- add record to database
-          const docRef = collection(db, `users/${this.user.email}/recordings`);
+          const docRef = collection(db, `users/${theRealUser}/recordings`);
 
           await addDoc(docRef, {
             language: this.language,
@@ -117,7 +117,8 @@ export default defineComponent({
           });
           this.completed = true;
           // this.$router.push("/"); // Redirect to the dashboard or any other page
-        } catch {
+        } catch (e) {
+          console.error(e);
           this.q.notify({
             type: "negative",
             message: this.$t("error-uploading-file-please-try-again"),

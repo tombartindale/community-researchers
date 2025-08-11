@@ -62,6 +62,8 @@ q-page(padding).text-center
               .col-auto
                 //- q-btn(icon="grain" dense flat :to="`/group/${user.id}`" no-caps)
                 //-   q-tooltip Clustering
+                q-btn(icon="upload" dense flat :to="`/upload/${user.id}`" no-caps)
+                  q-tooltip Upload
                 q-btn(icon="description" dense flat :to="`/describe/${user.id}`" no-caps)
                   q-tooltip Describe
           q-separator(inset)
