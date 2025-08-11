@@ -46,7 +46,7 @@ q-page(padding v-scroll="onScroll").text-center
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, computed } from "vue";
 
 import { useCollection, useCurrentUser, useDocument } from "vuefire";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
@@ -54,6 +54,7 @@ import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage 
 import { doc, collection, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
 
 import find from "lodash/find";
+import orderBy from "lodash/orderBy";
 
 // const toggleElement = (arr, val) =>
 //   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
@@ -78,10 +79,14 @@ export default defineComponent({
       doc(db, `users/${props.email}/recordings/${props.id}`)
     );
 
-    const codeBook = useCollection(collection(db, `codebook`));
+    const codebook = useCollection(collection(db, `codebook`));
 
     const { locale } = useI18n();
     const q = useQuasar();
+
+    const codeBook = computed(() => {
+      return orderBy(codebook.value, "code");
+    });
 
     // console.log("record", record);
     return { user, record, codeBook, locale, q };
