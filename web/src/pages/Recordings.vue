@@ -22,7 +22,8 @@ q-page(padding).text-center
       .col
         q-separator(inset)
     .row
-      .col.text-body1.text-grey.q-py-md(:html="region.description || 'Summary not written yet...'")
+      //- div {{region}}
+      .col.text-body1.text-grey.q-py-md(v-html="(region.description.trim()=='')? 'Summary not written yet...':region.description")
     .row.q-col-gutter-sm.q-mb-md
       .col(v-if="!region.clusters")
         q-spinner( size="2em")
@@ -53,7 +54,7 @@ q-page(padding).text-center
         q-separator(inset)
     .row.q-col-gutter-sm.q-mt-sm
       //- div {{users}}
-      .col-4(v-for="user of getRegionalUsers(region.id)")
+      .col-md-6.col-12(v-for="user of getRegionalUsers(region.id)")
         q-card(bordered flat).fit
           q-card-section
             .row.text-left.items-center
@@ -66,10 +67,11 @@ q-page(padding).text-center
                   q-tooltip Upload
                 q-btn(icon="description" dense flat :to="`/describe/${user.id}`" no-caps)
                   q-tooltip Describe
-          q-separator(inset)
+          q-separator
           q-list(separator).text-left
+            q-item(v-if="getRecordingsForUser(user.id).length === 0").text-grey No recordings yet...
             q-item(v-for="recording of getRecordingsForUser(user.id)") 
-              q-item-section {{recording.who}}
+              q-item-section.ellipsis-2-lines {{recording.who}}
               q-item-section(side).text-caption {{recording.language}}
               q-item-section(side)
                 q-btn(icon="graphic_eq" dense flat @click="getRecording(recording)" no-caps)
