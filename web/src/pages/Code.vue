@@ -22,20 +22,21 @@ q-page(padding v-scroll="onScroll").text-center
             //- div {{line.codes}}
             q-menu(touch-position)
               q-list(separator)
+                q-item(clickable)
+                  q-item-section {{ $t('correct-transcript') }}
+                    
+                    //- q-btn(icon="edit" flat dense)
+                    q-popup-edit(:model-value="line.alternatives[0].transcript" anchor="top right" auto-save v-slot="scope" @save="editLine($event,line)")
+                      q-input(v-model="scope.value" dense autofocus @keyup.enter="scope.set" borderless style="min-width:50vw;")
                 q-item
                   q-item-section.text-grey {{ $t('select-a-code') }}
-                  q-item-section(side)
-                    q-btn(icon="edit" flat dense)
-                      q-tooltip {{ $t('correct-transcript') }}
-                      q-popup-edit(:model-value="line.alternatives[0].transcript" anchor="top right" auto-save v-slot="scope" @save="editLine($event,line)")
-                        q-input(v-model="scope.value" dense autofocus @keyup.enter="scope.set" borderless style="min-width:50vw;")
                 q-separator
                 q-item(v-for="code in codeBook" :key="code.id" @click="addCode(line, code)" clickable v-close-popup :active="isActiveCode(line, code)")
                   q-item-section
                     q-item-label {{code.name[locale] || code.name['en']}}
                     //- q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
-            span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}
-            span . 
+            span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}&nbsp;
+            //- span &nbsp; 
     .col-md-2.gt-sm.q-pl-md.text-left
       div(:class="{'fixed':fixed}" style="top:55px;")
         div.text-overline {{ $t('codes') }}
@@ -55,6 +56,7 @@ import { doc, collection, updateDoc } from "firebase/firestore"; // Importing db
 
 import find from "lodash/find";
 import orderBy from "lodash/orderBy";
+import compact from "lodash/compact";
 
 // const toggleElement = (arr, val) =>
 //   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
@@ -111,7 +113,40 @@ export default defineComponent({
       // console.log(val);
       // console.log(line);
       try {
-        line.alternatives[0].transcript = val;
+        //TODO: split lines into new objects if a new full stop detected:
+
+        const newlines = compact(val.split("."));
+
+        // console.log(newlines);
+        // console.log(line);
+
+        // console.log(this.record.transcription);
+
+        const index = this.record.transcription.results.indexOf(line);
+        // console.log("index", index);
+
+        if (newlines.length == 1) line.alternatives[0].transcript = val;
+        else {
+          // console.log("new lines:");
+          //remove the old obj:
+          this.record.transcription.results.splice(index, 1);
+          const codes = line.codes;
+
+          //split into new lines:
+          let i = 0;
+          for (const nl of newlines) {
+            const newitem = {
+              alternatives: [{ transcript: `${nl.trim()}.` }],
+              record: this.id,
+            };
+            if (codes) newitem.codes = codes;
+            this.record.transcription.results.splice(index + i, 0, newitem);
+            i++;
+          }
+        }
+
+        // console.log(this.record.transcription.results);
+
         updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
           transcription: this.record.transcription,
         });
