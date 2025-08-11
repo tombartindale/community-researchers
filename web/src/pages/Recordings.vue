@@ -13,78 +13,97 @@ q-page(padding).text-center
             q-item(@click="getExportFile('json')" clickable v-close-popup) JSON (.json)
             q-item(@click="getExportFile('xlsx')" clickable v-close-popup) Excel (.xlsx)
 
-  div(v-for="region of regions").q-mt-lg.q-mb-xl
-    .row.items-center
-      .col
-        q-separator(inset)
-      .col-auto
-        .text-h6 {{region.id}}
-      .col
-        q-separator(inset)
-    .row
-      //- div {{region}}
-      .col.text-body1.text-grey.q-py-md(v-html="(region.description.trim()=='')? 'Summary not written yet...':region.description")
-    .row.q-col-gutter-sm.q-mb-md
-      .col(v-if="!region.clusters")
-        q-spinner( size="2em")
-      template(v-for="cluster of region.clusters")
-        .col-4( v-if="cluster.quotes.length")
-          q-card(flat bordered).fit
-            q-card-section 
-              //- div {{cluster}}
-              .column.q-col-gutter-sm 
-                .col
-                  .text-body1 {{cluster.title}}
-                  .text-caption {{cluster.parent}}
-                //- .col 
-                  //- .text-body2 {{cluster.description }}
-                .col 
-                  .text-body2 {{cluster.learn}}
-                .col    
-                  .text-body2 {{cluster.bullets}}
-                .col( v-for="element of cluster.quotes")
-                  Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
-                  q-separator(inset).q-mt-sm
-    .row.items-center
-      .col
-        q-separator(inset)
-      .col-auto
-        .text-caption Source Data
-      .col
-        q-separator(inset)
-    .row.q-col-gutter-sm.q-mt-sm
-      //- div {{users}}
-      .col-md-6.col-12(v-for="user of getRegionalUsers(region.id)")
-        q-card(bordered flat).fit
-          q-card-section
-            .row.text-left.items-center
-              .col
-                .text-body1 {{user.id}}
-              .col-auto
-                //- q-btn(icon="grain" dense flat :to="`/group/${user.id}`" no-caps)
-                //-   q-tooltip Clustering
-                q-btn(icon="upload" dense flat :to="`/upload/${user.id}`" no-caps)
-                  q-tooltip Upload
-                q-btn(icon="description" dense flat :to="`/describe/${user.id}`" no-caps)
-                  q-tooltip Describe
-          q-separator
-          q-list(separator).text-left
-            q-item(v-if="getRecordingsForUser(user.id).length === 0").text-grey No recordings yet...
-            q-item(v-for="recording of getRecordingsForUser(user.id)") 
-              q-item-section.ellipsis-2-lines {{recording.who}}
-              q-item-section(side).text-caption {{recording.language}}
-              q-item-section(side)
-                q-btn(icon="graphic_eq" dense flat @click="getRecording(recording)" no-caps)
-                  q-tooltip Recording
-              q-item-section(side)
-                q-btn(icon="article" dense flat @click="getTranscript(recording)" no-caps)
-                  q-tooltip Transcript
-              q-item-section(side v-if="!recording.error")
-                q-btn(icon="code" dense flat :to="`/code/${recording.parent}/${recording.id}`" no-caps)
-                  q-tooltip Coding
-              q-item-section(side v-if="recording.error")
-                q-icon(name="warning").q-mx-xs
-                  q-tooltip {{recording.error}}
+  .row
+    .col-auto
+      q-list
+        template(v-for="region of regions")
+          q-item(clickable @click="tab=region.id" :active="tab==region.id") 
+            q-item-section.text-left {{region.id}}
+            q-item-section(side) 
+              .row.items-center
+                q-avatar(size="sm" icon="person") 
+                .text-tiny {{getRegionalUsers(region.id).length}}
+            q-item-section(side)
+              .row.items-center 
+                q-avatar(size="sm" icon="graphic_eq") 
+                .text-tiny {{getRegionalUserRecordings(region.id)}}
+
+            //- q-tabs(v-model="tab" vertical no-caps)
+            //- q-tab(v-for="region of regions" :name="region.id" :label="region.id")
+    .col
+      q-tab-panels(v-model="tab")
+        q-tab-panel(v-for="region of regions" :name="region.id").q-mt-lg.q-mb-xl
+          .row.items-center
+            .col
+              q-separator(inset)
+            .col-auto
+              .text-h6 {{region.id}}
+            .col
+              q-separator(inset)
+          .row
+            //- div {{region}}
+            .col.text-body1.text-grey.q-py-md(v-html="(region.description.trim()=='')? 'Summary not written yet...':region.description")
+          .row.q-col-gutter-sm.q-mb-md
+            .col(v-if="!region.clusters")
+              q-spinner( size="2em")
+            template(v-for="cluster of region.clusters")
+              .col-md-6.col-12( v-if="cluster.quotes.length")
+                q-card(flat bordered).fit
+                  q-card-section 
+                    //- div {{cluster}}
+                    .column.q-col-gutter-sm 
+                      .col
+                        .text-body1 {{cluster.title}}
+                        .text-caption {{cluster.parent}}
+                      //- .col 
+                        //- .text-body2 {{cluster.description }}
+                      .col 
+                        .text-body2 {{cluster.learn}}
+                      .col    
+                        .text-body2 {{cluster.bullets}}
+                      .col( v-for="element of cluster.quotes")
+                        Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
+                        q-separator(inset).q-mt-sm
+          .row.items-center
+            .col
+              q-separator(inset)
+            .col-auto
+              .text-caption Source Data
+            .col
+              q-separator(inset)
+          .row.q-col-gutter-sm.q-mt-sm
+            //- div {{users}}
+            .col-md-6.col-12(v-for="user of getRegionalUsers(region.id)")
+              q-card(bordered flat).fit
+                q-card-section
+                  .row.text-left.items-center
+                    .col
+                      .text-body1 {{user.id}}
+                    .col-auto
+                      //- q-btn(icon="grain" dense flat :to="`/group/${user.id}`" no-caps)
+                      //-   q-tooltip Clustering
+                      q-btn(icon="upload" dense flat :to="`/upload/${user.id}`" no-caps)
+                        q-tooltip Upload
+                      q-btn(icon="description" dense flat :to="`/describe/${user.id}`" no-caps)
+                        q-tooltip Describe
+                q-separator
+                q-list(separator).text-left
+                  q-item(v-if="getRecordingsForUser(user.id).length === 0").text-grey No recordings yet...
+                  q-item(v-for="recording of getRecordingsForUser(user.id)") 
+                    q-item-section.ellipsis-2-lines {{recording.who}}
+                    q-item-section(side).text-caption {{recording.language}}
+                    q-item-section(side)
+                      q-btn(icon="graphic_eq" dense flat @click="getRecording(recording)" no-caps)
+                        q-tooltip Recording
+                    q-item-section(side)
+                      q-btn(icon="article" dense flat @click="getTranscript(recording)" no-caps)
+                        q-tooltip Transcript
+                    q-item-section(side v-if="!recording.error")
+                      q-btn(icon="code" dense flat :to="`/code/${recording.parent}/${recording.id}`" no-caps)
+                        q-tooltip Coding
+                    q-item-section(side v-if="recording.error")
+                      q-icon(name="warning").q-mx-xs
+                        q-tooltip {{recording.error}}
 
   //- q-list(separator).text-left
   //-   q-item(v-for="record of records")
@@ -98,7 +117,7 @@ q-page(padding).text-center
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref as vref } from "vue";
 
 import { useCollection, useCurrentUser } from "vuefire";
 import {
@@ -149,8 +168,11 @@ export default defineComponent({
       { once: true }
     );
 
+    const tab = vref("");
+
     promise.value.then(async (val) => {
       console.log("regions loaded");
+      tab.value = val[0].id;
       //for each region, call the ep for the cluster summary:
       for (let r of val) {
         console.log(r);
@@ -167,7 +189,7 @@ export default defineComponent({
     const q = useQuasar();
 
     // console.log("record", record);
-    return { user, records, codeBook, regions, locale, users, q };
+    return { user, records, codeBook, regions, locale, users, q, tab };
   },
   // watch: {
   //   record: {
@@ -214,6 +236,19 @@ export default defineComponent({
     },
     getRegionalUsers(region) {
       return filter(this.users, { region: region });
+    },
+    getRegionalUserRecordings(region) {
+      let uu = this.getRegionalUsers(region);
+      let count = 0;
+
+      for (let u of uu) {
+        count += this.getRecordingsForUser(u.id).length;
+        // console.log(u);
+      }
+
+      return count;
+
+      // return filter(this.users, { region: region });
     },
     async getTranscript(record) {
       try {
