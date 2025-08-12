@@ -6,7 +6,7 @@ q-page().text-center
         .text-body1 {{ $t('for-each-cluster-follow-the-prompts') }}
         
     //- div {{records}}
-    //- div {{clustered}}
+    div {{clustered}}
     //- div {{clusters}}
 
   .row.justify-center
@@ -16,25 +16,15 @@ q-page().text-center
       q-tab-panels(v-model="step" swipeable ref="stepper" v-if="usedClusters.length" flat animated)
         q-tab-panel(:name="cluster.code" v-for="cluster of usedClusters")
           .text-h6.q-mb-md {{cluster.title}}
-              //- q-step(v-for="(cluster,index) of clustered" :name="index" :title="clusters[index].title").q-pa-none.q-ma-none
-          //- div {{clusters[index]}}
           .column.q-col-gutter-sm.text-left
-            //- .col {{$t('give-this-cluster-a-name')}}
-            //- .col
-            //-   q-input(filled v-model="clusters[index].title" )
-            //- .col {{$t('enter-a-2-line-description-of-this-cluster')}}
-            //- .col
-              //- q-input(filled v-model="clusters[index].description")
             .col {{$t('why-did-you-think-this-is-interesting')}}
             .col
               q-input(filled type="textarea" autogrow v-model="cluster.learn")
-            //- .col
-            //-   q-input(filled v-model="clusters[index].questions" :label="$t('links-to-research-questions')")
-            //- .col
-            //-   q-input(filled v-model="clusters[index].bullets" :label="$t('take-home-messages-bullets')")
+            
             .col {{ $t('select-3-of-the-following-quotes-that-best-represent-this-cluster') }}
             .col( v-for="element of getQuotesForCode(cluster.code)")
-              Cluster(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true" :cluster="cluster")
+              //- div {{element}}
+              QuoteGrouped(:element="element" :codeBook="codeBook" :clusters="false" :locale="locale" :highlight="true" :cluster="cluster")
 
 
       //- div {{allCodes}}
@@ -63,7 +53,7 @@ import filter from "lodash/filter";
 import map from "lodash/map";
 import extend from "lodash/extend";
 
-import Cluster from "src/components/Quote.vue";
+import QuoteGrouped from "src/components/QuoteGrouped.vue";
 // import groupBy from "lodash/groupBy";
 
 import { useI18n } from "vue-i18n";
@@ -80,7 +70,7 @@ export default defineComponent({
   props: ["email"],
   components: {
     draggable,
-    Cluster,
+    QuoteGrouped,
   },
   data() {
     return {
@@ -183,16 +173,75 @@ export default defineComponent({
       return filter(this.clusters, (c) => this.getQuotesForCode(c.code).length);
     },
     allCodes() {
-      const tmp = [];
+      const output = [];
       // console.log(this.records);
       for (let record of this.records) {
-        // let all = filter(record.transcription?.results, (f) => f.cluster);
-        let all = map(record.transcription?.results, (o) => {
-          return extend(o, { record: record.id });
+        let all = map(record.transcription?.results, (o, i) => {
+          return extend(o, { record: record.id, index: i });
         });
-        tmp.push(...all);
+
+        //group into bigger quotes:
+        let lastIndex = 0;
+        let lastCode = null;
+        let newList = [];
+        let tmp = [];
+        for (let quote of all) {
+          //if its got codes, do something about it
+          if (quote.codes?.length) {
+            //if this line is next to the last line and has the same code:
+            console.log("lastIndex", lastIndex);
+            console.log("lastCode", lastCode);
+            console.log("Current Index", quote.index);
+            console.log("index Diff", quote.index - lastIndex);
+            if (
+              (quote.index - lastIndex == 1 && quote?.codes[0] == lastCode) ||
+              quote.index == 0
+            ) {
+              console.log("pushing to list", quote.index);
+              lastIndex = quote.index;
+              newList.push(quote);
+            }
+            //if this line is not next to the last line and/or does not have the same code:
+            else {
+              if (newList.length) {
+                console.log("Save List");
+                //add previous list to output
+                tmp.push({
+                  code: newList[0].codes[0],
+                  quotes: newList,
+                });
+              }
+
+              //restart list
+              console.log("Restart List");
+              newList = [];
+              lastIndex = quote.index;
+              newList.push(quote);
+
+              // tmp.push({
+              //   code: quote.codes[0],
+              //   // ...quote,
+              //   quotes: [newList],
+              // });
+            }
+
+            console.log("newlist:", ...newList);
+            lastCode = quote.codes[0];
+          } else console.log("no codes", quote.index);
+        }
+
+        // if (tmp.length) console.log(tmp);
+
+        // console.log(all);
+
+        output.push(...tmp);
       }
-      return tmp;
+
+      //group quotes by sentences that are next to eachother...(limit by 6 x 3 words)
+
+      // console.log("tmp:", tmp);
+
+      return output;
     },
     // clustered() {},
   },
@@ -203,22 +252,6 @@ export default defineComponent({
     records: {
       deep: true,
       handler() {
-        // if (this.clustered.length === 0) {
-        //   console.log("watch allcodes");
-        //   // const grouped = groupBy(this.allCodes, "code");
-
-        //   console.log(grouped);
-
-        //   const arr = [];
-
-        //   for (let i of Object.keys(grouped)) {
-        //     arr.push({
-        //       id: i,
-        //       quotes: grouped[i],
-        //     });
-        //   }
-        //   this.clustered = arr;
-        // } else {
         console.log("update records");
         try {
           for (const record of this.records) {
@@ -253,7 +286,11 @@ export default defineComponent({
   methods: {
     getQuotesForCode(code) {
       // console.log(this.allCodes);
-      return filter(this.allCodes, (e) => e.codes?.includes(code));
+      const ungrouped = filter(this.allCodes, (e) => e.code == code);
+
+      // console.log(ungrouped);
+
+      return ungrouped;
     },
     async save() {
       //save clusters to db:
