@@ -30,7 +30,7 @@ q-page(padding v-scroll="onScroll" @click="hideMenu").text-center
         div.text-left.line.q-mb-xs(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
   
   q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-coding') }}
-  q-menu(anchor="bottom end" self="top end" persistent v-model="showMenu" :target="currentTarget" no-parent-event @before-hide="hideMenu")
+  q-menu(ref="menu" anchor="bottom end" self="top end" persistent v-model="showMenu" :target="currentTarget" no-parent-event @before-hide="hideMenu")
     q-list(separator)
       q-item(clickable v-if="selection.length==1")
         q-item-section {{ $t('correct-transcript') }}
@@ -192,6 +192,7 @@ export default defineComponent({
       line.selected = !line.selected;
       this.currentLine = line;
       this.currentTarget = `#target_${id}`;
+      this.$refs.menu.updatePosition();
       this.showMenu = true;
     },
     // showMenu(ev) {
