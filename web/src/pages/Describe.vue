@@ -189,22 +189,22 @@ export default defineComponent({
           //if its got codes, do something about it
           if (quote.codes?.length) {
             //if this line is next to the last line and has the same code:
-            console.log("lastIndex", lastIndex);
-            console.log("lastCode", lastCode);
-            console.log("Current Index", quote.index);
-            console.log("index Diff", quote.index - lastIndex);
+            // console.log("lastIndex", lastIndex);
+            // console.log("lastCode", lastCode);
+            // console.log("Current Index", quote.index);
+            // console.log("index Diff", quote.index - lastIndex);
             if (
               (quote.index - lastIndex == 1 && quote?.codes[0] == lastCode) ||
               quote.index == 0
             ) {
-              console.log("pushing to list", quote.index);
+              // console.log("pushing to list", quote.index);
               lastIndex = quote.index;
               newList.push(quote);
             }
             //if this line is not next to the last line and/or does not have the same code:
             else {
               if (newList.length) {
-                console.log("Save List");
+                // console.log("Save List");
                 //add previous list to output
                 tmp.push({
                   code: newList[0].codes[0],
@@ -213,7 +213,7 @@ export default defineComponent({
               }
 
               //restart list
-              console.log("Restart List");
+              // console.log("Restart List");
               newList = [];
               lastIndex = quote.index;
               newList.push(quote);
@@ -225,7 +225,7 @@ export default defineComponent({
               // });
             }
 
-            console.log("newlist:", ...newList);
+            // console.log("newlist:", ...newList);
             lastCode = quote.codes[0];
           } else console.log("no codes", quote.index);
         }

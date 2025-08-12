@@ -4,7 +4,7 @@ q-page(padding).text-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
         .text-body1 {{ $t('summarise-across-all-the-insights-from-user-profile-region', [user.profile.region]) }}
-    //- div {{records}}
+    //- div {{clusters}}
   //- div {{regionData}}
   //- div {{clusters.length}}
 
@@ -34,7 +34,7 @@ q-page(padding).text-center
             //- .col    
             //-   .text-body2 {{clusters[index].bullets}}
             .col( v-for="element of cluster.quotes")
-              Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
+              QuoteGrouped(:element="element" :clusters="false" :locale="locale" :simple="true")
               q-separator(inset).q-mt-sm
   
   q-btn(color="primary" size="lg" to="/" no-caps).q-mt-lg {{ $t('ive-finished-reviewing') }}
@@ -55,7 +55,7 @@ import filter from "lodash/filter";
 import map from "lodash/map";
 import extend from "lodash/extend";
 
-import Cluster from "src/components/Quote.vue";
+import QuoteGrouped from "src/components/QuoteGrouped.vue";
 // import groupBy from "lodash/groupBy";
 
 import { useI18n } from "vue-i18n";
@@ -71,7 +71,7 @@ export default defineComponent({
   props: ["region"],
   components: {
     draggable,
-    Cluster,
+    QuoteGrouped,
   },
   async mounted() {
     // console.log(getClustersForRegion);
