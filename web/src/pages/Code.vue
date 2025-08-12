@@ -47,7 +47,7 @@ q-page(padding v-scroll="onScroll" @click="hideMenu").text-center
           //- q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
       q-item(@click="addAllCodes(null)" clickable v-close-popup )
         q-item-section
-          q-item-label Un-label
+          q-item-label {{ $t('un-label') }}
 </template>
 
 <script>
