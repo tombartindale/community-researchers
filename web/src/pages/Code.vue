@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page(padding v-scroll="onScroll").text-center
+q-page(padding v-scroll="onScroll" @click="hideMenu").text-center
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
@@ -13,37 +13,41 @@ q-page(padding v-scroll="onScroll").text-center
        span.q-mb-xs(v-for="code of codeBook" ) 
         span.line(:style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
         span &middot; 
-
   .row.justify-center(v-if="record")
     .col-md-8.offset-md-2.col
+      //- div {{selection}}
       q-card().text-justify
+        //- div {{currentTarget}}
         q-card-section.text-body1
-          span(v-for="(line,id) of record.transcription.results" :key="id" ).transcript
+          span(v-for="(line,id) of record.transcription.results" :key="id" :id="`target_${id}`" @click.stop.prevent="toggle(line,id)").transcript
             //- div {{line.codes}}
-            q-menu(touch-position)
-              q-list(separator)
-                q-item(clickable)
-                  q-item-section {{ $t('correct-transcript') }}
-                    
-                    //- q-btn(icon="edit" flat dense)
-                    q-popup-edit(:model-value="line.alternatives[0].transcript" anchor="top right" auto-save v-slot="scope" @save="editLine($event,line)")
-                      q-input(v-model="scope.value" dense autofocus @keyup.enter="scope.set" borderless style="min-width:50vw;")
-                q-item
-                  q-item-section.text-grey {{ $t('select-a-code') }}
-                q-separator
-                q-item(v-for="code in codeBook" :key="code.id" @click="addCode(line, code)" clickable v-close-popup :active="isActiveCode(line, code)")
-                  q-item-section
-                    q-item-label {{code.name[locale] || code.name['en']}}
-                    //- q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
-            span.line(:style="{ 'text-decoration-color': getLineColor(line) }") {{line.alternatives[0].transcript}}&nbsp;
-            //- span &nbsp; 
+            
+            span.line(:style="{ 'text-decoration-color': getLineColor(line) }" :class="{selected:line.selected}") {{line.alternatives[0].transcript}}&nbsp;
+            span(v-if="!line.alternatives[0].transcript.endsWith('.')") &nbsp; 
     .col-md-2.gt-sm.q-pl-md.text-left
       div(:class="{'fixed':fixed}" style="top:55px;")
         div.text-overline {{ $t('codes') }}
         div.text-left.line.q-mb-xs(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
   
   q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-coding') }}
-
+  q-menu(anchor="bottom end" self="top end" persistent v-model="showMenu" :target="currentTarget" no-parent-event @before-hide="hideMenu")
+    q-list(separator)
+      q-item(clickable v-if="selection.length==1")
+        q-item-section {{ $t('correct-transcript') }}
+          
+          //- q-btn(icon="edit" flat dense)
+          q-popup-edit(:model-value="selection[0].alternatives[0].transcript" anchor="top right" auto-save v-slot="scope" @save="editLine($event,selection[0])")
+            q-input(v-model="scope.value" dense autofocus @keyup.enter="scope.set" borderless style="min-width:50vw;")
+      q-item
+        q-item-section.text-grey {{ $t('select-a-code') }}
+      q-separator
+      q-item(v-for="code in codeBook" :key="code.id" @click.stop="addAllCodes(code)" clickable v-close-popup )
+        q-item-section
+          q-item-label {{code.name[locale] || code.name['en']}}
+          //- q-item-label(caption lines="2") {{code.description[locale] || code.description['en']}}
+      q-item(@click="addAllCodes(null)" clickable v-close-popup )
+        q-item-section
+          q-item-label Un-label
 </template>
 
 <script>
@@ -57,6 +61,7 @@ import { doc, collection, updateDoc } from "firebase/firestore"; // Importing db
 import find from "lodash/find";
 import orderBy from "lodash/orderBy";
 import compact from "lodash/compact";
+import filter from "lodash/filter";
 
 // const toggleElement = (arr, val) =>
 //   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
@@ -72,6 +77,10 @@ export default defineComponent({
   data() {
     return {
       fixed: false,
+      currentTarget: "",
+      // selection: [],
+      showMenu: false,
+      currentLine: null,
     };
   },
   setup(props) {
@@ -103,7 +112,33 @@ export default defineComponent({
   //     deep: true,
   //   },
   // },
+  computed: {
+    selection() {
+      return filter(this.record.transcription.results, { selected: true });
+    },
+  },
   methods: {
+    hideMenu() {
+      //unselect all:
+      let tmp = [...this.selection];
+
+      for (let l of tmp) {
+        // l.codes = [code.code];
+        delete l.selected;
+      }
+      this.showMenu = false;
+    },
+    toggle(line, id) {
+      //toggle selection of this line:
+      console.log(line, id);
+      line.selected = !line.selected;
+      this.currentLine = line;
+      this.currentTarget = `#target_${id}`;
+      this.showMenu = true;
+    },
+    // showMenu(ev) {
+    //   console.log(ev);
+    // },
     onScroll(position) {
       // console.log(position);
       if (position > 100) this.fixed = true;
@@ -173,16 +208,28 @@ export default defineComponent({
     isActiveCode(line, code) {
       return line.codes?.includes(code.code);
     },
-    addCode(line, code) {
-      console.log(line);
+    addAllCodes(code) {
+      let tmp = [...this.selection];
 
+      for (let l of tmp) {
+        // l.codes = [code.code];
+        this.addCode(l, code);
+      }
+    },
+    addCode(line, code) {
+      delete line.selected;
       // console.log(`transcription.results.${line}.codes`);
       if (!line.codes) {
         line.codes = [];
       }
 
-      if (line.codes.length == 1 && line.codes[0] == code.code) line.codes = [];
-      else line.codes = [code.code];
+      if (code === null) {
+        line.codes = [];
+      } else {
+        // if (line.codes.length == 1 && line.codes[0] == code.code)
+        // line.codes = [];
+        line.codes = [code.code];
+      }
 
       // line.codes = toggleElement(line.codes, code.code);
 
@@ -230,12 +277,18 @@ export default defineComponent({
   font-size: 1.4em;
   line-height: 2.5em;
   font-family: serif;
+  // user-select: "all";
+  // cursor: text;
 
   // text-decoration-style: wavy;
 
   :hover {
     background-color: #f0f0f0;
     cursor: pointer;
+  }
+
+  .selected {
+    background: yellow;
   }
 }
 </style>
