@@ -23,7 +23,7 @@ q-page(padding v-scroll="onScroll" @click="hideMenu").text-center
             //- div {{line.codes}}
             
             span.line(:style="{ 'text-decoration-color': getLineColor(line) }" :class="{selected:line.selected}") {{line.alternatives[0].transcript}}&nbsp;
-            span(v-if="!line.alternatives[0].transcript.endsWith('.')") &nbsp; 
+            //- span(v-if="!line.alternatives[0].transcript.endsWith('.')") &nbsp; 
     .col-md-2.gt-sm.q-pl-md.text-left
       div(:class="{'fixed':fixed}" style="top:55px;")
         div.text-overline {{ $t('codes') }}
@@ -62,6 +62,7 @@ import find from "lodash/find";
 import orderBy from "lodash/orderBy";
 import compact from "lodash/compact";
 import filter from "lodash/filter";
+import chunk from "lodash/chunk";
 
 // const toggleElement = (arr, val) =>
 //   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
@@ -86,9 +87,66 @@ export default defineComponent({
   setup(props) {
     const user = useCurrentUser();
 
-    const record = useDocument(
-      doc(db, `users/${props.email}/recordings/${props.id}`)
+    const { data: record, promise } = useDocument(
+      doc(db, `users/${props.email}/recordings/${props.id}`),
+      { once: true }
     );
+
+    promise.value.then(function (val) {
+      console.log("loaded record", val);
+      //splice up into smaller chunks:
+
+      const newArr = [];
+      if (!val.transcription.hasBeenSplit) {
+        for (let line of val.transcription.results) {
+          // console.log(line);
+          if (line.alternatives[0].transcript.length)
+            line.alternatives[0].transcript += ".";
+          const words = line.alternatives[0].transcript.split(" ");
+
+          const newlines = chunk(words, 6);
+
+          // console.log(newlines);
+          // console.log(line);
+
+          // console.log(this.record.transcription);
+
+          const index = val.transcription.results.indexOf(line);
+          console.log("index", index);
+
+          //if should be split into more than 1 line:
+          if (newlines.length > 1) {
+            // console.log("new lines:");
+            //remove the old obj:
+            // val.transcription.results.splice(index, 1);
+            const codes = line.codes;
+
+            //split into new lines:
+            // let i = 0;
+            for (const nl of newlines) {
+              const trans = `${nl.join(" ").trim()}`;
+              // console.log(trans);
+              if (trans.length) {
+                const newitem = {
+                  alternatives: [{ transcript: trans }],
+                  record: props.id,
+                };
+                if (codes) newitem.codes = codes;
+                // val.transcription.results.splice(index + i, 0, newitem);
+                newArr.push(newitem);
+              }
+              // console.log(newitem);
+              // i++;
+            }
+          } else {
+            if (line.alternatives[0].transcript.length) newArr.push(line);
+          }
+        }
+        console.log(newArr);
+        val.transcription.results = newArr;
+        val.transcription.hasBeenSplit = true;
+      }
+    });
 
     const codebook = useCollection(collection(db, `codebook`));
 
