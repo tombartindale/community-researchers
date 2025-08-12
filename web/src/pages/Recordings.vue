@@ -62,7 +62,7 @@ q-page(padding).text-center
                       .col    
                         .text-body2 {{cluster.bullets}}
                       .col( v-for="element of cluster.quotes")
-                        Cluster(:element="element" :clusters="false" :locale="locale" :simple="true")
+                        QuoteGrouped(:element="element" :clusters="false" :locale="locale" :simple="true")
                         q-separator(inset).q-mt-sm
           .row.items-center
             .col
@@ -137,7 +137,7 @@ import {
 
 import { ref, getDownloadURL } from "firebase/storage";
 import { openURL, useQuasar } from "quasar";
-import Cluster from "src/components/Quote.vue";
+import QuoteGrouped from "src/components/QuoteGrouped.vue";
 import { useI18n } from "vue-i18n";
 
 import filter from "lodash/filter";
@@ -150,7 +150,7 @@ import filter from "lodash/filter";
 export default defineComponent({
   name: "CodePage",
   props: ["id"],
-  components: { Cluster },
+  components: { QuoteGrouped },
   data() {
     return { loading: false };
   },
