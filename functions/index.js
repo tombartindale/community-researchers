@@ -434,14 +434,71 @@ export const getClustersForRegion = onCall(
               recording.data().transcription &&
               recording.data().transcription.results &&
               recording.ref.parent.parent.id == cluster.ref.parent.parent.id
-            )
-              for (const quote of recording.data().transcription?.results) {
-                // console.log(quote);
+            ) {
+              //update to grouped codes (i.e. group them if they are next to eachother)
+              let lastIndex = 0;
+              let lastCode = null;
+              let newList = [];
+              let tmp = [];
 
-                if (quote.codes?.includes(outt.code) && quote.highlighted)
-                  outt.quotes.push(quote);
+              for (const quote of recording.data().transcription.results) {
+                if (quote.codes?.includes(outt.code) && quote.highlighted) {
+                  // console.log("lastIndex", lastIndex);
+                  // console.log("lastCode", lastCode);
+                  // console.log("Current Index", quote.index);
+                  // console.log("index Diff", quote.index - lastIndex);
+                  if (
+                    (quote.index - lastIndex == 1 &&
+                      quote.codes[0] == lastCode) ||
+                    quote.index == 0
+                  ) {
+                    // console.log("pushing to list", quote.index);
+                    lastIndex = quote.index;
+                    newList.push(quote);
+                  }
+                  //if this line is not next to the last line and/or does not have the same code:
+                  else {
+                    if (newList.length) {
+                      // console.log("Save List");
+                      //add previous list to output
+                      tmp.push({
+                        code: newList[0].codes[0],
+                        quotes: newList,
+                      });
+                    }
+
+                    //restart list
+                    // console.log("Restart List");
+                    newList = [];
+                    lastIndex = quote.index;
+                    newList.push(quote);
+
+                    // tmp.push({
+                    //   code: quote.codes[0],
+                    //   // ...quote,
+                    //   quotes: [newList],
+                    // });
+                  }
+
+                  // console.log("newlist:", ...newList);
+                  lastCode = quote.codes[0];
+                } else {
+                  if (newList.length) {
+                    // console.log("Save List");
+                    //add previous list to output
+                    tmp.push({
+                      code: newList[0].codes[0],
+                      quotes: newList,
+                    });
+                    newList = [];
+                  }
+                  // console.log("no codes", quote.index);
+                }
+                // if (quote.codes?.includes(outt.code) && quote.highlighted)
+                //   outt.quotes.push(quote);
               }
-
+              outt.quotes.push(...tmp);
+            }
             // console.log(foruser);
           }
 
