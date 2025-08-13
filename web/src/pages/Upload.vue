@@ -18,7 +18,7 @@ q-page(padding)
                   q-popup-proxy(cover)
                     q-date(v-model="when" :label="$t('when')" filled landscape)
                       .row.items-center.justify-end
-                        q-btn(v-close-popup flat no-caps) Close
+                        q-btn(v-close-popup flat no-caps) {{ $t('close') }}
           .col.text-center
             q-btn.q-mt-md(type="submit" :label="$t('upload')" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
       

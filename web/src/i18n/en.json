@@ -99,5 +99,6 @@
   "updates-require-saving": "Updates require saving...",
   "save": "Save",
   "all-changes-saved": "All changes saved!",
-  "save-and-continue-later": "Save and continue later"
+  "save-and-continue-later": "Save and continue later",
+  "close": "Close"
 }
