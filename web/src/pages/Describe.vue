@@ -209,6 +209,9 @@ export default defineComponent({
             else {
               if (newList.length) {
                 // console.log("Save List");
+
+                // console.log(newList);
+
                 //add previous list to output
                 tmp.push({
                   code: newList[0].codes[0],
@@ -231,12 +234,22 @@ export default defineComponent({
 
             // console.log("newlist:", ...newList);
             lastCode = quote.codes[0];
-          } else console.log("no codes", quote.index);
+          } else {
+            if (newList.length) {
+              //add previous list to output
+              tmp.push({
+                code: newList[0].codes[0],
+                quotes: newList,
+              });
+            }
+            //restart list
+            newList = [];
+          }
         }
 
         // if (tmp.length) console.log(tmp);
 
-        // console.log(all);
+        // console.log(...tmp);
 
         output.push(...tmp);
       }
