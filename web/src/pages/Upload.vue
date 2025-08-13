@@ -16,7 +16,9 @@ q-page(padding)
               template(v-slot:append)
                 q-icon(name="event").cursor-pointer
                   q-popup-proxy(cover)
-                    q-date(v-model="when" :label="$t('when')" filled landscape v-close-popup)
+                    q-date(v-model="when" :label="$t('when')" filled landscape)
+                      .row.items-center.justify-end
+                        q-btn(v-close-popup flat no-caps) Close
           .col.text-center
             q-btn.q-mt-md(type="submit" :label="$t('upload')" color="primary" :disable="this.uploading || !inputVal" no-caps size="lg")
       
