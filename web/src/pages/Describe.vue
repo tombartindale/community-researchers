@@ -6,7 +6,7 @@ q-page().text-center
         .text-body1 {{ $t('for-each-cluster-follow-the-prompts') }}
         
     //- div {{records}}
-    div {{clustered}}
+    //- div {{clustered}}
     //- div {{clusters}}
 
   .row.justify-center
@@ -247,7 +247,7 @@ export default defineComponent({
   },
   watch: {
     usedClusters() {
-      if (this.step == 0) this.step = this.usedClusters[0].code;
+      if (this.step == 0) this.step = this.usedClusters[0]?.code;
     },
     records: {
       deep: true,
