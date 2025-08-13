@@ -94,5 +94,10 @@
   "upload-complete": "Subir completo",
   "your-plan-has-been-reviewed-and-you-are-ready-to-collect-data": "¡Su plan ha sido revisado y está listo para recopilar datos!",
   "correct-transcript": "Transcripción correcta",
-  "un-label": "Sin etiqueta"
+  "un-label": "Sin etiqueta",
+  "all-changes-saved": "¡Todos los cambios guardados!",
+  "preparing-transcript": "Preparación de la transcripción ...",
+  "save": "Ahorrar",
+  "save-and-continue-later": "Guardar y continuar más tarde",
+  "updates-require-saving": "Las actualizaciones requieren guardar ..."
 }

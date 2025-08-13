@@ -1,5 +1,18 @@
 <template lang="pug">
 q-page(padding v-scroll="onScroll" @click="hideMenu").text-center
+  div(v-if="initialSave").fullscreen.absolute.full-width.bg-white
+    .column.full-height.justify-center
+      .col-auto
+        .text-body1 {{ $t('preparing-transcript') }}
+  q-banner(style="left:0;bottom:0em;" :class="{'bg-warning':isDirty,'bg-grey-2':!isDirty}").fixed.full-width.z-max
+    div(v-if="isDirty")
+      .row.items-center
+        .col {{ $t('updates-require-saving') }}
+        .col-auto 
+          q-btn(flat no-caps @click="save" :loading="saving" :disabled="saving").text-white {{ $t('save') }}
+    div(v-else)
+      .row.items-center
+        .col {{ $t('all-changes-saved') }}
   .row.justify-center
     .col-md-8.col
       q-banner.text-center.q-mb-md
@@ -29,7 +42,11 @@ q-page(padding v-scroll="onScroll" @click="hideMenu").text-center
         div.text-overline {{ $t('codes') }}
         div.text-left.line.q-mb-xs(v-for="code of codeBook" :style="{ 'text-decoration-color': getLineColor({codes:[code.code]}) }") {{code.name[locale] || code.name['en']}} 
   
-  q-btn(color="primary" size="lg" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-coding') }}
+  .row.q-col-gutter-md.justify-center.q-mt-lg.q-mb-xl.q-pb-lg
+    .col-auto
+      q-btn(v-if="isDirty" color="primary" outline size="lg" @click="save()" no-caps :disabled="saving" :loading="saving") {{ $t('save-and-continue-later') }}
+    .col-auto
+      q-btn(color="primary" size="lg" @click="done()" no-caps :loading="saving" :disabled="saving") {{ $t('ive-finished-coding') }}
   q-menu(ref="menu" anchor="bottom end" self="top end" persistent v-model="showMenu" :target="currentTarget" no-parent-event @before-hide="hideMenu")
     q-list(separator)
       q-item(clickable v-if="selection.length==1")
@@ -51,7 +68,7 @@ q-page(padding v-scroll="onScroll" @click="hideMenu").text-center
 </template>
 
 <script>
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, ref } from "vue";
 
 import { useCollection, useCurrentUser, useDocument } from "vuefire";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
@@ -82,17 +99,20 @@ export default defineComponent({
       // selection: [],
       showMenu: false,
       currentLine: null,
+      isDirty: false,
+      saving: false,
     };
   },
   setup(props) {
     const user = useCurrentUser();
+    const initialSave = ref(true);
 
     const { data: record, promise } = useDocument(
       doc(db, `users/${props.email}/recordings/${props.id}`),
       { once: true }
     );
 
-    promise.value.then(function (val) {
+    promise.value.then(async function (val) {
       console.log("loaded record", val);
       //splice up into smaller chunks:
 
@@ -142,9 +162,31 @@ export default defineComponent({
             if (line.alternatives[0].transcript.length) newArr.push(line);
           }
         }
-        console.log(newArr);
+
         val.transcription.results = newArr;
         val.transcription.hasBeenSplit = true;
+
+        try {
+          console.log("start initial save");
+
+          // line.codes.push(code.code);
+          updateDoc(
+            doc(db, `users/${user.value.email}/recordings/${props.id}`),
+            {
+              transcription: val.transcription,
+            }
+          );
+          await new Promise((r) => setTimeout(r, 2000));
+          console.log("finish initial save");
+          initialSave.value = false;
+        } catch (e) {
+          this.q.notify({
+            type: "negative",
+            message: e,
+          });
+        }
+      } else {
+        initialSave.value = false;
       }
     });
 
@@ -158,7 +200,7 @@ export default defineComponent({
     });
 
     // console.log("record", record);
-    return { user, record, codeBook, locale, q };
+    return { user, record, codeBook, locale, q, initialSave };
   },
   // watch: {
   //   record: {
@@ -188,7 +230,7 @@ export default defineComponent({
     },
     toggle(line, id) {
       //toggle selection of this line:
-      console.log(line, id);
+      // console.log(line, id);
       line.selected = !line.selected;
       this.currentLine = line;
       this.currentTarget = `#target_${id}`;
@@ -203,11 +245,11 @@ export default defineComponent({
       if (position > 100) this.fixed = true;
       else this.fixed = false;
     },
-    editLine(val, line) {
+    async editLine(val, line) {
       // console.log(val);
       // console.log(line);
       try {
-        //TODO: split lines into new objects if a new full stop detected:
+        //split lines into new objects if a new full stop detected:
 
         const newlines = compact(val.split("."));
 
@@ -241,9 +283,14 @@ export default defineComponent({
 
         // console.log(this.record.transcription.results);
 
-        updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-          transcription: this.record.transcription,
-        });
+        this.isDirty = true;
+        // this.save();
+        // await updateDoc(
+        //   doc(db, `users/${this.user.email}/recordings/${this.id}`),
+        //   {
+        //     transcription: this.record.transcription,
+        //   }
+        // );
       } catch (e) {
         this.q.notify({
           type: "negative",
@@ -251,17 +298,25 @@ export default defineComponent({
         });
       }
     },
-    done() {
+    async done() {
       try {
-        updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-          status: "coded",
-        });
+        this.saving = true;
+        await updateDoc(
+          doc(db, `users/${this.user.email}/recordings/${this.id}`),
+          {
+            transcription: this.record.transcription,
+            status: "coded",
+          }
+        );
+        this.isDirty = false;
         this.$router.push("/");
       } catch (e) {
         this.q.notify({
           type: "negative",
           message: e,
         });
+      } finally {
+        this.saving = false;
       }
     },
     isActiveCode(line, code) {
@@ -275,7 +330,28 @@ export default defineComponent({
         this.addCode(l, code);
       }
     },
-    addCode(line, code) {
+    async save() {
+      try {
+        this.saving = true;
+        console.log("start save");
+        await new Promise((r) => setTimeout(r, 1000));
+
+        // line.codes.push(code.code);
+        updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
+          transcription: this.record.transcription,
+        });
+        console.log("finish save");
+        this.isDirty = false;
+      } catch (e) {
+        this.q.notify({
+          type: "negative",
+          message: e,
+        });
+      } finally {
+        this.saving = false;
+      }
+    },
+    async addCode(line, code) {
       delete line.selected;
       // console.log(`transcription.results.${line}.codes`);
       if (!line.codes) {
@@ -290,19 +366,10 @@ export default defineComponent({
         line.codes = [code.code];
       }
 
+      // this.save();
+      this.isDirty = true;
       // line.codes = toggleElement(line.codes, code.code);
 
-      try {
-        // line.codes.push(code.code);
-        updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-          transcription: this.record.transcription,
-        });
-      } catch (e) {
-        this.q.notify({
-          type: "negative",
-          message: e,
-        });
-      }
       // console.log(line, code);
     },
     getLineColor(line) {

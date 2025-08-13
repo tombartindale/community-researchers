@@ -94,5 +94,10 @@
   "download": "Download",
   "your-plan-has-been-reviewed-and-you-are-ready-to-collect-data": "Your plan has been reviewed and You are ready to collect data!",
   "correct-transcript": "Correct transcript",
-  "un-label": "Un-label"
+  "un-label": "Un-label",
+  "preparing-transcript": "Preparing transcript...",
+  "updates-require-saving": "Updates require saving...",
+  "save": "Save",
+  "all-changes-saved": "All changes saved!",
+  "save-and-continue-later": "Save and continue later"
 }

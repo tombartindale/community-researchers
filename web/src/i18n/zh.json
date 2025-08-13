@@ -94,5 +94,10 @@
   "upload-complete": "上传完成",
   "your-plan-has-been-reviewed-and-you-are-ready-to-collect-data": "您的计划已经进行了审查，您准备收集数据！",
   "correct-transcript": "正确的成绩单",
-  "un-label": "未标签"
+  "un-label": "未标签",
+  "all-changes-saved": "所有更改都保存了！",
+  "preparing-transcript": "准备成绩单...",
+  "save": "节省",
+  "save-and-continue-later": "保存并继续",
+  "updates-require-saving": "更新需要保存..."
 }

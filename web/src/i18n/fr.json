@@ -94,5 +94,10 @@
   "upload-complete": "Téléchargement complet",
   "your-plan-has-been-reviewed-and-you-are-ready-to-collect-data": "Votre plan a été examiné et vous êtes prêt à collecter des données!",
   "correct-transcript": "Transcription correcte",
-  "un-label": "Se désagréger"
+  "un-label": "Se désagréger",
+  "all-changes-saved": "Tous les modifications enregistrées!",
+  "preparing-transcript": "Préparation de la transcription ...",
+  "save": "Sauvegarder",
+  "save-and-continue-later": "Économisez et continuez plus tard",
+  "updates-require-saving": "Les mises à jour nécessitent une économie ..."
 }

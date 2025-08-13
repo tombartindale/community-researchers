@@ -94,5 +94,10 @@
   "upload-complete": "تحميل كامل",
   "your-plan-has-been-reviewed-and-you-are-ready-to-collect-data": "تمت مراجعة خطتك وأنت مستعد لجمع البيانات!",
   "correct-transcript": "النص الصحيح",
-  "un-label": "الأمم المتحدة"
+  "un-label": "الأمم المتحدة",
+  "all-changes-saved": "كل التغييرات المحفوظة!",
+  "preparing-transcript": "إعداد النص ...",
+  "save": "يحفظ",
+  "save-and-continue-later": "حفظ ومتابعة لاحقًا",
+  "updates-require-saving": "تحديثات تتطلب الادخار ..."
 }
