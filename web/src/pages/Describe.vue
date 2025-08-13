@@ -8,6 +8,8 @@ q-page().text-center
     //- div {{records}}
     //- div {{clustered}}
     //- div {{clusters}}
+  //- div {{loading}}
+  q-spinner(size="md" v-if="loading")
 
   .row.justify-center
     .col-md-6.col
@@ -31,11 +33,11 @@ q-page().text-center
           
       .row.justify-between.q-mx-md.q-mb-xl.q-pb-xl(v-if="usedClusters.length")
         .col-auto
-          q-btn(:disable="step == usedClusters[0].code" outline @click="$refs.stepper.previous()" no-caps color="primary") {{ $t('previous-cluster') }}
+          q-btn(:disable="step == usedClusters[0].code" outline @click="prev()" no-caps color="primary"  :disable="saving" :loading="saving") {{ $t('previous-cluster') }}
         .col-auto(v-if="step != usedClusters[usedClusters.length-1].code")
-          q-btn(@click="$refs.stepper.next()" no-caps color="primary") {{ $t('next-cluster') }}
+          q-btn(@click="next()" no-caps color="primary" :disable="saving" :loading="saving") {{ $t('next-cluster') }}
         .col-auto(v-if="step == usedClusters[usedClusters.length-1].code")
-          q-btn(color="primary" @click="done()" no-caps) {{ $t('ive-finished-describing') }}
+          q-btn(color="primary" @click="done()" no-caps :disable="saving" :loading="saving") {{ $t('ive-finished-describing') }}
 
 </template>
 
@@ -82,6 +84,7 @@ export default defineComponent({
       list1: [],
       step: 0,
       clustered: [],
+      saving: false,
       // group1: [],
       // group2: [],
     };
@@ -109,6 +112,7 @@ export default defineComponent({
 
     Promise.all([promiseCodes.value, promise1.value, promise.value]).then(
       async function (val) {
+        console.log("all things loaded");
         // console.log(val[1]);
         //if no clusters added yet:
         if (val[1].length == 0) {
@@ -166,7 +170,7 @@ export default defineComponent({
     const q = useQuasar();
 
     // console.log("record", record);
-    return { user, records, codeBook, locale, clusters, q };
+    return { user, records, codeBook, locale, clusters, q, loading };
   },
   computed: {
     usedClusters() {
@@ -252,25 +256,25 @@ export default defineComponent({
     records: {
       deep: true,
       handler() {
-        console.log("update records");
-        try {
-          for (const record of this.records) {
-            if (record.transcription) {
-              updateDoc(
-                doc(db, `users/${this.email}/recordings/${record.id}`),
-                {
-                  transcription: record.transcription,
-                }
-              );
-            }
-          }
-        } catch (e) {
-          console.log(e);
-          this.q.notify({
-            type: "negative",
-            message: e,
-          });
-        }
+        // console.log("update records");
+        // try {
+        //   for (const record of this.records) {
+        //     if (record.transcription) {
+        //       updateDoc(
+        //         doc(db, `users/${this.email}/recordings/${record.id}`),
+        //         {
+        //           transcription: record.transcription,
+        //         }
+        //       );
+        //     }
+        //   }
+        // } catch (e) {
+        //   console.log(e);
+        //   this.q.notify({
+        //     type: "negative",
+        //     message: e,
+        //   });
+        // }
       },
       // },
     },
@@ -279,11 +283,19 @@ export default defineComponent({
       handler() {
         window.scrollTo(0, 0);
         //save to db:
-        this.save();
+        // this.save();
       },
     },
   },
   methods: {
+    async next() {
+      await this.save();
+      this.$refs.stepper.next();
+    },
+    async prev() {
+      await this.save();
+      this.$refs.stepper.previous();
+    },
     getQuotesForCode(code) {
       // console.log(this.allCodes);
       const ungrouped = filter(this.allCodes, (e) => e.code == code);
@@ -295,8 +307,21 @@ export default defineComponent({
     async save() {
       //save clusters to db:
       console.log("saving clusters");
+      this.saving = true;
+      await new Promise((r) => setTimeout(r, 1000));
       // console.log(this.clusters);
+      //SAVE RECORDS
       try {
+        for (const record of this.records) {
+          if (record.transcription) {
+            updateDoc(doc(db, `users/${this.email}/recordings/${record.id}`), {
+              transcription: record.transcription,
+            });
+          }
+        }
+
+        //SAVE CLUSTERS
+
         for (let cluster of this.clusters) {
           await updateDoc(
             doc(db, `users/${this.email}/clusters/${cluster.id}`),
@@ -310,6 +335,8 @@ export default defineComponent({
           type: "negative",
           message: e,
         });
+      } finally {
+        this.saving = false;
       }
     },
     getItemsForCluster(cluster) {
@@ -317,8 +344,8 @@ export default defineComponent({
         cluster: cluster,
       });
     },
-    done() {
-      this.save();
+    async done() {
+      await this.save();
       try {
         setDoc(
           doc(db, `users/${this.email}`),

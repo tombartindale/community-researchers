@@ -44,9 +44,9 @@ q-page(padding v-scroll="onScroll" @click="hideMenu").text-center
   
   .row.q-col-gutter-md.justify-center.q-mt-lg.q-mb-xl.q-pb-lg
     .col-auto
-      q-btn(v-if="isDirty" color="primary" outline size="lg" @click="save()" no-caps :disabled="saving" :loading="saving") {{ $t('save-and-continue-later') }}
+      q-btn(v-if="isDirty" color="primary" outline size="lg" @click="save()" no-caps :disable="saving" :loading="saving") {{ $t('save-and-continue-later') }}
     .col-auto
-      q-btn(color="primary" size="lg" @click="done()" no-caps :loading="saving" :disabled="saving") {{ $t('ive-finished-coding') }}
+      q-btn(color="primary" size="lg" @click="done()" no-caps :loading="saving" :disable="saving") {{ $t('ive-finished-coding') }}
   q-menu(ref="menu" anchor="bottom end" self="top end" persistent v-model="showMenu" :target="currentTarget" no-parent-event @before-hide="hideMenu")
     q-list(separator)
       q-item(clickable v-if="selection.length==1")

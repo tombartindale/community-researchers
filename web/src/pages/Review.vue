@@ -36,8 +36,11 @@ q-page(padding).text-center
             .col( v-for="element of cluster.quotes")
               QuoteGrouped(:element="element" :clusters="false" :locale="locale" :simple="true")
               q-separator(inset).q-mt-sm
-  
-  q-btn(color="primary" size="lg" to="/" no-caps).q-mt-lg {{ $t('ive-finished-reviewing') }}
+  .row.justify-center.q-col-gutter-md
+    .col-auto
+      q-btn(@click="saveDesc()" :loading="saving" :disable="saving" color="primary" outline size="lg" no-caps).q-mt-lg {{ $t('save-and-continue-later') }}
+    .col-auto
+      q-btn(color="primary" size="lg" :loading="saving" :disabled="saving" @click="done()" no-caps).q-mt-lg {{ $t('ive-finished-reviewing') }}
 
 </template>
 
@@ -48,7 +51,7 @@ import draggable from "vuedraggable";
 import { useCurrentUser, useDocument } from "vuefire";
 import { db, getClustersForRegion } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 // import { ref, uploadBytesResumable } from "firebase/storage";
-import { doc, setDoc, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
+import { doc, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
 
 import filter from "lodash/filter";
 // import groupBy from "lodash/groupBy";
@@ -76,6 +79,7 @@ export default defineComponent({
   async mounted() {
     // console.log(getClustersForRegion);
     try {
+      console.log("loading clusters");
       this.clusters = (
         await getClustersForRegion({ region: this.region })
       ).data;
@@ -97,6 +101,7 @@ export default defineComponent({
       clustered: [],
       clusters: [],
       loading: true,
+      saving: false,
     };
   },
   setup(props) {
@@ -164,13 +169,14 @@ export default defineComponent({
     //   return [];
     // },
   },
-  watch: {
-    async "regionData.description"() {},
-  },
+  // watch: {
+  //   async "regionData.description"() {},
+  // },
   methods: {
     async saveDesc() {
       // console.log(data);
-
+      this.saving = true;
+      await new Promise((r) => setTimeout(r, 1000));
       try {
         await updateDoc(doc(db, `regions/${this.region}`), {
           description: this.regionData.description,
@@ -180,6 +186,8 @@ export default defineComponent({
           type: "negative",
           message: e,
         });
+      } finally {
+        this.saving = false;
       }
     },
     getItemsForCluster(cluster) {
@@ -187,22 +195,26 @@ export default defineComponent({
         cluster: cluster,
       });
     },
-    done() {
+    async done() {
       try {
-        this.save();
-        setDoc(
-          doc(db, `users/${this.user.email}`),
-          {
-            status: "described",
-          },
-          { merge: true }
-        );
+        await this.saveDesc();
+        // this.saving = true;
+        // setDoc(
+        //   doc(db, `users/${this.user.email}`),
+        //   {
+        //     status: "described",
+        //   },
+        //   { merge: true }
+        // );
+
         this.$router.push("/");
       } catch (e) {
         this.q.notify({
           type: "negative",
           message: e,
         });
+      } finally {
+        // this.saving = false;
       }
     },
   },
