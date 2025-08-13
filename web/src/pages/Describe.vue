@@ -33,7 +33,7 @@ q-page().text-center
           
       .row.justify-between.q-mx-md.q-mb-xl.q-pb-xl(v-if="usedClusters.length")
         .col-auto
-          q-btn(:disable="step == usedClusters[0].code" outline @click="prev()" no-caps color="primary"  :disable="saving" :loading="saving") {{ $t('previous-cluster') }}
+          q-btn(:disable="step == usedClusters[0].code || saving" outline @click="prev()" no-caps color="primary"  :loading="saving") {{ $t('previous-cluster') }}
         .col-auto(v-if="step != usedClusters[usedClusters.length-1].code")
           q-btn(@click="next()" no-caps color="primary" :disable="saving" :loading="saving") {{ $t('next-cluster') }}
         .col-auto(v-if="step == usedClusters[usedClusters.length-1].code")
