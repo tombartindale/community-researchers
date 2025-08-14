@@ -34,7 +34,7 @@ import { defineComponent } from "vue";
 import { useCollection, useCurrentUser } from "vuefire";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 // import { ref, uploadBytesResumable } from "firebase/storage";
-import { doc, collection, updateDoc, setDoc } from "firebase/firestore"; // Importing dbRef for database operations
+import { doc, collection, updateDoc, setDoc, getDoc } from "firebase/firestore"; // Importing dbRef for database operations
 import { useQuasar } from "quasar";
 // import find from "lodash/find";
 
@@ -82,13 +82,21 @@ export default defineComponent({
     async addNew() {
       if (this.newEmail.length && this.newRegion.length) {
         try {
-          // throw Error();
-          await setDoc(doc(db, `users/${this.newEmail}`), {
-            region: this.newRegion,
-            isAdmin: false,
-            isEditor: false,
-          });
-          this.newEmail = "";
+          const docref = doc(db, `users/${this.newEmail.trim()}`);
+          const exists = (await getDoc(docref)).exists();
+          if (!exists) {
+            await setDoc(docref, {
+              region: this.newRegion,
+              isAdmin: false,
+              isEditor: false,
+            });
+            this.newEmail = "";
+          } else {
+            this.q.notify({
+              type: "warning",
+              message: "User already exists!",
+            });
+          }
         } catch (e) {
           this.q.notify({
             type: "negative",
