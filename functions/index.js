@@ -254,9 +254,14 @@ export const transcribe2 = onObjectFinalized(
       event.data.name.endsWith(".wav")
     ) {
       try {
-        const languageCode = event.data.name.split("_")[0].split("audio/")[1];
+        console.log("name", event.data.name);
+        const filename = event.data.name.split("/")[3];
+        console.log("filename", filename);
 
+        const languageCode = filename.split("_")[0];
         console.log("languageCode:", languageCode);
+
+        // return;
 
         const config = {
           encoding: "LINEAR16",
