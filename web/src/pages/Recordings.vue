@@ -89,7 +89,7 @@ q-page(padding).text-center
                 q-card-section
                   .row.text-left.items-center
                     .col
-                      .text-body1 {{user.id}}
+                      .text-body1.ellipsis {{user.id}}
                     .col-auto
                       //- q-btn(icon="grain" dense flat :to="`/group/${user.id}`" no-caps)
                       //-   q-tooltip Clustering
