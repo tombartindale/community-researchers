@@ -7,7 +7,7 @@ q-page().text-center
         
     //- div {{records}}
     //- div {{clustered}}
-    //- div {{clusters}}
+    //- div {{step}}
   //- div {{loading}}
   q-spinner(size="md" v-if="loading")
 
@@ -264,7 +264,10 @@ export default defineComponent({
   },
   watch: {
     usedClusters() {
-      if (this.step == 0) this.step = this.usedClusters[0]?.code;
+      console.log("watch used", this.step);
+      if (this.step == 0 || this.step == undefined) {
+        this.step = this.usedClusters[0]?.code;
+      }
     },
     records: {
       deep: true,
@@ -296,7 +299,6 @@ export default defineComponent({
       handler() {
         window.scrollTo(0, 0);
         //save to db:
-        // this.save();
       },
     },
   },
