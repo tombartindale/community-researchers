@@ -186,12 +186,12 @@ export default defineComponent({
 
       return some(this.recordings, { status: "coded" });
     },
-    canDescribe() {
-      return (
-        this.user.profile.status == "clustered" ||
-        this.user.profile.status == "described"
-      );
-    },
+    // canDescribe() {
+    //   return (
+    //     this.user.profile.status == "clustered" ||
+    //     this.user.profile.status == "described"
+    //   );
+    // },
     canReview() {
       return (
         this.user.profile.status == "described" ||

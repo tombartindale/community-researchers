@@ -171,7 +171,10 @@ export default defineComponent({
 
           // line.codes.push(code.code);
           updateDoc(
-            doc(db, `users/${user.value.email}/recordings/${props.id}`),
+            doc(
+              db,
+              `users/${props.email || user.value.email}/recordings/${props.id}`
+            ),
             {
               transcription: val.transcription,
             }
@@ -302,7 +305,10 @@ export default defineComponent({
       try {
         this.saving = true;
         await updateDoc(
-          doc(db, `users/${this.user.email}/recordings/${this.id}`),
+          doc(
+            db,
+            `users/${this.email || this.user.email}/recordings/${this.id}`
+          ),
           {
             transcription: this.record.transcription,
             status: "coded",
@@ -337,9 +343,15 @@ export default defineComponent({
         await new Promise((r) => setTimeout(r, 1000));
 
         // line.codes.push(code.code);
-        updateDoc(doc(db, `users/${this.user.email}/recordings/${this.id}`), {
-          transcription: this.record.transcription,
-        });
+        updateDoc(
+          doc(
+            db,
+            `users/${this.email || this.user.email}/recordings/${this.id}`
+          ),
+          {
+            transcription: this.record.transcription,
+          }
+        );
         console.log("finish save");
         this.isDirty = false;
       } catch (e) {

@@ -27,6 +27,14 @@ q-page(padding).text-center
               .row.items-center 
                 q-avatar(size="sm" icon="graphic_eq") 
                 .text-tiny {{getRegionalUserRecordings(region.id)}}
+            q-item-section(side)
+              .row.items-center 
+                q-avatar(size="sm" icon="code") 
+                .text-tiny {{getRegionalUserCoding(region.id)}}
+            q-item-section(side)
+              .row.items-center 
+                q-avatar(size="sm" icon="article") 
+                .text-tiny {{getRegionalUserDescribe(region.id)}}
 
             //- q-tabs(v-model="tab" vertical no-caps)
             //- q-tab(v-for="region of regions" :name="region.id" :label="region.id")
@@ -84,7 +92,7 @@ q-page(padding).text-center
                       //-   q-tooltip Clustering
                       q-btn(icon="upload" dense flat :to="`/upload/${user.id}`" no-caps)
                         q-tooltip Upload
-                      q-btn(icon="description" dense flat :to="`/describe/${user.id}`" no-caps)
+                      q-btn(icon="description" dense flat :to="`/describe/${user.id}`" no-caps :color="(user.status=='described')?'positive':''")
                         q-tooltip Describe
                 q-separator
                 q-list(separator).text-left
@@ -99,11 +107,12 @@ q-page(padding).text-center
                       q-btn(icon="article" dense flat @click="getTranscript(recording)" no-caps)
                         q-tooltip Transcript
                     q-item-section(side v-if="!recording.error")
-                      q-btn(icon="code" dense flat :to="`/code/${recording.parent}/${recording.id}`" no-caps)
+                      q-btn(icon="code" dense flat :to="`/code/${recording.parent}/${recording.id}`" no-caps :color="(recording.status=='coded')?'positive':''")
                         q-tooltip Coding
                     q-item-section(side v-if="recording.error")
                       q-icon(name="warning").q-mx-xs
                         q-tooltip {{recording.error}}
+                    
 
   //- q-list(separator).text-left
   //-   q-item(v-for="record of records")
@@ -264,6 +273,25 @@ export default defineComponent({
           });
         });
     },
+    getRegionalUserDescribe(region) {
+      const uu = this.getRegionalUsers(region);
+      return filter(uu, { status: "described" }).length;
+    },
+    getRegionalUserCoding(region) {
+      let count = 0;
+      let uu = this.getRegionalUsers(region);
+      for (let u of uu) {
+        const recs = this.getRecordingsForUser(u.id);
+        const rec_coded = filter(recs, { status: "coded" });
+        count += rec_coded.length;
+      }
+      //for every recording:
+
+      // return filter(this.getRegionalUserRecordings(region), { status: "coded" })
+      //   .length;
+      return count;
+    },
+
     getRecordingsForUser(user) {
       return filter(this.records, (r) => r.parent == user);
     },
@@ -280,8 +308,6 @@ export default defineComponent({
       }
 
       return count;
-
-      // return filter(this.users, { region: region });
     },
     async getTranscript(record) {
       try {
