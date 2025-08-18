@@ -78,7 +78,7 @@ const routes = [
 
     children: [
       {
-        path: "",
+        path: ":tab?",
         component: () => import("pages/Recordings.vue"),
         props: true,
       },

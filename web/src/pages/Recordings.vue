@@ -17,7 +17,7 @@ q-page(padding).text-center
     .col-auto
       q-list
         template(v-for="region of regions")
-          q-item(clickable @click="tab=region.id" :active="tab==region.id") 
+          q-item(clickable :to="`/admin/${region.id}`" :active="tab==region.id") 
             q-item-section.text-left {{region.id}}
             q-item-section(side) 
               .row.items-center
@@ -31,8 +31,8 @@ q-page(padding).text-center
             //- q-tabs(v-model="tab" vertical no-caps)
             //- q-tab(v-for="region of regions" :name="region.id" :label="region.id")
     .col
-      q-tab-panels(v-model="tab")
-        q-tab-panel(v-for="region of regions" :name="region.id").q-mt-lg.q-mb-xl
+      q-tab-panels(v-model="tab" @transition="loadPanel")
+        q-tab-panel(v-for="region of regions" :name="region.id" ).q-mt-lg.q-mb-xl
           .row.items-center
             .col
               q-separator(inset)
@@ -117,7 +117,8 @@ q-page(padding).text-center
 </template>
 
 <script>
-import { defineComponent, ref as vref } from "vue";
+import { defineComponent } from "vue";
+import { useRouter } from "vue-router";
 
 import { useCollection, useCurrentUser } from "vuefire";
 import {
@@ -141,6 +142,7 @@ import QuoteGrouped from "src/components/QuoteGrouped.vue";
 import { useI18n } from "vue-i18n";
 
 import filter from "lodash/filter";
+import find from "lodash/find";
 
 // const toggleElement = (arr, val) =>
 //   arr.includes(val) ? arr.filter((el) => el !== val) : [...arr, val];
@@ -149,12 +151,12 @@ import filter from "lodash/filter";
 
 export default defineComponent({
   name: "CodePage",
-  props: ["id"],
+  props: ["id", "tab"],
   components: { QuoteGrouped },
   data() {
     return { loading: false };
   },
-  setup() {
+  setup(props) {
     const user = useCurrentUser();
 
     const records = useCollection(collectionGroup(db, `recordings`), {
@@ -165,31 +167,62 @@ export default defineComponent({
 
     const { data: regions, promise } = useCollection(
       collection(db, `regions`),
-      { once: true }
+      {
+        once: true,
+      }
     );
 
-    const tab = vref("");
+    const q = useQuasar();
+    const router = useRouter();
 
-    promise.value.then(async (val) => {
-      console.log("regions loaded");
-      tab.value = val[0].id;
-      //for each region, call the ep for the cluster summary:
-      for (let r of val) {
-        console.log(r);
-        const dat = await getClustersForRegion({ region: r.id });
-        // console.log(dat);
-        r.clusters = dat.data;
+    const loadPanel = async (region) => {
+      // console.log("Load", region);
+      if (region.length) {
+        const reg = find(regions.value, { id: region });
+        // console.log(reg);
+        try {
+          const dat = await getClustersForRegion({ region: reg.id });
+          //   // console.log(dat);
+          reg.clusters = dat.data;
+        } catch (e) {
+          q.notify({
+            type: "negative",
+            message: e,
+          });
+        }
       }
+    };
+
+    promise.value.then((val) => {
+      // console.log(props);
+      // console.log(val);
+      if (!props.tab) {
+        console.log(val[0].id);
+        router.replace(`/admin/${val[0].id}`);
+        // props.tab = val[0].id;
+      } else loadPanel(props.tab);
     });
+
+    // const tab = vref("");
+
+    // promise.value.then(async (val) => {
+    //   console.log("regions loaded");
+    //   // tab.value = val[0].id;
+    //   //for each region, call the ep for the cluster summary:
+    //   // for (let r of val) {
+    //   //   console.log(r);
+    //   //   const dat = await getClustersForRegion({ region: r.id });
+    //   //   // console.log(dat);
+    //   //   r.clusters = dat.data;
+    //   // }
+    // });
 
     const { locale } = useI18n();
 
     const codeBook = useCollection(collection(db, `codebook`), { once: true });
 
-    const q = useQuasar();
-
     // console.log("record", record);
-    return { user, records, codeBook, regions, locale, users, q, tab };
+    return { user, records, codeBook, regions, locale, users, q, loadPanel };
   },
   // watch: {
   //   record: {
