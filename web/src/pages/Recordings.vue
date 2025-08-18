@@ -14,31 +14,34 @@ q-page(padding).text-center
             q-item(@click="getExportFile('xlsx')" clickable v-close-popup) Excel (.xlsx)
 
   .row
-    .col-auto
-      q-list
+    .col-sm-auto.col-12
+      q-list(separator)
         template(v-for="region of regions")
           q-item(clickable :to="`/admin/${region.id}`" :active="tab==region.id") 
-            q-item-section.text-left {{region.id}}
-            q-item-section(side) 
-              .row.items-center
-                q-avatar(size="sm" icon="person") 
-                .text-tiny {{getRegionalUsers(region.id).length}}
-            q-item-section(side)
-              .row.items-center 
-                q-avatar(size="sm" icon="graphic_eq") 
-                .text-tiny {{getRegionalUserRecordings(region.id)}}
-            q-item-section(side)
-              .row.items-center 
-                q-avatar(size="sm" icon="code") 
-                .text-tiny {{getRegionalUserCoding(region.id)}}
-            q-item-section(side)
-              .row.items-center 
-                q-avatar(size="sm" icon="article") 
-                .text-tiny {{getRegionalUserDescribe(region.id)}}
+            q-item-section.text-left 
+              .row 
+                .col {{region.id}}
+              .row
+                q-item-section(side) 
+                  .row.items-center
+                    q-avatar(size="sm" icon="person") 
+                    .text-tiny {{getRegionalUsers(region.id).length}}
+                q-item-section(side)
+                  .row.items-center 
+                    q-avatar(size="sm" icon="graphic_eq") 
+                    .text-tiny {{getRegionalUserRecordings(region.id)}}
+                q-item-section(side)
+                  .row.items-center 
+                    q-avatar(size="sm" icon="code") 
+                    .text-tiny {{getRegionalUserCoding(region.id)}}
+                q-item-section(side)
+                  .row.items-center 
+                    q-avatar(size="sm" icon="article") 
+                    .text-tiny {{getRegionalUserDescribe(region.id)}}
 
             //- q-tabs(v-model="tab" vertical no-caps)
             //- q-tab(v-for="region of regions" :name="region.id" :label="region.id")
-    .col
+    .col-12.col-sm
       q-tab-panels(v-model="tab" @transition="loadPanel")
         q-tab-panel(v-for="region of regions" :name="region.id" ).q-mt-lg.q-mb-xl
           .row.items-center
