@@ -402,7 +402,7 @@ export const downloadTranscript = onCall(
 );
 
 export const getClustersForRegion = onCall(
-  { region: region },
+  { region: region, memory: "2GiB" },
   async (request) => {
     if (request.auth) {
       // return data:
@@ -421,7 +421,7 @@ export const getClustersForRegion = onCall(
 
         let output = [];
 
-        // console.log(clusters.docs);
+        // console.log(request.data.region);
 
         for (let cluster of clusters.docs) {
           //for each cluster, get the records for that person:
@@ -509,7 +509,7 @@ export const getClustersForRegion = onCall(
 
           output.push(outt);
         }
-
+        // console.log("returning");
         return output;
       } catch (e) {
         console.log(e);
