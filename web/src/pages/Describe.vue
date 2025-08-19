@@ -43,12 +43,12 @@ q-page().text-center
 
 <script>
 import { defineComponent, ref } from "vue";
-import draggable from "vuedraggable";
+// import draggable from "vuedraggable";
 
 import { useCollection, useCurrentUser } from "vuefire";
 import { db } from "src/boot/firebase"; // Assuming you have a Firebase storage setup
 // import { ref, uploadBytesResumable } from "firebase/storage";
-import { doc, collection, setDoc, updateDoc } from "firebase/firestore"; // Importing dbRef for database operations
+import { doc, collection, setDoc, updateDoc, getDoc } from "firebase/firestore"; // Importing dbRef for database operations
 
 import filter from "lodash/filter";
 // import groupBy from "lodash/groupBy";
@@ -71,7 +71,7 @@ export default defineComponent({
   name: "DescribePage",
   props: ["email"],
   components: {
-    draggable,
+    // draggable,
     QuoteGrouped,
   },
   data() {
@@ -114,9 +114,17 @@ export default defineComponent({
       async function (val) {
         console.log("all things loaded");
         // console.log(val[1]);
+        let region = user.value.profile.region;
+        //lookup region of user:
+
         //if no clusters added yet:
         if (val[1].length == 0) {
           console.log("adding groups");
+          if (props.email) {
+            region = (await getDoc(doc(db, `users/${props.email}`))).data()
+              .region;
+            console.log("Is admin - lookup region for user", region);
+          }
 
           let i = 0;
           for (let code of val[0]) {
@@ -129,7 +137,7 @@ export default defineComponent({
               learn: "",
               // questions: "",
               // bullets: "",
-              region: user.value.profile.region,
+              region: region,
             };
 
             console.log(obj);
