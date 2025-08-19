@@ -84,7 +84,7 @@ export default defineComponent({
       console.log("Changing language to:", val);
     });
 
-    locale.value = $q.lang.getLocale();
+    locale.value = $q.lang.getLocale().substring(0, 2);
 
     console.log($q.lang.getLocale());
 
