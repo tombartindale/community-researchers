@@ -110,6 +110,8 @@ export default defineComponent({
 
     const { locale } = useI18n();
 
+    console.log(locale);
+
     Promise.all([promiseCodes.value, promise1.value, promise.value]).then(
       async function (val) {
         console.log("all things loaded");
@@ -129,9 +131,9 @@ export default defineComponent({
           let i = 0;
           for (let code of val[0]) {
             // console.log(code.name);
-            // console.log(locale);
+            console.log("locale", locale.value);
             const obj = {
-              title: code.name[locale.value],
+              title: code.name[locale.value.substring(0, 2)] || code.name["en"],
               code: code.code,
               description: "",
               learn: "",
