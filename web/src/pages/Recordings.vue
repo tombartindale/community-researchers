@@ -49,10 +49,13 @@ q-page(padding).text-center
               q-separator(inset)
             .col-auto
               .text-h6 {{region.id}}
+                q-btn(icon="edit" flat dense no-caps :to="`/review/${region.id}`")
             .col
               q-separator(inset)
           .row
             //- div {{region}}
+            
+              
             .col.text-body1.text-grey.q-py-md(v-html="(region.description.trim()=='')? 'Summary not written yet...':region.description")
           .row.q-col-gutter-sm.q-mb-md
             .col(v-if="!region.clusters")
