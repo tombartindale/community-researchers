@@ -4,7 +4,7 @@ q-page(padding).text-center
   div
     q-tabs
       q-route-tab(to="/admin/users") Users
-      q-route-tab(to="/admin") Analysis
+      q-route-tab(to="/admin/" ) Analysis
       q-route-tab(to="/admin/researchplans") Research Plans
       q-route-tab(to="/admin/regions") Regions
   router-view
