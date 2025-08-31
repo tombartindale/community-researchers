@@ -25,6 +25,7 @@ import fs from "fs";
 import reader from "any-text";
 import flatten from "lodash/flatten.js";
 import find from "lodash/find.js";
+import map from "lodash/map.js";
 import { convertMarkdownToDocx } from "./md-to-docx-main/dist/index.js";
 import * as XLSX from "xlsx/xlsx.mjs";
 // import * as fs from "fs";
@@ -521,254 +522,325 @@ export const getClustersForRegion = onCall(
   }
 );
 
-export const startExport = onCall({ region: region }, async (request) => {
-  if (request.auth) {
-    console.log("Starting Export");
-    const [clusters, records, regions, users, codebook_db] = await Promise.all([
-      getFirestore().collectionGroup("clusters").get(),
-      getFirestore().collectionGroup("recordings").get(),
-      getFirestore().collection("regions").get(),
-      getFirestore().collection("users").get(),
-      getFirestore().collection("codebook").get(),
-    ]);
+export const startExport = onCall(
+  { region: region, memory: "2GiB", timeoutSeconds: 300 },
+  async (request) => {
+    if (request.auth) {
+      console.log("Starting Export");
+      const [clusters, records, regions, users, codebook_db] =
+        await Promise.all([
+          getFirestore().collectionGroup("clusters").get(),
+          getFirestore().collectionGroup("recordings").get(),
+          getFirestore().collection("regions").get(),
+          getFirestore().collection("users").get(),
+          getFirestore().collection("codebook").get(),
+        ]);
 
-    let output = [];
+      let output = [];
 
-    //for each region:
-    for (let region of regions.docs) {
-      let reg_out = {
-        name: region.id,
-        summary: region.data().description,
-        clusters: [],
-        recordings: [],
-        users: [],
-      };
+      //for each region:
+      for (let region of regions.docs) {
+        let reg_out = {
+          name: region.id,
+          summary: region.data().description,
+          clusters: [],
+          recordings: [],
+          users: [],
+        };
 
-      //users for this region
-      for (const user of users.docs) {
-        if (user.data().region == region.id) reg_out.users.push(user.id);
-      }
+        //users for this region
+        for (const user of users.docs) {
+          if (user.data().region == region.id) reg_out.users.push(user.id);
+        }
 
-      console.log(reg_out.users);
+        // console.log(reg_out.users);
 
-      //recordings from users from this region
-      for (const recording of records.docs) {
-        // console.log(recording.ref.parent.parent.id);
-        if (reg_out.users.includes(recording.ref.parent.parent.id))
-          reg_out.recordings.push({
-            ...recording.data(),
-            researcher: recording.ref.parent.parent.id,
-          });
-      }
+        //recordings from users from this region
+        for (const recording of records.docs) {
+          // console.log(recording.ref.parent.parent.id);
+          if (reg_out.users.includes(recording.ref.parent.parent.id))
+            reg_out.recordings.push({
+              ...recording.data(),
+              researcher: recording.ref.parent.parent.id,
+            });
+        }
 
-      //for each cluster
-      for (let cluster of clusters.docs) {
-        let outt = cluster.data();
+        //for each cluster
+        for (let cluster of clusters.docs) {
+          let outt = cluster.data();
 
-        if (outt.region === region.id) {
-          outt.id = cluster.id;
-          outt.code = cluster.data().code;
-          outt.quotes = [];
+          if (outt.region === region.id) {
+            outt.id = cluster.id;
+            outt.code = cluster.data().code;
+            outt.quotes = [];
 
-          //for each recording:
-          for (const recording of records.docs) {
-            if (
-              recording.data().transcription &&
-              recording.data().transcription.results &&
-              recording.ref.parent.parent.id == cluster.ref.parent.parent.id
-            )
-              for (const quote of recording.data().transcription.results) {
-                // console.log(quote);
+            //for each recording:
+            for (const recording of records.docs) {
+              if (
+                recording.data().transcription &&
+                recording.data().transcription.results &&
+                recording.ref.parent.parent.id == cluster.ref.parent.parent.id
+              ) {
+                let lastIndex = 0;
+                let lastCode = null;
+                let newList = [];
+                // let tmp = [];
+                for (const quote of recording.data().transcription.results) {
+                  // console.log(quote);
 
-                if (
-                  quote.codes?.includes(cluster.data().code) &&
-                  quote.highlighted
-                )
-                  outt.quotes.push(quote);
+                  if (
+                    quote.codes?.includes(cluster.data().code) &&
+                    quote.highlighted
+                  ) {
+                    if (
+                      (quote.index - lastIndex == 1 &&
+                        quote.codes[0] == lastCode) ||
+                      quote.index == 0
+                    ) {
+                      // console.log("pushing to list", quote.index);
+                      lastIndex = quote.index;
+                      newList.push(quote);
+                    }
+                    //if this line is not next to the last line and/or does not have the same code:
+                    else {
+                      if (newList.length) {
+                        // console.log("Save List");
+                        //add previous list to output
+                        const qq = {
+                          codes: newList[0].codes,
+                          alternatives: [
+                            {
+                              transcript: map(
+                                newList,
+                                "alternatives[0].transcript"
+                              ).join(" "),
+                            },
+                          ],
+                        };
+                        // console.log(qq);
+                        outt.quotes.push(qq);
+                      }
+                      //restart list
+                      // console.log("Restart List");
+                      newList = [];
+                      lastIndex = quote.index;
+                      newList.push(quote);
+                    }
+
+                    lastCode = quote.codes[0];
+                  } else {
+                    if (newList.length) {
+                      // console.log("Save List");
+                      //add previous list to output
+                      const qq = {
+                        codes: newList[0].codes,
+                        alternatives: [
+                          {
+                            transcript: map(
+                              newList,
+                              "alternatives[0].transcript"
+                            ).join(),
+                          },
+                        ],
+                      };
+                      // console.log(qq);
+                      outt.quotes.push(qq);
+                      newList = [];
+                    }
+                  }
+                }
               }
 
-            // console.log(foruser);
-          }
-
-          // output.push(outt);
-          reg_out.clusters.push(outt);
-        }
-      }
-
-      output.push(reg_out);
-    }
-
-    // console.log(output);
-
-    //MARKDOWN:s
-    let markdown = `# Community Research Analysis\n${new Date().toUTCString()}\n\\pagebreak\n[TOC]\n\\pagebreak\n`;
-
-    //create markdown:
-
-    for (const region of output) {
-      markdown += `# ${region.name}\n`;
-
-      markdown += `Contributions by `;
-      // for (const user of region.users) {
-      markdown += `${region.users.join(", ")}`;
-      // }
-
-      markdown += `\n`;
-      //summary
-      markdown += `## Summary\n ${region.summary}\n`;
-
-      //clusters:
-      markdown += `## Clusters\n`;
-      for (const cluster of region.clusters) {
-        markdown += `### ${cluster.title} (${cluster.parent})\n`;
-        //meta:
-        markdown += `${cluster.description}\n\n`;
-        markdown += `${cluster.learn}\n\n`;
-        // markdown += `${cluster.questions}\n`;
-        //quotes:
-        for (const quote of cluster.quotes) {
-          markdown += `> ${
-            quote.alternatives[0].transcript
-          } [${quote.codes.join(",")}]\n\n`;
-        }
-      }
-
-      //recordings:
-      markdown += `## Interviews\n`;
-      for (const recording of region.recordings) {
-        markdown += `### ${recording.who} on ${recording.when}\n`;
-        markdown += ``;
-
-        if (recording.transcription && recording.transcription.results)
-          for (const line of recording.transcription.results) {
-            if (line.codes)
-              markdown += `**${
-                line.alternatives[0].transcript
-              }.** *[${line.codes.join(",")}]* `;
-            else markdown += `${line.alternatives[0].transcript}. `;
-          }
-        markdown += `\n`;
-      }
-
-      markdown += `\n\\pagebreak\n`;
-    }
-
-    const docx = await convertMarkdownToDocx(markdown);
-
-    //XLSX:
-    const rows = [];
-    const clusters_data = [];
-    const codebook = [];
-
-    for (const code of codebook_db.docs) {
-      codebook.push({
-        code: code.data().code,
-        description: code.data().description.en,
-        name: code.data().name.en,
-      });
-    }
-
-    for (const region of output) {
-      // console.log(region);
-
-      //for each recording:
-      //if its coded, push it
-      for (const recording of region.recordings) {
-        //for each transcription line:
-        // console.log(recording);
-        if (recording.transcription && recording.transcription.results)
-          for (const line of recording.transcription.results) {
-            // console.log(line);
-
-            //get cluster (assumes limit of 1 code per line):
-
-            if (line.codes) {
-              let row = {};
-              // console.log(line.codes[0]);
-
-              // console.log(region.clusters);
-
-              const clus = find(region.clusters, { code: line.codes[0] })?.id;
-              console.log(clus);
-              row.region = region.name;
-              row.content = line.alternatives[0].transcript;
-              row.codes = line.codes.join(",");
-              row.highlighted = line?.highlighted || false;
-              row.researcher = recording.researcher;
-              row.cluster = `${recording.researcher}_${clus}`;
-              row.who = recording.who;
-              row.when = recording.when;
-              row.language = recording.language;
-
-              rows.push(row);
+              // console.log(foruser);
             }
+
+            // console.log(outt.quotes);
+
+            // output.push(outt);
+            reg_out.clusters.push(outt);
           }
+          //reconcile multi-line quotes into single lines:
+        }
+
+        // quote.alternatives[0].transcript
+
+        output.push(reg_out);
       }
 
-      for (const cluster of region.clusters) {
-        clusters_data.push({
-          region: cluster.region,
-          researcher: cluster.parent,
-          title: cluster.title,
-          // description: cluster.description,
-          lessons: cluster.learn,
-          code: cluster.code,
-          id: `${cluster.parent}_${cluster.id}`,
+      // console.log(output);
+
+      //MARKDOWN:s
+      let markdown = `# Community Research Analysis\n${new Date().toUTCString()}\n\\pagebreak\n[TOC]\n\\pagebreak\n`;
+
+      //create markdown:
+
+      for (const region of output) {
+        markdown += `# ${region.name}\n`;
+
+        markdown += `Contributions by `;
+        // for (const user of region.users) {
+        markdown += `${region.users.join(", ")}`;
+        // }
+
+        markdown += `\n`;
+        //summary
+        markdown += `## Summary\n ${region.summary}\n`;
+
+        //clusters:
+        markdown += `## Clusters\n`;
+        for (const cluster of region.clusters) {
+          markdown += `### ${cluster.title} (${cluster.parent})\n`;
+          //meta:
+          markdown += `${cluster.description}\n\n`;
+          markdown += `${cluster.learn}\n\n`;
+          // markdown += `${cluster.questions}\n`;
+          //quotes:
+          for (const quote of cluster.quotes) {
+            markdown += `> ${
+              quote.alternatives[0].transcript
+            } [${quote.codes.join(",")}]\n\n`;
+          }
+        }
+
+        //recordings:
+        markdown += `## Interviews\n`;
+        for (const recording of region.recordings) {
+          markdown += `### ${recording.who} on ${recording.when}\n`;
+          markdown += ``;
+
+          if (recording.transcription && recording.transcription.results)
+            for (const line of recording.transcription.results) {
+              if (line.codes)
+                markdown += `**${
+                  line.alternatives[0].transcript
+                }.** *[${line.codes.join(",")}]* `;
+              else markdown += `${line.alternatives[0].transcript}. `;
+            }
+          markdown += `\n`;
+        }
+
+        markdown += `\n\\pagebreak\n`;
+      }
+
+      const docx = await convertMarkdownToDocx(markdown);
+
+      //XLSX:
+      const rows = [];
+      const clusters_data = [];
+      const codebook = [];
+
+      for (const code of codebook_db.docs) {
+        codebook.push({
+          code: code.data().code,
+          description: code.data().description.en,
+          name: code.data().name.en,
         });
       }
 
-      // markdown += `# ${region.name}\n`;
+      for (const region of output) {
+        // console.log(region);
 
-      // markdown += `Contributions by `;
-      // // for (const user of region.users) {
-      // markdown += `${region.users.join(", ")}`;
-      // // }
+        //for each recording:
+        //if its coded, push it
+        for (const recording of region.recordings) {
+          //for each transcription line:
+          // console.log(recording);
+          if (recording.transcription && recording.transcription.results)
+            for (const line of recording.transcription.results) {
+              // console.log(line);
 
-      // markdown += `\n`;
-      // //summary
-      // markdown += `## Summary\n ${region.summary}\n`;
+              //get cluster (assumes limit of 1 code per line):
 
-      //clusters:
-      // markdown += `## Clusters\n`;
-      // for (const cluster of region.clusters) {
-      //   markdown += `### ${cluster.title}\n`;
-      //   //meta:
-      //   markdown += `${cluster.description}\n\n`;
-      //   markdown += `${cluster.learn}\n\n`;
-      //   // markdown += `${cluster.questions}\n`;
-      //   //quotes:
-      //   for (const quote of cluster.quotes) {
-      //     markdown += `> ${
-      //       quote.alternatives[0].transcript
-      //     } [${quote.codes.join(",")}]\n\n`;
-      //   }
-      // }
-    } // for each region
+              if (line.codes) {
+                let row = {};
+                // console.log(line.codes[0]);
 
-    // console.log(rows);
+                // console.log(region.clusters);
 
-    // XLSX.set_fs(fs);
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Codes");
-    const worksheet1 = XLSX.utils.json_to_sheet(clusters_data);
-    XLSX.utils.book_append_sheet(workbook, worksheet1, "Clusters");
-    const worksheet2 = XLSX.utils.json_to_sheet(codebook);
-    XLSX.utils.book_append_sheet(workbook, worksheet2, "Codebook");
+                const clus = find(region.clusters, { code: line.codes[0] })?.id;
+                console.log(clus);
+                row.region = region.name;
+                row.content = line.alternatives[0].transcript;
+                row.codes = line.codes.join(",");
+                row.highlighted = line?.highlighted || false;
+                row.researcher = recording.researcher;
+                row.cluster = `${recording.researcher}_${clus}`;
+                row.who = recording.who;
+                row.when = recording.when;
+                row.language = recording.language;
 
-    const excel = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+                rows.push(row);
+              }
+            }
+        }
 
-    await Promise.all([
-      getStorage().bucket().file(`exports/latestExport.xlsx`).save(excel),
-      getStorage()
-        .bucket()
-        .file(`exports/latestExport.docx`)
-        .save(docx.stream()),
-      getStorage().bucket().file(`exports/latestExport.md`).save(markdown),
-      getStorage()
-        .bucket()
-        .file(`exports/latestExport.json`)
-        .save(JSON.stringify(output)),
-    ]);
+        for (const cluster of region.clusters) {
+          clusters_data.push({
+            region: cluster.region,
+            researcher: cluster.parent,
+            title: cluster.title,
+            // description: cluster.description,
+            lessons: cluster.learn,
+            code: cluster.code,
+            id: `${cluster.parent}_${cluster.id}`,
+          });
+        }
+
+        // markdown += `# ${region.name}\n`;
+
+        // markdown += `Contributions by `;
+        // // for (const user of region.users) {
+        // markdown += `${region.users.join(", ")}`;
+        // // }
+
+        // markdown += `\n`;
+        // //summary
+        // markdown += `## Summary\n ${region.summary}\n`;
+
+        //clusters:
+        // markdown += `## Clusters\n`;
+        // for (const cluster of region.clusters) {
+        //   markdown += `### ${cluster.title}\n`;
+        //   //meta:
+        //   markdown += `${cluster.description}\n\n`;
+        //   markdown += `${cluster.learn}\n\n`;
+        //   // markdown += `${cluster.questions}\n`;
+        //   //quotes:
+        //   for (const quote of cluster.quotes) {
+        //     markdown += `> ${
+        //       quote.alternatives[0].transcript
+        //     } [${quote.codes.join(",")}]\n\n`;
+        //   }
+        // }
+      } // for each region
+
+      // console.log(rows);
+
+      // XLSX.set_fs(fs);
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Codes");
+      const worksheet1 = XLSX.utils.json_to_sheet(clusters_data);
+      XLSX.utils.book_append_sheet(workbook, worksheet1, "Clusters");
+      const worksheet2 = XLSX.utils.json_to_sheet(codebook);
+      XLSX.utils.book_append_sheet(workbook, worksheet2, "Codebook");
+
+      const excel = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+
+      await Promise.all([
+        getStorage().bucket().file(`exports/latestExport.xlsx`).save(excel),
+        getStorage()
+          .bucket()
+          .file(`exports/latestExport.docx`)
+          .save(docx.stream()),
+        getStorage().bucket().file(`exports/latestExport.md`).save(markdown),
+        getStorage()
+          .bucket()
+          .file(`exports/latestExport.json`)
+          .save(JSON.stringify(output)),
+      ]);
+
+      console.log("Export Complete");
+    }
   }
-});
+);
