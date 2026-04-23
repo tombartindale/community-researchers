@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Researcher Analysis</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+      body {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 300;
+        font-style: normal;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="title-page">
+      <h1>Community Researcher Analysis</h1>
+    </div>
+    <div class="page-break"></div>
+
+    <div class="code-book">
+      <h1>Analysis Codebook</h1>
+      {{#each data.codebook}}
+      <div class="code-line">
+        <div class="code-color code {{this.code}}"></div>
+        <div class="code-name">{{this.name}}</div>
+      </div>
+      {{/each}}
+    </div>
+    <div class="page-break"></div>
+
+    <div class="source-data">
+      <h1>Community Data and Analysis</h1>
+    </div>
+    <div class="page-break"></div>
+    {{#each data.countries}}
+    <div class="country">
+      <h1>{{this.name}}</h1>
+      <div class="subtitle">Contributions by {{join this.users}}</div>
+
+      <!-- <h2>Country Summary</h2> -->
+      <div class="summary">{{{this.summary}}}</div>
+      <div class="page-break"></div>
+      <h2>Findings</h2>
+      {{#each this.clusters}}
+      <div class="cluster">
+        <h3>
+          {{this.title}}
+          <div class="contributor">({{this.parent}})</div>
+        </h3>
+        <div class="description">{{this.description}}</div>
+        <div class="learn">{{this.description}}</div>
+        <div class="quotes">
+          {{#each this.quotes}}
+          <div class="quote">
+            {{this.alternatives.[0].transcript}}
+            <div class="label">{{join this.codes}}</div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      {{/each}} {{#each this.recordings}}
+      <div class="recording">
+        <h3>{{this.who}} <span class="when">{{this.when}}</span></h3>
+
+        <div class="transcript">
+          {{#each this.merged}} {{#if this.code}}
+          <span class="quote code {{this.code}}"
+            >{{this.quote}}
+            <span class="code">{{this.code}}</span>
+          </span>
+          {{else}}
+          <span class="quote">{{this.quote}}</span>
+          {{/if}} {{/each}}
+        </div>
+      </div>
+      {{/each}}
+    </div>
+
+    <div class="page-break"></div>
+    {{/each}}
+  </body>
+</html>

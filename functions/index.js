@@ -28,6 +28,14 @@ import find from "lodash/find.js";
 import map from "lodash/map.js";
 import { convertMarkdownToDocx } from "./md-to-docx-main/dist/index.js";
 import * as XLSX from "xlsx/xlsx.mjs";
+import Handlebars from "handlebars";
+Handlebars.registerHelper("join", function (aArray) {
+  return aArray.join(", ");
+});
+const template = Handlebars.compile(
+  fs.readFileSync("./template.html").toString()
+);
+
 // import * as fs from "fs";
 // Set internal fs instance
 
@@ -558,11 +566,74 @@ export const startExport = onCall(
         //recordings from users from this region
         for (const recording of records.docs) {
           // console.log(recording.ref.parent.parent.id);
-          if (reg_out.users.includes(recording.ref.parent.parent.id))
-            reg_out.recordings.push({
-              ...recording.data(),
-              researcher: recording.ref.parent.parent.id,
-            });
+          if (reg_out.users.includes(recording.ref.parent.parent.id)) {
+            let merged = [];
+            if (
+              recording.data().transcription &&
+              recording.data().transcription.results
+            ) {
+              //TODO: merge
+              let lastIndex = 0;
+              let lastCode = null;
+              let newList = [];
+              for (const quote of recording.data().transcription.results) {
+                if (quote.codes?.length) {
+                  if (
+                    (quote.index - lastIndex == 1 &&
+                      quote.codes[0] == lastCode) ||
+                    quote.index == 0
+                  ) {
+                    // console.log("pushing to list", quote.index);
+                    lastIndex = quote.index;
+                    newList.push(quote);
+                  }
+                  //if this line is not next to the last line and/or does not have the same code:
+                  else {
+                    if (newList.length) {
+                      merged.push({
+                        quote: `${map(
+                          newList,
+                          "alternatives[0].transcript"
+                        ).join(" ")}`,
+                        code: newList[0].codes[0],
+                      });
+                    }
+                    //restart list
+                    // console.log("Restart List");
+                    newList = [];
+                    lastIndex = quote.index;
+                    newList.push(quote);
+                  }
+
+                  lastCode = quote.codes[0];
+                } else {
+                  //if there were leftover codes:
+                  if (newList.length) {
+                    merged.push({
+                      quote: `${map(newList, "alternatives[0].transcript").join(
+                        " "
+                      )}`,
+                      code: newList[0].codes[0],
+                    });
+                    newList = [];
+                  }
+
+                  //no codes:
+                  // markdown += `${quote.alternatives[0].transcript}. `;
+                  merged.push({
+                    quote: `${quote.alternatives[0].transcript}`,
+                    // code: newList[0].codes.join(","),
+                  });
+                }
+              } //each quote
+              // reg_out.merged = merged;
+              reg_out.recordings.push({
+                ...recording.data(),
+                researcher: recording.ref.parent.parent.id,
+                merged: merged,
+              });
+            }
+          }
         }
 
         //for each cluster
@@ -639,7 +710,7 @@ export const startExport = onCall(
                             transcript: map(
                               newList,
                               "alternatives[0].transcript"
-                            ).join(),
+                            ).join(" "),
                           },
                         ],
                       };
@@ -675,6 +746,7 @@ export const startExport = onCall(
       //create markdown:
 
       for (const region of output) {
+        // markdown += `<div class="region">\n`;
         markdown += `# ${region.name}\n`;
 
         markdown += `Contributions by `;
@@ -708,27 +780,62 @@ export const startExport = onCall(
           markdown += `### ${recording.who} on ${recording.when}\n`;
           markdown += ``;
 
-          if (recording.transcription && recording.transcription.results)
-            for (const line of recording.transcription.results) {
-              if (line.codes)
-                markdown += `**${
-                  line.alternatives[0].transcript
-                }.** *[${line.codes.join(",")}]* `;
-              else markdown += `${line.alternatives[0].transcript}. `;
-            }
-          markdown += `\n`;
-        }
+          if (recording.transcription && recording.transcription.results) {
+            let lastIndex = 0;
+            let lastCode = null;
+            let newList = [];
 
+            for (const quote of recording.transcription.results) {
+              if (quote.codes?.length) {
+                if (
+                  (quote.index - lastIndex == 1 &&
+                    quote.codes[0] == lastCode) ||
+                  quote.index == 0
+                ) {
+                  // console.log("pushing to list", quote.index);
+                  lastIndex = quote.index;
+                  newList.push(quote);
+                }
+                //if this line is not next to the last line and/or does not have the same code:
+                else {
+                  if (newList.length) {
+                    markdown += `**${map(
+                      newList,
+                      "alternatives[0].transcript"
+                    ).join(" ")}** *[${newList[0].codes.join(",")}]* `;
+                  }
+                  //restart list
+                  // console.log("Restart List");
+                  newList = [];
+                  lastIndex = quote.index;
+                  newList.push(quote);
+                }
+
+                lastCode = quote.codes[0];
+              } else {
+                //if there were leftover codes:
+                if (newList.length) {
+                  markdown += `**${map(
+                    newList,
+                    "alternatives[0].transcript"
+                  ).join(" ")}** *[${newList[0].codes.join(",")}]* `;
+                  newList = [];
+                }
+
+                //no codes:
+                markdown += `${quote.alternatives[0].transcript}. `;
+              }
+            } //each quote
+
+            markdown += `\n`;
+          } //has transcription
+        } // each recording
+
+        // markdown += `</div>\n`;
         markdown += `\n\\pagebreak\n`;
-      }
+      } //each region
 
-      const docx = await convertMarkdownToDocx(markdown);
-
-      //XLSX:
-      const rows = [];
-      const clusters_data = [];
       const codebook = [];
-
       for (const code of codebook_db.docs) {
         codebook.push({
           code: code.data().code,
@@ -736,6 +843,19 @@ export const startExport = onCall(
           name: code.data().name.en,
         });
       }
+
+      const docx = await convertMarkdownToDocx(markdown);
+
+      //remove the pagebreaks from the markdown:
+      markdown = markdown.replaceAll(/\n\\pagebreak\n/g, "");
+
+      const html = template({
+        data: { countries: output, codebook: codebook },
+      });
+
+      //XLSX:
+      const rows = [];
+      const clusters_data = [];
 
       for (const region of output) {
         // console.log(region);
@@ -785,33 +905,6 @@ export const startExport = onCall(
             id: `${cluster.parent}_${cluster.id}`,
           });
         }
-
-        // markdown += `# ${region.name}\n`;
-
-        // markdown += `Contributions by `;
-        // // for (const user of region.users) {
-        // markdown += `${region.users.join(", ")}`;
-        // // }
-
-        // markdown += `\n`;
-        // //summary
-        // markdown += `## Summary\n ${region.summary}\n`;
-
-        //clusters:
-        // markdown += `## Clusters\n`;
-        // for (const cluster of region.clusters) {
-        //   markdown += `### ${cluster.title}\n`;
-        //   //meta:
-        //   markdown += `${cluster.description}\n\n`;
-        //   markdown += `${cluster.learn}\n\n`;
-        //   // markdown += `${cluster.questions}\n`;
-        //   //quotes:
-        //   for (const quote of cluster.quotes) {
-        //     markdown += `> ${
-        //       quote.alternatives[0].transcript
-        //     } [${quote.codes.join(",")}]\n\n`;
-        //   }
-        // }
       } // for each region
 
       // console.log(rows);
@@ -829,6 +922,7 @@ export const startExport = onCall(
 
       await Promise.all([
         getStorage().bucket().file(`exports/latestExport.xlsx`).save(excel),
+        getStorage().bucket().file(`exports/latestExport.html`).save(html),
         getStorage()
           .bucket()
           .file(`exports/latestExport.docx`)
